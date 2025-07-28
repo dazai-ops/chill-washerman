@@ -1,20 +1,41 @@
-import { useState } from 'react'
-import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select } from '@radix-ui/themes'
+import { useEffect, useState } from 'react'
+import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, DropdownMenu } from '@radix-ui/themes'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/app/redux/store'
-import { addAdmin } from '@/app/redux/api/adminThunk'
-import { PersonIcon } from '@radix-ui/react-icons';
+import { updateAdmin } from '@/app/redux/api/adminThunk'
+import { Pencil1Icon } from '@radix-ui/react-icons';
+import ConfirmChange from '../../alert/confirmChange/ConfirmChange';
 
-function AddModal() {
+interface AdminDetailProps {
+  id: string
+  nama: string
+  no_telepon: string
+  alamat_rumah: string
+  username: string
+  role: string
+}
+
+function EditModal({data}: {data: AdminDetailProps}) {
   const dispatch = useDispatch<AppDispatch>()
   const [formData, setFormData] = useState({
     nama: '',
     no_telepon: '',
     alamat_rumah: '',
     username: '',
-    password_hash: '',
     role: '',
   })
+
+  useEffect(() => {
+    if(data) {
+      setFormData({
+        nama: data.nama,
+        no_telepon: data.no_telepon,
+        alamat_rumah: data.alamat_rumah,
+        username: data.username,
+        role: data.role
+      })
+    }
+  }, [data])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -25,40 +46,42 @@ function AddModal() {
 
   const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    dispatch(addAdmin(formData))
+    // console.log(formData)
+    dispatch(updateAdmin({ id: data.id, admin: formData }))
   }
 
+  useEffect(() => {
+    console.log(formData)
+  }, [formData])
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
-        <Button size="3"><PersonIcon/>Add new...</Button>
+        <DropdownMenu.Item color='yellow' onSelect={(e) => e.preventDefault()}>
+          <Pencil1Icon />Edit
+        </DropdownMenu.Item>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
-        <AlertDialog.Title>Tambah Admin</AlertDialog.Title>
+        <AlertDialog.Title>Edit Admin</AlertDialog.Title>
         <AlertDialog.Description >
-          Isi form dibawah ini
+          Ubah data yang diperlukan
         </AlertDialog.Description>
-        {/* <Separator size="4"/> */}
         <form onSubmit={(e) => handleSubmit(e)}>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
               <Text size="2" weight="bold">Nama</Text>
-              <TextField.Root size="3" className='mb-1' name='nama' onChange={handleInputChange}/>
+              <TextField.Root size="3" className='mb-1' name='nama' onChange={handleInputChange} defaultValue={data?.nama}/>
 
               <Text size="2" weight="bold">Nomer Telepon</Text>
-              <TextField.Root size="3" className='mb-1' name='no_telepon' type='number' onChange={handleInputChange}/>
+              <TextField.Root size="3" className='mb-1' name='no_telepon' type='number' onChange={handleInputChange} defaultValue={data?.no_telepon}/>
 
               <Text size="2" weight="bold">Alamat Rumah</Text>
-              <TextArea size="3" className='mb-1' name='alamat_rumah' onChange={handleInputChange}/>
+              <TextArea size="3" className='mb-1' name='alamat_rumah' onChange={handleInputChange} defaultValue={data?.alamat_rumah}/>
 
               <Text size="2" weight="bold">Username</Text>
-              <TextField.Root size="3" className='mb-1' name='username' onChange={handleInputChange}/>
+              <TextField.Root size="3" className='mb-1' name='username' onChange={handleInputChange} defaultValue={data?.username}/>
 
-              <Text size="2" weight="bold">Password</Text>
-              <TextField.Root size="3" className='mb-1' name='password_hash' type='password' onChange={handleInputChange}/>
-              
               <Text size="2" weight="bold">Role Admin</Text>
-              <Select.Root defaultValue="apple" size="3" name='role' onValueChange={(value) => setFormData({ ...formData, role: value })}>
+              <Select.Root size="3" name='role' onValueChange={(value) => setFormData({ ...formData, role: value })} defaultValue={data?.role}>
                 <Select.Trigger />
                   <Select.Content>
                     <Select.Group>
@@ -78,9 +101,7 @@ function AddModal() {
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
-              <Button type='submit'>
-                Submit
-              </Button>
+              <ConfirmChange onConfirm={() => dispatch(updateAdmin({ id: data.id, admin: formData }))} customButton={<Button color='blue'>Update</Button>}/>
             </AlertDialog.Action>
           </Flex>
         </form>
@@ -89,4 +110,4 @@ function AddModal() {
   )
 }
 
-export default AddModal
+export default EditModal

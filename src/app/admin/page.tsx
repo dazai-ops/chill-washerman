@@ -1,9 +1,9 @@
 "use client"
-import AdminView from './view'
+import AdminLayout from './layout'
 
 function AdminPage() {  
   return (
-    <AdminView/>
+    <AdminLayout/>
   ) 
 }
 

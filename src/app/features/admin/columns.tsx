@@ -2,8 +2,8 @@ import { Badge } from "@radix-ui/themes"
 
 export const adminColumns = [
     {
-      header: 'ID',
-      accessorKey: 'id',
+      header: 'No',
+      cell: ({row}: {row: {index: number}}) => row.index + 1
     },
     {
       header: 'Nama',

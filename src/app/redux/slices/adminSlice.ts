@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { retriveAdmin, addAdmin, deleteAdmin } from "../api/adminThunk";
+import { retriveAdmin, addAdmin, deleteAdmin, changeRole, updateAdmin } from "../api/adminThunk";
 
 type Admin = {
+  id: string;
   username: string;
   role: string
+  nama: string;
+  no_telepon: string;
+  alamat_rumah: string;
 }
 
 interface AdminState {
@@ -26,6 +30,7 @@ const adminSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // retrive admin
       .addCase(retriveAdmin.pending, (state) => {
         state.loading = true
         state.error = null
@@ -38,9 +43,12 @@ const adminSlice = createSlice({
         state.loading = false
         state.error = action.payload as string
       })
+
+      // add admin
       .addCase(addAdmin.pending, (state) => {
         state.loading = true
         state.error = null
+        state.success = null
       })
       .addCase(addAdmin.fulfilled, (state, action) => {
         state.loading = false
@@ -50,9 +58,12 @@ const adminSlice = createSlice({
         state.loading = false
         state.error = action.payload as string
       })
+
+      // delete admin
       .addCase(deleteAdmin.pending, (state) => {
         state.loading = true
         state.error = null
+        state.success = null
       })
       .addCase(deleteAdmin.fulfilled, (state, action) => {
         state.loading = false
@@ -62,8 +73,37 @@ const adminSlice = createSlice({
         state.loading = false
         state.error = action.payload as string
       })
+
+      //update admin
+      .addCase(updateAdmin.pending, (state) => {
+        state.loading = true
+        state.error = null
+        state.success = null
+      })
+      .addCase(updateAdmin.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = action.payload.message
+      })
+      .addCase(updateAdmin.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
+
+      // change role
+      .addCase(changeRole.pending, (state) => {
+        state.loading = true
+        state.error = null
+        state.success = null
+      })
+      .addCase(changeRole.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = action.payload.message
+      })
+      .addCase(changeRole.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+      })
   }
 })
 
-export const {loading, error, success} = adminSlice.actions
 export default adminSlice.reducer

@@ -6,6 +6,7 @@ import { Theme } from "@radix-ui/themes";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import RehydrateUser from './redux/features/rehydrateUser';
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
           <Theme appearance="dark">
             <RehydrateUser />
             {children}
+            <Toaster richColors position="bottom-right" />
           </Theme>
         </body>
       </html>
