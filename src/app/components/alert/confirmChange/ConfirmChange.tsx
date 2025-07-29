@@ -4,10 +4,11 @@ import { AlertDialog, Button, Flex, DropdownMenu } from '@radix-ui/themes'
 type ConfirmChangeProps = {
   onConfirm: () => void
   label?: string
+  customIcon?: React.ReactNode
   customButton?: React.ReactNode
 }
 
-function ConfirmChange({onConfirm, label = 'Update', customButton}: ConfirmChangeProps) {
+function ConfirmChange({onConfirm, label = 'Update', customButton, customIcon}: ConfirmChangeProps) {
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
@@ -16,7 +17,7 @@ function ConfirmChange({onConfirm, label = 'Update', customButton}: ConfirmChang
           : <DropdownMenu.Item 
               color="blue" onSelect={(e) => e.preventDefault()}
             >
-              <PersonIcon />{label}
+              {customIcon ? customIcon : <PersonIcon />}{label}
             </DropdownMenu.Item>
         }
       </AlertDialog.Trigger>

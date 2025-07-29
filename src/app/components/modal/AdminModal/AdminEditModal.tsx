@@ -15,7 +15,7 @@ interface AdminDetailProps {
   role: string
 }
 
-function EditModal({data}: {data: AdminDetailProps}) {
+function AdminEditModal({data}: {data: AdminDetailProps}) {
   const dispatch = useDispatch<AppDispatch>()
   const [formData, setFormData] = useState({
     nama: '',
@@ -46,13 +46,9 @@ function EditModal({data}: {data: AdminDetailProps}) {
 
   const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // console.log(formData)
     dispatch(updateAdmin({ id: data.id, admin: formData }))
   }
 
-  useEffect(() => {
-    console.log(formData)
-  }, [formData])
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
@@ -62,9 +58,11 @@ function EditModal({data}: {data: AdminDetailProps}) {
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
         <AlertDialog.Title>Edit Admin</AlertDialog.Title>
+
         <AlertDialog.Description >
           Ubah data yang diperlukan
         </AlertDialog.Description>
+
         <form onSubmit={(e) => handleSubmit(e)}>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
@@ -94,6 +92,7 @@ function EditModal({data}: {data: AdminDetailProps}) {
               </Select.Root>
             </Grid>
           </Flex>
+
           <Flex gap="3" mt="4" justify="end">
             <AlertDialog.Cancel>
               <Button color='red'>
@@ -101,13 +100,16 @@ function EditModal({data}: {data: AdminDetailProps}) {
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
-              <ConfirmChange onConfirm={() => dispatch(updateAdmin({ id: data.id, admin: formData }))} customButton={<Button color='blue'>Update</Button>}/>
+              <ConfirmChange 
+                onConfirm={() => dispatch(updateAdmin({ id: data.id, admin: formData }))} 
+                customButton={<Button color='blue'>Update</Button>}/>
             </AlertDialog.Action>
           </Flex>
         </form>
+
       </AlertDialog.Content>
     </AlertDialog.Root>
   )
 }
 
-export default EditModal
+export default AdminEditModal

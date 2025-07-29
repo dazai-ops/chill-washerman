@@ -21,7 +21,8 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/',
-    '/admin/:path*',
     '/login',
+    '/admin/:path*',
+    '/mesin-cuci/:path*',
   ]
 }
