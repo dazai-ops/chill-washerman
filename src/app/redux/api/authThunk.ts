@@ -1,6 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { supabase } from "@/app/utils/supabaseClient";
-import bcrypt from "bcryptjs";
 import { toast } from "sonner";
 
 interface LoginPayload {
@@ -11,23 +9,17 @@ interface LoginPayload {
 export const loginAdmin = createAsyncThunk(
   "auth/login",
   async ({username, password}: LoginPayload, {rejectWithValue}) => {
-    const {data,error} = await supabase
-      .from('admin')
-      .select('*')
-      .eq('username', username)
-      .single()
+    const res = await fetch('redux/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({username, password})
+    })
 
-      
-    if (error || !data){
-      toast.error('Invalid credentials', {
-        position: "top-center"
-      });
-      return rejectWithValue('Invalid credentials')
-    }
+    const result = await res.json()
 
-    const passwordMatch = await bcrypt.compare(password, data.password_hash)
-    
-    if (error || !passwordMatch){ 
+    if(!res.ok || !result.success){
       toast.error('Invalid credentials', {
         position: "top-center"
       });
@@ -38,6 +30,7 @@ export const loginAdmin = createAsyncThunk(
       position: "top-center",
       description: "Redirecting..."
     })
-    return data
+
+    return result
   }
 )
