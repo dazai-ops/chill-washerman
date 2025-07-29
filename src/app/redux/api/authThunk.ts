@@ -26,6 +26,8 @@ export const loginAdmin = createAsyncThunk(
       return rejectWithValue('Invalid credentials')
     }
 
+    localStorage.setItem('auth', JSON.stringify(result.user))
+
     toast.success('Login successful', {
       position: "top-center",
       description: "Redirecting..."

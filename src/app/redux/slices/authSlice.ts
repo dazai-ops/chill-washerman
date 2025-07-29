@@ -23,7 +23,7 @@ const authSlice = createSlice({
   initialState,
   reducers:{
     rehydrate: (state) => {
-      const userStr = localStorage.getItem('user')
+      const userStr = localStorage.getItem('auth')
       state.user = userStr ? JSON.parse(userStr) : null
     },
     logout: (state) => {

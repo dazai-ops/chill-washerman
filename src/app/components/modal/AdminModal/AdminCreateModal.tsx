@@ -5,7 +5,7 @@ import { AppDispatch } from '@/app/redux/store'
 import { addAdmin } from '@/app/redux/api/adminThunk'
 import { PersonIcon } from '@radix-ui/react-icons';
 
-function AddModal() {
+function AdminAddModal() {
   const dispatch = useDispatch<AppDispatch>()
   const [formData, setFormData] = useState({
     nama: '',
@@ -35,10 +35,11 @@ function AddModal() {
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
         <AlertDialog.Title>Tambah Admin</AlertDialog.Title>
+
         <AlertDialog.Description >
           Isi form dibawah ini
         </AlertDialog.Description>
-        {/* <Separator size="4"/> */}
+
         <form onSubmit={(e) => handleSubmit(e)}>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
@@ -71,6 +72,7 @@ function AddModal() {
               </Select.Root>
             </Grid>
           </Flex>
+
           <Flex gap="3" mt="4" justify="end">
             <AlertDialog.Cancel>
               <Button color='red'>
@@ -84,9 +86,10 @@ function AddModal() {
             </AlertDialog.Action>
           </Flex>
         </form>
+        
       </AlertDialog.Content>
     </AlertDialog.Root>
   )
 }
 
-export default AddModal
+export default AdminAddModal

@@ -22,7 +22,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 })
   }
 
-  const response = NextResponse.json({ success: true})
+  const user = {
+    id: data.id,
+    nama: data.nama,
+    username: data.username,
+    role: data.role
+  }
+  const response = NextResponse.json({ 
+    user,
+    success: true
+  })
+
   response.cookies.set('auth', 'true', {
     httpOnly: true,
     path: '/',

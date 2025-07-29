@@ -1,12 +1,24 @@
 import React from 'react'
-import { Button, Flex, Dialog, DataList, Code, IconButton, Badge, Link, DropdownMenu } from '@radix-ui/themes'
-import { CopyIcon, EyeOpenIcon } from '@radix-ui/react-icons'
+import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
+import { EyeOpenIcon } from '@radix-ui/react-icons'
 import { formatDateWIB } from '@/app/utils/dateFormatter'
 
-function AdminDetail({data}) {
+interface AdminDetailProps {
+  id: number;
+  nama: string;
+  role: string;
+  no_telepon: string;
+  email: string;
+  username: string;
+  alamat_rumah: string;
+  last_login: string;
+  created_at: string;
+  jumlah_input: number
+}
+function AdminDetailDialog({data}: {data: AdminDetailProps}) {
   return (
     <Dialog.Root>
-      <Dialog.Trigger asChild>
+      <Dialog.Trigger>
         <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
           <EyeOpenIcon />Detail
         </DropdownMenu.Item>
@@ -15,9 +27,10 @@ function AdminDetail({data}) {
       <Dialog.Content maxWidth="450px">
         <Dialog.Title>{data.nama}</Dialog.Title>
         <DropdownMenu.Separator />
-        {/* <Dialog.Description size="2" mb="4"xwxwxw>
+        
+        <Dialog.Description size="2" mb="4">
           Detail
-        </Dialog.Description> */}
+        </Dialog.Description>
 
         <DataList.Root>
           <DataList.Item align="center">
@@ -57,9 +70,10 @@ function AdminDetail({data}) {
             </DataList.Value>
           </DataList.Item>
         </DataList.Root>
+
       </Dialog.Content>
     </Dialog.Root>
   )
 }
 
-export default AdminDetail
+export default AdminDetailDialog
