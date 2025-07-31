@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/redux/store.js", "src/app/redux/slices/adminSlice.js", "src/app/features/admin/columns.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/redux/store.js", "src/redux/slices/adminSlice.js", "src/features/admin/columns.jsx"],
   "exclude": ["node_modules"]
 }
