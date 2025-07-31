@@ -1,14 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { retriveAdmin, addAdmin, deleteAdmin, changeRole, updateAdmin } from "@/lib/thunk/admin/adminThunk";
-
-type Admin = {
-  id: string;
-  username: string;
-  role: string
-  nama: string;
-  no_telepon: string;
-  alamat_rumah: string;
-}
+import { Admin } from "@/models/admin.model";
 
 interface AdminState {
   adminCollection: Admin[]

@@ -1,4 +1,5 @@
 export interface Admin {
+  [key:string]: unknown
   id: string | undefined
   username?: string
   role?: string

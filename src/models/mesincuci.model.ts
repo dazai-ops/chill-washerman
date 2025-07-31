@@ -1,4 +1,5 @@
 export interface MesinCuci {
+  [key: string]: unknown;
   id: string;
   nama: string;
   merk: string;

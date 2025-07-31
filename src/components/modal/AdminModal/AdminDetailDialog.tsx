@@ -2,7 +2,7 @@ import React from 'react'
 import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
 import { EyeOpenIcon } from '@radix-ui/react-icons'
 import { formatDateWIB } from '@/utils/dateFormatter'
-import { Admin } from '@/lib/thunk/admin/adminThunk';
+import { Admin } from '@/models/admin.model';
 
 function AdminDetailDialog({data}: {data: Admin}) {
   return (

@@ -10,7 +10,8 @@ import {
 } from '@tanstack/react-table'
 import { useState } from 'react'
 
-import { Button, Table, TextField } from '@radix-ui/themes'
+import { Button, IconButton, Table, TextField, Text } from '@radix-ui/themes'
+import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[]
@@ -94,25 +95,27 @@ export function DataTable<TData, TValue>({ columns, data, renderAction, renderTo
         </Table.Body>
       </Table.Root>
 
-      <div className="flex items-center justify-between mt-2">
-        <Button
-          variant="surface"
+      <div className="flex items-center justify-center mt-2 gap-3">
+        <IconButton
+          variant="soft"
+          color='gray'
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Prev
-        </Button>
-        <div className="text-sm">
+          <ChevronLeftIcon />
+        </IconButton>
+        <Text className="text-sm">
           Page {table.getState().pagination.pageIndex + 1} of{' '}
           {table.getPageCount()}
-        </div>
-        <Button
-          variant="surface"
+        </Text>
+        <IconButton
+          variant="soft"
+          color='gray'
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          Next
-        </Button>
+          <ChevronRightIcon/>
+        </IconButton>
       </div>
     </div>
   )

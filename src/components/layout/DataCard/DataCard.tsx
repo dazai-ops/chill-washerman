@@ -1,0 +1,97 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  Flex,
+  Text,
+  TextField,
+  IconButton,
+} from '@radix-ui/themes'
+import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons'
+
+type DataCardProps<TData> = {
+  data: TData[]
+  renderCard: (item: TData) => React.ReactNode
+  renderToolbar?: React.ReactNode
+  itemsPerPage?: number
+}
+
+export function DataCard<TData extends Record<string, unknown>>({
+  data,
+  renderCard,
+  renderToolbar,
+  itemsPerPage = 12,
+}: DataCardProps<TData>) {
+  const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const filteredData = data.filter((item) => {
+    const values = Object.values(item).join(' ').toLowerCase()
+    return values.includes(search.toLowerCase())
+  })
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage)
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
+  return (
+    <div className="w-full">
+      <div className="flex gap-2 mb-4">
+        <TextField.Root
+          size="3"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setCurrentPage(1) // reset ke halaman pertama saat mencari
+          }}
+          className="w-full"
+        />
+        {renderToolbar}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-6">
+        {currentData.map((item, index) => (
+          <div key={index}>{renderCard(item)}</div>
+        ))}
+        {currentData.length === 0 && (
+          <Text size="2" color="gray">
+            No results found.
+          </Text>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <Flex justify="center" align="center" gap="3">
+          <IconButton
+            disabled={currentPage === 1}
+            onClick={() => goToPage(currentPage - 1)}
+            color="gray"
+            variant="soft"
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+
+          <Text className='text-sm'>
+            Page {currentPage} of {totalPages}
+          </Text>
+
+          <IconButton
+            disabled={currentPage === totalPages}
+            onClick={() => goToPage(currentPage + 1)}
+            color="gray"
+            variant="soft"
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </Flex>
+      )}
+    </div>
+  )
+}

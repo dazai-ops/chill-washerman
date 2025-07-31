@@ -25,6 +25,7 @@ export const loginAdmin = createAsyncThunk(
     localStorage.setItem('auth', JSON.stringify(result.user))
 
     toast.success('Login successful', {
+      duration: 1500,
       position: "top-center",
       description: "Redirecting..."
     })

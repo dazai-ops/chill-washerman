@@ -27,5 +27,6 @@ export const config = {
     '/login',
     '/admin/:path*',
     '/mesin-cuci/:path*',
+    '/jenis-pakaian/:path*',
   ]
 }

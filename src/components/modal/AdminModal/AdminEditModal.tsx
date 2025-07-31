@@ -5,17 +5,9 @@ import { AppDispatch } from '@/redux/store'
 import { updateAdmin } from '@/lib/thunk/admin/adminThunk'
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
+import { Admin } from '@/models/admin.model'
 
-interface AdminDetailProps {
-  id: string
-  nama: string
-  no_telepon: string
-  alamat_rumah: string
-  username: string
-  role: string
-}
-
-function AdminEditModal({data}: {data: AdminDetailProps}) {
+function AdminEditModal({data}: {data: Admin}) {
   const dispatch = useDispatch<AppDispatch>()
   const [formData, setFormData] = useState({
     nama: '',

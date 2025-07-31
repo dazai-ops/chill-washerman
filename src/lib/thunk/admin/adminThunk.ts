@@ -2,18 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import bcrypt from "bcryptjs";
 import { toast } from "sonner";
-
-export interface Admin {
-  id: string;
-  username: string;
-  role: string;
-  nama: string;
-  no_telepon: string;
-  alamat_rumah: string;
-  last_login?: string;
-  jumlah_input?: number;
-  created_at?: string;
-}
+import { Admin } from "@/models/admin.model";
 
 export const retriveAdmin = createAsyncThunk<
   Admin[], 
@@ -50,7 +39,8 @@ export const addAdmin = createAsyncThunk<
 
       const adminPayload = {
         ...admin,
-        password_hash: hashedPassword
+        password_hash: hashedPassword,
+        last_login: "Just added",
       }
 
       const { data, error } = await supabase.from("admin").insert(adminPayload).select()
@@ -80,7 +70,7 @@ export const deleteAdmin = createAsyncThunk<
   { rejectValue: string }
 >(
   "admin/deleteAdmin",
-  async (id, { rejectWithValue }) => {
+  async ( id, { rejectWithValue }) => {
     try{
       const { data, error } = await supabase.from("admin").delete().eq("id", id).select()
       if (error) {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { TabNav } from '@radix-ui/themes'
 import { usePathname } from 'next/navigation'
-import NewProfile from '../AdminProfile/NewProfile';
+import Profile from '@/components/layout/AdminProfile/AdminProfile';
 
 function Tabnav() {
 
@@ -9,12 +9,12 @@ function Tabnav() {
   
   return (
     <TabNav.Root size="2">
+      <Profile/>
       <TabNav.Link href="/admin" active={pathName === '/admin'} >Admin</TabNav.Link>
-      <TabNav.Link href="#" active={pathName === '/transaksi'}>Transaksi</TabNav.Link>
+      <TabNav.Link href="/" active={pathName === '/transaksi'}>Transaksi</TabNav.Link>
       <TabNav.Link href="#" active={pathName === '/histori'}>Histori</TabNav.Link>
       <TabNav.Link href="/mesin-cuci" active={pathName === '/mesin-cuci'}>Mesin Cuci</TabNav.Link>
-      <TabNav.Link href="#" active={pathName === '/jenispakaian'}>Jenis Pakaian</TabNav.Link>
-      <NewProfile/>
+      <TabNav.Link href="/jenis-pakaian" active={pathName === '/jenis-pakaian'}>Jenis Pakaian</TabNav.Link>
     </TabNav.Root>
   )
 }

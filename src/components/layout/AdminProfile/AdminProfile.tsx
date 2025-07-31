@@ -12,9 +12,9 @@ function Profile() {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
         <Avatar
-         className='mt-1'
+         className='mt-1 mr-2'
           size="2"
-          src="https://media.istockphoto.com/id/2220604143/id/vektor/flat-illustration-in-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette.jpg?s=612x612&w=0&k=20&c=Tl1AYJO-6C50uz5BG74vZYygE1mUOvwgMm93t3SOKq8="
+          src="/admin.png"
           radius="full"
           fallback="T"
         />
