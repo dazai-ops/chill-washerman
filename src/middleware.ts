@@ -5,8 +5,11 @@ const PUBLIC_ROUTES = ['/login']
 export function middleware(request: NextRequest) {
   const {pathname} = request.nextUrl
   const isLoggedIn = request.cookies.get('auth')?.value === 'true'
-  console.log(isLoggedIn || 'not logged in')
 
+  if(pathname === '/'){
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
+  
   if(isLoggedIn && PUBLIC_ROUTES.includes(pathname)) {
     return NextResponse.redirect(new URL('/admin', request.url))
   }

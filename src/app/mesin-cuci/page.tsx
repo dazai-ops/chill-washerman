@@ -1,5 +1,5 @@
 import React from 'react'
-import MesinCuciLayout from './layout'
+import MesinCuciLayout from '@/components/features/MesinCuci/layout'
 
 function MesinCuciPage() {
   return (
