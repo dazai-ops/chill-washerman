@@ -6,6 +6,7 @@ import {
   getPaginationRowModel,
   flexRender,
   ColumnDef,
+  getFilteredRowModel,
 } from '@tanstack/react-table'
 import { useState } from 'react'
 
@@ -42,7 +43,7 @@ export function DataTable<TData, TValue>({ columns, data, renderAction, renderTo
     },
     onPaginationChange: (updater) => {
       if (typeof updater === 'function') {
-        const newState = updater({ pageIndex, pageSize: 5 })
+        const newState = updater({ pageIndex, pageSize: 10 })
         setPageIndex(newState.pageIndex)
       } else {
         setPageIndex(updater.pageIndex)
@@ -50,6 +51,7 @@ export function DataTable<TData, TValue>({ columns, data, renderAction, renderTo
     },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn: (row, columnId, filterValue) =>
       String(row.getValue(columnId)).toLowerCase().includes(filterValue.toLowerCase()),
   })
