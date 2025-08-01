@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { JSX, useState } from 'react'
 import {
   Flex,
   Text,
@@ -9,24 +9,26 @@ import {
 } from '@radix-ui/themes'
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons'
 
-type DataCardProps<TData> = {
-  data: TData[]
-  renderCard: (item: TData) => React.ReactNode
+type DataCardProps<T> = {
+  data: T[]
+  renderCard: (row: T) => JSX.Element
   renderToolbar?: React.ReactNode
   itemsPerPage?: number
 }
 
-export function DataCard<TData extends Record<string, unknown>>({
+export function DataCard<T>({
   data,
   renderCard,
   renderToolbar,
   itemsPerPage = 12,
-}: DataCardProps<TData>) {
+}: DataCardProps<T>) {
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
   const filteredData = data.filter((item) => {
-    const values = Object.values(item).join(' ').toLowerCase()
+    const values = Object.values(item as Record<string, unknown>)
+    .map((value) => String(value))
+    .join(' ').toLowerCase()
     return values.includes(search.toLowerCase())
   })
 

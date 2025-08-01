@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
 import { EyeOpenIcon } from '@radix-ui/react-icons'
-import { formatDateToDDMMYYYY, formatDateWIB } from '@/utils/dateFormatter'
+import { formatDateWIB } from '@/utils/dateFormatter'
 import { JenisPakaian } from '@/models/jenispakaian.model'
 
 function JenisPakaianDetailDialog({data}: {data: JenisPakaian}) {

@@ -40,7 +40,6 @@ export const addAdmin = createAsyncThunk<
       const adminPayload = {
         ...admin,
         password_hash: hashedPassword,
-        last_login: "Just added",
       }
 
       const { data, error } = await supabase.from("admin").insert(adminPayload).select()
@@ -57,9 +56,9 @@ export const addAdmin = createAsyncThunk<
         newAdmin: data[0] as Admin,
         message: "Admin added successfully"
       }
-    } catch (error ) {
+    } catch (error) {
       toast.error('Failed to add admin');
-      return rejectWithValue("Failed to add admin")
+      return rejectWithValue((error as Error).message)
     }
   }
 )
