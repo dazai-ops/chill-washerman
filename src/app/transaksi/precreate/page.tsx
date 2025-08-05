@@ -1,11 +1,10 @@
 import CreateTransaksi from '@/components/features/Transaksi/CreateTransaksi/layout'
 import React from 'react'
 
-function CreateTransaksiPage() {
+function PreCreate() {
   return (
     <CreateTransaksi/>
-
   )
 }
 
-export default CreateTransaksiPage
+export default PreCreate

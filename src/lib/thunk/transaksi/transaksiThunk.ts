@@ -1,4 +1,4 @@
-import { Transaksi } from '@/models/transaksi.model';
+import { CreateTransaksiDetail, CreateTransaksiOverview, Transaksi, TransaksiDetail } from '@/models/transaksi.model';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ export const retriveTransaksi = createAsyncThunk<
         dibayarkan,
         status_pembayaran,
         status_proses,
+        catatan,
         created_at,
         updated_at,
         dibuat_oleh(
@@ -67,7 +68,55 @@ export const retriveTransaksi = createAsyncThunk<
       return rejectWithValue(error.message)
     }
 
-    return data as Transaksi[]
+    return data as unknown as Transaksi[]
+  }
+)
+
+export const addTransaksi = createAsyncThunk(
+  "transaksi/addTransaksi",
+  async ({transaksi, transaksiDetail}: {transaksi: CreateTransaksiOverview, transaksiDetail: CreateTransaksiDetail}, { rejectWithValue }) => {
+    // return console.log(transaksi, transaksiDetail)
+    try{
+      const { data: transaksiData, error: transaksiError } = await supabase
+        .from("transaksi")
+        .insert([transaksi])
+        .select()
+
+      if(transaksiError){
+        toast.error('Something went wrong',{
+          description: 'Failed to add transaksi',
+        })
+        return rejectWithValue(transaksiError.message)
+      }
+
+      const transaksiId = transaksiData[0].id
+      console.log(transaksiId)
+      const detailWithParent = {
+        ...transaksiDetail,
+        transaksi_parent: Number(transaksiId)
+      }
+
+      const { data: transaksiDetailData, error: transaksiDetailError } = await supabase
+        .from("transaksi_detail")
+        .insert(detailWithParent)
+        .select()
+
+      if(transaksiDetailError){
+        toast.error('Something went wrong',{
+          description: 'Failed to add detail transaksi',
+        })
+        return rejectWithValue(transaksiDetailError.message)
+      }
+
+      toast.success('transaksi added successfully')
+      return {
+        transaksi: transaksiDetailData[0] as Transaksi,
+        message: "transaksi added successfully"
+      }
+    } catch (error ) {
+      toast.error('Failed to add transaksi');
+      return rejectWithValue((error as Error).message)
+    }
   }
 )
 

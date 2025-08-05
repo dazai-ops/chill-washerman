@@ -54,7 +54,7 @@ function TransaksiLayout() {
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
                 <Button variant="solid" size="3">
-                  <Link href="/transaksi/new-transaksi" underline='none'>Add new...</Link>
+                  <Link href="/transaksi/create" underline='none' >Add new...</Link>
                 </Button>
               </>
             }

@@ -4,22 +4,25 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/redux/store'
 import { PersonIcon } from '@radix-ui/react-icons';
 import { addJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk'
-import { JenisPakaianCreateModalProps } from '@/models/jenispakaian.model';
+import { JenisPakaian } from '@/models/jenispakaian.model';
 
 function JenisPakaianCreateModal() {
   const dispatch = useDispatch<AppDispatch>()
-  const [formData, setFormData] = useState<JenisPakaianCreateModalProps>({
+  const [formData, setFormData] = useState<JenisPakaian>({
     jenis_pakaian: '',
     satuan: '',
-    harga_per_item: '',
-    harga_per_kg: '',
-    estimasi_waktu: ''
+    harga_per_item: 0,
+    harga_per_kg: 0,
+    estimasi_waktu: 0,
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    const numberFields = ['harga_per_item', 'harga_per_kg', 'estimasi_waktu']
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: numberFields.includes(name) ? Number(value) : value
     })
   }
 
@@ -31,7 +34,7 @@ function JenisPakaianCreateModal() {
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
-        <Button size="3"><PersonIcon/>Add new...</Button>
+        <Button size="3" color='gray' highContrast><PersonIcon/>Add new...</Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
         <AlertDialog.Title>Tambah Jenis Pakaian</AlertDialog.Title>
@@ -50,13 +53,13 @@ function JenisPakaianCreateModal() {
               <TextField.Root size="3" className='mb-1' name='satuan' onChange={handleInputChange}/>
 
               <Text size="2" weight="bold">Harga / (kg)</Text>
-              <TextField.Root size="3" className='mb-1' name='harga_per_kg' onChange={handleInputChange}/>
+              <TextField.Root type='number' size="3" className='mb-1' name='harga_per_kg' onChange={handleInputChange}/>
       
               <Text size="2" weight="bold">Harga / (item)</Text>
-              <TextField.Root size="3" className='mb-1' name='harga_per_item' onChange={handleInputChange}/>
+              <TextField.Root type='number' size="3" className='mb-1' name='harga_per_item' onChange={handleInputChange}/>
 
               <Text size="2" weight="bold">Estimasi Waktu</Text>
-              <TextField.Root size="3" type='number'className='mb-1' name='estimasi_waktu' onChange={handleInputChange}/>
+              <TextField.Root typeof='number' size="3" type='number'className='mb-1' name='estimasi_waktu' onChange={handleInputChange}/>
             </Grid>
           </Flex>
           <Flex gap="3" mt="4" justify="end">

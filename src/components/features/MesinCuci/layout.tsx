@@ -34,7 +34,7 @@ function MesinCuciLayout() {
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
       {loading ? <Spinner className='mt-8'/> : null}
-      <div className='w-[800px] mt-10'>
+      <div className='w-full sm:w-[600px] md:w-[700px] lg:w-[1000px] mt-10'>
         {segmented === 'table' ?
           <DataTable 
             columns={columns}

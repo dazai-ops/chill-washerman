@@ -30,7 +30,7 @@ function MesinCuciCreateModal() {
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
-        <Button size="3"><PersonIcon/>Add new...</Button>
+        <Button size="3" color='gray' highContrast><PersonIcon/>Add new...</Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
         <AlertDialog.Title>Tambah Admin</AlertDialog.Title>

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner";
-import { JenisPakaian, JenisPakaianCreateModalProps } from "@/models/jenispakaian.model";
+import { JenisPakaian } from "@/models/jenispakaian.model";
 
 export const retriveJenisPakaian = createAsyncThunk<
   JenisPakaian[], 
@@ -26,8 +26,8 @@ export const retriveJenisPakaian = createAsyncThunk<
 )
 
 export const addJenisPakaian = createAsyncThunk<
-  { jenisPakaian : JenisPakaianCreateModalProps; message: string },
-  JenisPakaianCreateModalProps,
+  { jenisPakaian : JenisPakaian; message: string },
+  JenisPakaian,
   { rejectValue: string }
 >(
   "jenisPakaian/addAdmin",

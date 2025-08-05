@@ -8,7 +8,7 @@ function Tabnav() {
   const pathName = usePathname()
   
   return (
-    <TabNav.Root size="2">
+    <TabNav.Root size="2" color="gray" highContrast>
       <Profile/>
       <TabNav.Link href="/admin" active={pathName === '/admin'} >Admin</TabNav.Link>
       <TabNav.Link href="/transaksi" active={pathName === '/transaksi'}>Transaksi</TabNav.Link>

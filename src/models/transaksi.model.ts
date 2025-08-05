@@ -45,3 +45,26 @@ export interface Transaksi {
   created_at?: string,
   updated_at?: string
 }
+
+export interface CreateTransaksiOverview {
+  kode_transaksi: string,
+  nama_pelanggan: string,
+  telepon_pelanggan: string,
+  dibuat_oleh: number,
+  total_harga: number,
+  dibayarkan: number,
+  status_pembayaran: string,
+  catatan: string
+}
+
+export interface CreateTransaksiDetail {
+  jenis_pakaian: number | string | undefined,
+  berat_kg: number,
+  jumlah_item: number,
+  layanan_setrika: boolean | null,
+  mesin_cuci: number | string,
+  total_harga_layanan: number,
+  catatan_pelanggan: string,
+  catatan_admin: string
+  transaksi_parent: number | string
+}

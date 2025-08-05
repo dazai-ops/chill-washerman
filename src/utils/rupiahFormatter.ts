@@ -1,7 +1,13 @@
-export function formatRupiah(value: number): string {
+export function formatRupiah(val: number): string {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
-  }).format(value);
+  }).format(val);
 }
+
+export const formatNumber = (value: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+  }).format(value);
+};

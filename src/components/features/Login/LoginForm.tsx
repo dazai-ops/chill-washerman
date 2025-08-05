@@ -15,8 +15,9 @@ import { toast } from 'sonner'
 
 function LoginForm() {
   const router = useRouter()
+console.log("hello")
   const dispatch = useDispatch<AppDispatch>()
-  const { loading, success } = useSelector((state: RootState) => state.auth)
+  const { loading, success, error } = useSelector((state: RootState) => state.auth)
   
   const [userForm, setUserForm] = useState<UserAuth>({username: '', password: ''})
   const [showPassword, setShowPassword] = useState(false)
@@ -41,6 +42,10 @@ function LoginForm() {
   }
 
   useEffect(() => {
+    if(error) setUserForm({...userForm, password: ''})
+  }, [error])
+  
+  useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/admin')
     }, 2000)
@@ -61,7 +66,13 @@ function LoginForm() {
                 <Text size="2">Username</Text>
                 <TextField.Root className='mb-3' name='username' onChange={handleChange}/>
                 <Text size="2">Password</Text>
-                <TextField.Root name='password' type={showPassword ? 'text' : 'password'} onChange={handleChange} >
+                <TextField.Root 
+                  name='password' 
+                  type={showPassword ? 'text' : 'password'} 
+                  value={userForm.password || ''}
+                  onChange={handleChange} 
+
+                >
                   <TextField.Slot>
                     <button
                       type="button"

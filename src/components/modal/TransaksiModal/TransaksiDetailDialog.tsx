@@ -55,13 +55,13 @@ function TransaksiDetailDialog({data}: {data: Transaksi}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Selesai</DataList.Label>
             <DataList.Value>
-              {data.tanggal_selesai || '-' }
+              {formatDateWIB(data.tanggal_selesai) || '-' }
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Keluar</DataList.Label>
             <DataList.Value>
-              {data.tanggal_keluar || '-' }
+              {formatDateWIB(data.tanggal_keluar) || '-' }
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>

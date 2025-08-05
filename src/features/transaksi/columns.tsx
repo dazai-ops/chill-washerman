@@ -49,10 +49,9 @@ export const transaksiColumns = [
     {
       header: 'Jumlah Layanan',
       accessorKey: 'transaksi_detail',
-      cell: ({getValue}: {getValue: () => unknown}) => {
-        const data = getValue() as Transaksi
-        const detail = data.transaksi_detail
-        return detail?.length ?? 0
+      cell: ({ getValue }) => {
+        const details = getValue();
+        return details?.length ?? 0;
       }
     }
   ]
