@@ -23,6 +23,7 @@ function AdminLayout() {
   const dispatch = useDispatch<AppDispatch>()
   const { loading, success } = useSelector((state: RootState) => state.admin)
   const [ segmented, setSegmented ] = useState('card')
+  const admin = useSelector((state: RootState) => state.auth.user)
   
   const columns = adminColumns
   const data = useSelector((state: RootState) => state.admin.adminCollection)
@@ -47,20 +48,24 @@ function AdminLayout() {
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
                   <AdminDetail data={row}/>
-                  <EditModal data={row}/>
-                  <DropdownMenu.Separator />
-                  {row.role === 'admin' 
-                    ? <ConfirmChange 
-                        label='Set as Superuser' 
-                        onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'superuser'}))}
-                      />
-                    : <ConfirmChange 
-                        label='Set as Admin' 
-                        onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'admin'}))}
-                      />
-                  }
-                  <DropdownMenu.Separator />
-                  <ConfirmDelete onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
+                  {admin?.role === 'superuser' && (
+                  <>
+                    <EditModal data={row}/>
+                    <DropdownMenu.Separator />
+                    {row.role === 'admin' 
+                      ? <ConfirmChange 
+                          label='Set as Superuser' 
+                          onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'superuser'}))}
+                        />
+                      : <ConfirmChange 
+                          label='Set as Admin' 
+                          onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'admin'}))}
+                        />
+                    }
+                    <DropdownMenu.Separator />
+                    <ConfirmDelete onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
+                  </>
+                  )}
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             )}
@@ -99,20 +104,24 @@ function AdminLayout() {
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Content>
                         <AdminDetail data={row}/>
-                        <EditModal data={row}/>
-                        <DropdownMenu.Separator />
-                        {row.role === 'admin' 
-                          ? <ConfirmChange 
-                              label='Set as Superuser' 
-                              onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'superuser'}))}
-                            />
-                          : <ConfirmChange 
-                              label='Set as Admin' 
-                              onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'admin'}))}
-                            />
-                        }
-                        <DropdownMenu.Separator />
-                        <ConfirmDelete onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
+                        {admin?.role === 'superuser' &&(
+                          <>
+                            <EditModal data={row}/>
+                            <DropdownMenu.Separator />
+                            {row.role === 'admin' 
+                              ? <ConfirmChange 
+                                  label='Set as Superuser' 
+                                  onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'superuser'}))}
+                                />
+                              : <ConfirmChange 
+                                  label='Set as Admin' 
+                                  onConfirm={() => row.id && dispatch(changeRole({id: row.id, role: 'admin'}))}
+                                />
+                            }
+                            <DropdownMenu.Separator />
+                            <ConfirmDelete onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
+                          </>
+                        )}
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>
                   </Flex>

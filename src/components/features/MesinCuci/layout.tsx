@@ -6,10 +6,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { ArchiveIcon, DotsVerticalIcon } from '@radix-ui/react-icons';
-
 import { mesinCuciColumns } from '@/features/mesincuci/columns';
 import { retriveMesinCuci, changeActive, deleteMesinCuci } from '@/lib/thunk/mesincuci/mesincuciThunk';
 import { formatDateWIB } from '@/utils/dateFormatter';
+
 import Tabnav from '@/components/layout/TabNav/TabNav'
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';

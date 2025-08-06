@@ -47,18 +47,29 @@ export interface Transaksi {
 }
 
 export interface CreateTransaksiOverview {
+  dibuat_oleh: {
+    id: null | number | string,
+    nama: string
+  },
   kode_transaksi: string,
   nama_pelanggan: string,
   telepon_pelanggan: string,
-  dibuat_oleh: number,
-  total_harga: number,
-  dibayarkan: number,
-  status_pembayaran: string,
   catatan: string
+  dibayarkan: number,
+  total_harga: number,
+  sisa_bayar: number,
+  kembalian: number,
+  status_pembayaran: string,
 }
 
 export interface CreateTransaksiDetail {
-  jenis_pakaian: number | string | undefined,
+  jenis_pakaian: {
+    id: string | number | null,
+    jenis_pakaian: string
+    harga_per_item: number
+    harga_per_kg: number
+    satuan: string
+  },
   berat_kg: number,
   jumlah_item: number,
   layanan_setrika: boolean | null,
@@ -67,4 +78,6 @@ export interface CreateTransaksiDetail {
   catatan_pelanggan: string,
   catatan_admin: string
   transaksi_parent: number | string
+
+  acuan_harga? : string
 }

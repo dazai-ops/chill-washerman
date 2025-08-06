@@ -1,4 +1,4 @@
-import LoginLayout from '@/components/features/Login/LoginForm'
+import LoginLayout from '@/components/features/Login/layout'
 
 function LoginPage() {
   return (

@@ -13,9 +13,8 @@ import { Box, Card, Flex, Text, TextField, Button, Grid } from '@radix-ui/themes
 import { EyeOpenIcon, EyeClosedIcon } from '@radix-ui/react-icons'
 import { toast } from 'sonner'
 
-function LoginForm() {
+function LoginLayout() {
   const router = useRouter()
-console.log("hello")
   const dispatch = useDispatch<AppDispatch>()
   const { loading, success, error } = useSelector((state: RootState) => state.auth)
   
@@ -43,7 +42,7 @@ console.log("hello")
 
   useEffect(() => {
     if(error) setUserForm({...userForm, password: ''})
-  }, [error])
+  }, [error, userForm])
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -63,9 +62,9 @@ console.log("hello")
           <form onSubmit={handleSubmit}>
             <Flex direction="column" gap="3" className='mt-4'>
               <Grid gap="1">
-                <Text size="2">Username</Text>
+                <Text size="2" weight="bold">Username</Text>
                 <TextField.Root className='mb-3' name='username' onChange={handleChange}/>
-                <Text size="2">Password</Text>
+                <Text size="2" weight="bold">Password</Text>
                 <TextField.Root 
                   name='password' 
                   type={showPassword ? 'text' : 'password'} 
@@ -95,4 +94,4 @@ console.log("hello")
   )
 }
 
-export default LoginForm
+export default LoginLayout

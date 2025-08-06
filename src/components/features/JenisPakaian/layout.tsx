@@ -8,6 +8,7 @@ import { deleteJenisPakaian, retriveJenisPakaian } from '@/lib/thunk/jenispakaia
 import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { jenisPakaianColumns } from '@/features/jenispakaian/columns';
+import { formatRupiah } from '@/utils/rupiahFormatter';
 
 import Tabnav from '@/components/layout/TabNav/TabNav'
 import JenisPakaianDetail from '@/components/modal/JenisPakaianModal/JenisPakaianDetailDialog';
@@ -15,7 +16,6 @@ import AddModal from '@/components/modal/JenisPakaianModal/JanisPakaianCreateMod
 import EditModal from '@/components/modal/JenisPakaianModal/JenisPakaianEditModal';
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
-import { formatRupiah } from '@/utils/rupiahFormatter';
 
 
 function JenisPakaianLayout() {
@@ -48,7 +48,7 @@ function JenisPakaianLayout() {
                   <JenisPakaianDetail data={row}/>
                   <EditModal data={row}/>
                   <DropdownMenu.Separator />
-                  <ConfirmDelete onConfirm={() => row.id && dispatch(deleteJenisPakaian(row.id))}/>
+                  <ConfirmDelete onConfirm={() => row.id && dispatch(deleteJenisPakaian(String(row.id)))}/>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             )}
@@ -88,7 +88,7 @@ function JenisPakaianLayout() {
                       <DropdownMenu.Content>
                         <JenisPakaianDetail data={row}/>
                         <EditModal data={row}/>
-                        <ConfirmDelete onConfirm={() => row.id && dispatch(deleteJenisPakaian(row.id))}/>
+                        <ConfirmDelete onConfirm={() => row.id && dispatch(deleteJenisPakaian(String(row.id)))}/>
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>
                   </Flex>

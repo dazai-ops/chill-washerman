@@ -74,12 +74,17 @@ export const retriveTransaksi = createAsyncThunk<
 
 export const addTransaksi = createAsyncThunk(
   "transaksi/addTransaksi",
-  async ({transaksi, transaksiDetail}: {transaksi: CreateTransaksiOverview, transaksiDetail: CreateTransaksiDetail}, { rejectWithValue }) => {
-    // return console.log(transaksi, transaksiDetail)
+  async ({transaksi, transaksiDetail}: {transaksi: CreateTransaksiOverview, transaksiDetail: CreateTransaksiDetail[]}, { rejectWithValue }) => {
     try{
+      const {sisa_bayar, kembalian, ...transaksiPayload} = transaksi
+      const payload = {
+        ...transaksiPayload,
+        dibuat_oleh: transaksi.dibuat_oleh.id
+      }
+
       const { data: transaksiData, error: transaksiError } = await supabase
         .from("transaksi")
-        .insert([transaksi])
+        .insert([payload])
         .select()
 
       if(transaksiError){
@@ -87,31 +92,58 @@ export const addTransaksi = createAsyncThunk(
           description: 'Failed to add transaksi',
         })
         return rejectWithValue(transaksiError.message)
-      }
 
-      const transaksiId = transaksiData[0].id
-      console.log(transaksiId)
-      const detailWithParent = {
-        ...transaksiDetail,
-        transaksi_parent: Number(transaksiId)
-      }
+      } else if(!transaksiData){
+        const transaksiId = transaksiData[0].id
+        const detailWithParent = transaksiDetail.map(({acuan_harga,...detail}) => ({
+          ...detail,
+          transaksi_parent: Number(transaksiId),
+          jenis_pakaian: detail.jenis_pakaian?.id
+        }))
+  
+        const { data: transaksiDetailData, error: transaksiDetailError } = await supabase
+          .from("transaksi_detail")
+          .insert(detailWithParent)
+          .select()
+  
+        if(transaksiDetailError){
+          toast.error('Something went wrong',{
+            description: 'Failed to add detail transaksi',
+          })
+          return rejectWithValue(transaksiDetailError.message)
 
-      const { data: transaksiDetailData, error: transaksiDetailError } = await supabase
-        .from("transaksi_detail")
-        .insert(detailWithParent)
-        .select()
+        } else if(transaksiDetailData){
+          if(transaksiData && transaksiDetailData){
+            await supabase.rpc("increment_jumlah_input", {
+              admin_id: transaksiData[0].dibuat_oleh
+            })
 
-      if(transaksiDetailError){
-        toast.error('Something went wrong',{
-          description: 'Failed to add detail transaksi',
-        })
-        return rejectWithValue(transaksiDetailError.message)
-      }
+            const mesinCuciId = transaksiDetail
+              .map((detail) => detail.mesin_cuci)
+              .filter((id): id is number => typeof id === 'number')
+            
+            if(mesinCuciId.length > 0){
+              const {error: mesinCuciError} = await supabase
+                .from("mesin_cuci")
+                .update({
+                  status_mesin: "digunakan"
+                })
+                .in("id", mesinCuciId)
 
-      toast.success('transaksi added successfully')
-      return {
-        transaksi: transaksiDetailData[0] as Transaksi,
-        message: "transaksi added successfully"
+              if(mesinCuciError){
+                toast.error('Something went wrong',{
+                  description: 'Failed to update mesin cuci',
+                })
+                return rejectWithValue(mesinCuciError.message)
+              }
+            }
+          }
+        }
+        toast.success('transaksi added successfully')
+        return {
+          transaksi: transaksiDetailData[0] as Transaksi,
+          message: "transaksi added successfully"
+        }
       }
     } catch (error ) {
       toast.error('Failed to add transaksi');

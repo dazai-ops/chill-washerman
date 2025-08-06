@@ -6,16 +6,17 @@ import { updateJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk'
 import { Pencil1Icon } from '@radix-ui/react-icons';
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
 import { JenisPakaian } from '@/models/jenispakaian.model'
+import { toast } from 'sonner'
 
 
-function MesinCuciEditModal({data}: {data: JenisPakaian}) {
+function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
   const dispatch = useDispatch<AppDispatch>()
   const [formData, setFormData] = useState({
     jenis_pakaian: '',
-    harga_per_kg: '',
-    harga_per_item: '',
+    harga_per_kg: '' as number | string,
+    harga_per_item: '' as number | string,
     satuan: '',
-    estimasi_waktu: '',
+    estimasi_waktu: '' as number | string,
   })
 
   useEffect(() => {
@@ -39,8 +40,11 @@ function MesinCuciEditModal({data}: {data: JenisPakaian}) {
 
   const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(formData)
-    dispatch(updateJenisPakaian({ id: data.id, jenisPakaian: formData }))
+    if(data.id !== undefined){
+      dispatch(updateJenisPakaian({ id: data.id, jenisPakaian: formData }))
+    }else{
+      toast.error('Failed to update jenis pakaian')
+    }
   }
 
   return (
@@ -65,13 +69,13 @@ function MesinCuciEditModal({data}: {data: JenisPakaian}) {
               <TextField.Root size="3" className='mb-1' name='satuan' onChange={handleInputChange} defaultValue={data?.satuan}/>
 
               <Text size="2" weight="bold">Harga / (kg)</Text>
-              <TextField.Root size="3" className='mb-1' name='harga_per_kg' onChange={handleInputChange} defaultValue={data?.harga_per_kg}/>
+              <TextField.Root size="3" className='mb-1' name='harga_per_kg' onChange={handleInputChange} defaultValue={String(data?.harga_per_kg)}/>
       
               <Text size="2" weight="bold">Harga / (item)</Text>
-              <TextField.Root size="3" className='mb-1' name='harga_per_item' onChange={handleInputChange} defaultValue={data?.harga_per_item}/>
+              <TextField.Root size="3" className='mb-1' name='harga_per_item' onChange={handleInputChange} defaultValue={String(data?.harga_per_item)}/>
 
               <Text size="2" weight="bold">Estimasi Waktu</Text>
-              <TextField.Root size="3" type='number'className='mb-1' name='estimasi_waktu' onChange={handleInputChange} defaultValue={data?.estimasi_waktu}/>
+              <TextField.Root size="3" type='number'className='mb-1' name='estimasi_waktu' onChange={handleInputChange} defaultValue={String(data?.estimasi_waktu)}/>
             </Grid>
           </Flex>
 
@@ -83,7 +87,7 @@ function MesinCuciEditModal({data}: {data: JenisPakaian}) {
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange 
-                onConfirm={() => dispatch(updateJenisPakaian({ id: data.id, jenisPakaian: formData }))} 
+                onConfirm={() => dispatch(updateJenisPakaian({ id: data.id ?? '', jenisPakaian: formData }))} 
                 customButton={<Button color='blue'
                 >
                   Update
@@ -97,4 +101,4 @@ function MesinCuciEditModal({data}: {data: JenisPakaian}) {
   )
 }
 
-export default MesinCuciEditModal
+export default JenisPakaianEditModal

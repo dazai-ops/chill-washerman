@@ -5,15 +5,26 @@ import { MesinCuci } from "@/models/mesincuci.model";
 
 export const retriveMesinCuci = createAsyncThunk<
   MesinCuci[], 
-  void, 
+  Partial<{status_mesin: string; is_active: string}> | undefined, 
   { rejectValue: string }
 >(
   "mesinCuci/retriveMesinCuci",
-  async (_, { rejectWithValue }) => {
-    const { data, error } = await supabase
+  async (params, { rejectWithValue }) => {
+
+    let query = supabase
       .from("mesin_cuci")
       .select("*")
-      .order("is_active", { ascending: false })
+
+    if(params?.status_mesin){
+      query = query.eq("status_mesin", params.status_mesin)
+    }
+
+    if(params?.is_active){
+      query = query.eq("is_active", params.is_active === "true")
+    }
+
+    query = query.order("is_active", { ascending: false })
+    const { data, error } = await query
 
     if (error) {
       toast.error('Something went wrong', {

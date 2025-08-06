@@ -1,10 +1,8 @@
 import CreateTransaksi from '@/components/features/Transaksi/CreateTransaksi/layout'
-import React from 'react'
 
 function CreateTransaksiPage() {
   return (
     <CreateTransaksi/>
-
   )
 }
 

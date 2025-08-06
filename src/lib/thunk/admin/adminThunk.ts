@@ -123,7 +123,7 @@ export const updateAdmin = createAsyncThunk<
 
 export const changeRole = createAsyncThunk<
   { changedAdmin: Admin; message: string }, 
-  {id: string, role: string}, 
+  { id: string, role: string}, 
   { rejectValue: string }
 >(
   "admin/changeRole",

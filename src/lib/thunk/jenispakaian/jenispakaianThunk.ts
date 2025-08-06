@@ -92,7 +92,7 @@ export const deleteJenisPakaian = createAsyncThunk<
 
 export const updateJenisPakaian = createAsyncThunk<
   { updatedAdmin: JenisPakaian; message: string }, 
-  { id: string, jenisPakaian: Partial<JenisPakaian>},
+  { id: string | number, jenisPakaian: Partial<JenisPakaian>},
   { rejectValue: string }
 >(
   "admin/updateAdmin",
