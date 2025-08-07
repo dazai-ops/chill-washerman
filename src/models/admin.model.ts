@@ -1,10 +1,10 @@
 export interface Admin {
-  [key:string]: unknown
+
   id: string | undefined
   username?: string
   role?: string
   nama?: string
-  no_telepon?: string
+  no_telepon?: number
   alamat_rumah?: string
   last_login?: string
   jumlah_input?: number

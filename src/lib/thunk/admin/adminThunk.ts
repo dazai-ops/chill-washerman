@@ -42,7 +42,7 @@ export const addAdmin = createAsyncThunk<
         password_hash: hashedPassword,
       }
 
-      const { data, error } = await supabase.from("admin").insert(adminPayload).select()
+      const { data, error } = await supabase.from("asdmin").insert(adminPayload).select()
 
       if(error) {
         toast.error('Something went wrong',{

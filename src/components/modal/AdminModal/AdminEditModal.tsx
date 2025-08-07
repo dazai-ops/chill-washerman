@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, DropdownMenu } from '@radix-ui/themes'
+import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, DropdownMenu, Box } from '@radix-ui/themes'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/redux/store'
 import { updateAdmin } from '@/lib/thunk/admin/adminThunk'
@@ -58,43 +58,54 @@ function AdminEditModal({data}: {data: Admin}) {
         <form onSubmit={(e) => handleSubmit(e)}>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
-              <Text size="2" weight="bold">Nama</Text>
-              <TextField.Root size="3" className='mb-1' name='nama' onChange={handleInputChange} defaultValue={data?.nama}/>
-
-              <Text size="2" weight="bold">Nomer Telepon</Text>
-              <TextField.Root size="3" className='mb-1' name='no_telepon' type='number' onChange={handleInputChange} defaultValue={data?.no_telepon}/>
-
+              <Flex className='w-full' gap="3">
+                <Box className='w-full'>
+                  <Text size="2" weight="bold">Nama</Text>
+                  <TextField.Root size="3" className='mb-1' name='nama' onChange={handleInputChange} defaultValue={data?.nama}/>
+                </Box>
+                <Box className='w-full'>
+                  <Text size="2" weight="bold">Nomer Telepon</Text>
+                  <TextField.Root size="3" className='mb-1' name='no_telepon' type='number' onChange={handleInputChange} defaultValue={data?.no_telepon}/>
+                </Box>
+              </Flex>
+              <Flex className='w-full' gap="3">
+                <Box className='w-full'>
+                  <Text size="2" weight="bold">Username</Text>
+                  <TextField.Root size="3" className='mb-1' name='username' onChange={handleInputChange} defaultValue={data?.username}/>
+                </Box>
+                <Box className='flex flex-row w-full'>
+                  <Box className='w-full'>
+                    <Text size="2" weight="bold">Role Admin</Text>
+                  </Box>
+                  <Select.Root size="3" name='role' onValueChange={(value) => setFormData({ ...formData, role: value })} defaultValue={data?.role}>
+                    <Select.Trigger style={{ width: '100%'}}/>
+                      <Select.Content>
+                        <Select.Group>
+                          <Select.Label>Superuser dapat mengakses semua fitur!</Select.Label>
+                          <Select.Separator />
+                          <Select.Item value="superuser">Superuser</Select.Item>
+                          <Select.Item value="admin">Admin</Select.Item>
+                        </Select.Group>
+                      </Select.Content>
+                  </Select.Root>
+                </Box>
+              </Flex>
               <Text size="2" weight="bold">Alamat Rumah</Text>
               <TextArea size="3" className='mb-1' name='alamat_rumah' onChange={handleInputChange} defaultValue={data?.alamat_rumah}/>
 
-              <Text size="2" weight="bold">Username</Text>
-              <TextField.Root size="3" className='mb-1' name='username' onChange={handleInputChange} defaultValue={data?.username}/>
-
-              <Text size="2" weight="bold">Role Admin</Text>
-              <Select.Root size="3" name='role' onValueChange={(value) => setFormData({ ...formData, role: value })} defaultValue={data?.role}>
-                <Select.Trigger />
-                  <Select.Content>
-                    <Select.Group>
-                      <Select.Label>Superuser dapat mengakses semua fitur!</Select.Label>
-                      <Select.Separator />
-                      <Select.Item value="superuser">Superuser</Select.Item>
-                      <Select.Item value="admin">Admin</Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-              </Select.Root>
             </Grid>
           </Flex>
 
           <Flex gap="3" mt="4" justify="end">
             <AlertDialog.Cancel>
-              <Button color='red'>
+              <Button color='gray'>
                 Batal
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange 
                 onConfirm={() => dispatch(updateAdmin({ id: data.id, admin: formData }))} 
-                customButton={<Button color='blue'>Update</Button>}/>
+                customButton={<Button color='green'>Update</Button>}/>
             </AlertDialog.Action>
           </Flex>
         </form>

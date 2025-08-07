@@ -5,13 +5,16 @@ import mesinCuciReducer from "@/redux/slices/mesinCuciSlice";
 import jenisPakaianReducer from "@/redux/slices/jenispakaianSlice";
 import transaksiReducer from "@/redux/slices/transaksiSlice";
 
+import formAdminReducer from "./slices/form-validation/formAdminSlice"
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     admin: adminReducer,
     mesinCuci: mesinCuciReducer,
     jenisPakaian: jenisPakaianReducer,
-    transaksi: transaksiReducer
+    transaksi: transaksiReducer,
+    formAdmin: formAdminReducer
   }
 })
 
