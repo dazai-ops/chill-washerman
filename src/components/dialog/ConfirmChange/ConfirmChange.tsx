@@ -2,10 +2,11 @@ import { PersonIcon } from '@radix-ui/react-icons'
 import { AlertDialog, Button, Flex, DropdownMenu } from '@radix-ui/themes'
 
 type ConfirmChangeProps = {
-  onConfirm: () => void
+  onConfirm?: () => void
   label?: string
   customIcon?: React.ReactNode
   customButton?: React.ReactNode
+  disabled?: boolean
 }
 
 function ConfirmChange({onConfirm, label = 'Update', customButton, customIcon}: ConfirmChangeProps) {

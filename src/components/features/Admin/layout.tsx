@@ -129,10 +129,13 @@ function AdminLayout() {
                     <Badge>{row.role}</Badge>
                     <Box className='mt-2'>
                       <Text as="div" size="2" weight="bold">
-                        {row.last_login != null && 
-                          <Badge color="yellow" variant="soft">Last login: {formatDateWIB(row.last_login)}</Badge> || 
+                        {row.last_login != null ? (
+                          <Badge color="yellow" variant="soft">Last login: {row.last_login && formatDateWIB(row.last_login)}</Badge>
+                        ) : row.last_login == null ?(
+                          <Badge color="red" variant="soft">Belum login / Baru Ditambahkan</Badge>
+                        ) : (
                           <Badge color="jade" variant="soft">Sedang Online</Badge>
-                        }
+                        )}
                       </Text>
                       <Text as="div" size="1" color="gray">
                         Telepon: {row.no_telepon}

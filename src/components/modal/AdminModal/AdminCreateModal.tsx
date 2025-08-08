@@ -131,7 +131,7 @@ function AdminAddModal() {
                   <Text size="2" weight="bold">Password</Text>
                   <TextField.Root 
                     size="3" 
-                    className={`mb-1 ${getErrorMessage('username') ? 'border border-red-500' : ''}`}
+                    className={`mb-1 ${getErrorMessage('password_hash') ? 'border border-red-500' : ''}`}
                     name='password_hash' 
                     type='password' 
                     onChange={formChange}

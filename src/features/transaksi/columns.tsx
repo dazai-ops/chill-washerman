@@ -1,4 +1,3 @@
-import { Transaksi } from "@/models/transaksi.model"
 import { formatDateWIB } from "@/utils/dateFormatter"
 import { Badge } from "@radix-ui/themes"
 
@@ -24,15 +23,6 @@ export const transaksiColumns = [
       }
     },
     {
-      header: 'Tanggal Selesai',
-      accessorKey: 'tanggal_selesai',
-      cell: ({getValue}: {getValue: () => unknown}) => {
-        if(!getValue()) return '-'
-        const value = getValue() as string
-        return formatDateWIB(value)
-      }
-    },
-    {
       header: 'Status',
       accessorKey: 'status_proses',
       cell: ({getValue}: {getValue: () => unknown}) => {
@@ -47,7 +37,7 @@ export const transaksiColumns = [
       }
     },
     {
-      header: 'Jumlah Layanan',
+      header: 'Total',
       accessorKey: 'transaksi_detail',
       cell: ({ getValue }) => {
         const details = getValue();

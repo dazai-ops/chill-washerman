@@ -41,7 +41,13 @@ function AdminDetailDialog({data}: {data: Admin}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Last Login</DataList.Label>
             <DataList.Value>
-              {data.last_login != null && formatDateWIB(data.last_login) || <Badge color="jade" variant="soft" radius="full">Sedang Online</Badge> }
+              {data.last_login != null ? (
+                <Badge color="yellow" variant="soft">Last login: {data.last_login && formatDateWIB(data.last_login)}</Badge>
+              ) : data.last_login == null ?(
+                <Badge color="red" variant="soft">Belum login / Baru Ditambahkan</Badge>
+              ) : (
+                <Badge color="jade" variant="soft">Sedang Online</Badge>
+              )}
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
