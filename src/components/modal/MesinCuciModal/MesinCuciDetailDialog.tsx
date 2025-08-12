@@ -1,8 +1,10 @@
-import React from 'react'
-import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
+//lib
 import { EyeOpenIcon } from '@radix-ui/react-icons'
-import { formatDateToDDMMYYYY, formatDateWIB } from '@/utils/dateFormatter'
+import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
+
+//utils
 import { MesinCuci } from '@/models/mesincuci.model'
+import { formatDateToDDMMYYYY, formatDateWIB } from '@/utils/dateFormatter'
 
 function MesinCuciDetailDialog({data}: {data: MesinCuci}) {
   return (
@@ -75,7 +77,9 @@ function MesinCuciDetailDialog({data}: {data: MesinCuci}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Terakhir Digunakan</DataList.Label>
             <DataList.Value>
-              {data.status_mesin === 'digunakan' ? 'Sedang Digunakan' : formatDateWIB(data.terakhir_digunakan)}
+              {data.status_mesin === 'digunakan' ? 'Sedang Digunakan' 
+              : data.terakhir_digunakan === null ? 'Belum Digunakan' 
+              : formatDateWIB(data.terakhir_digunakan)}
             </DataList.Value>
           </DataList.Item>
 

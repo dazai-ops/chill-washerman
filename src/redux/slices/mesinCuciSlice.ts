@@ -74,7 +74,7 @@ const mesinCuciSlice = createSlice({
       })
       .addCase(updateMesinCuci.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.success = action.payload.status
       })
       .addCase(updateMesinCuci.rejected, (state, action) => {
         state.loading = false

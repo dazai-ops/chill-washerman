@@ -1,16 +1,24 @@
+//lib
+import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
+import { Pencil1Icon } from '@radix-ui/react-icons';
 import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, DropdownMenu, Box } from '@radix-ui/themes'
+
+//redux
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
 import { updateAdmin } from '@/lib/thunk/admin/adminThunk'
-import { Pencil1Icon } from '@radix-ui/react-icons';
-import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
+
+//utils
 import { Admin } from '@/models/admin.model'
-import { clearForm, setErrors, setForm } from '@/redux/slices/form-validation/formAdminSlice'
 import { validateForm } from '@/utils/form-validation/validateForm'
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
+import { clearForm, setErrors, setForm, clearErrors } from '@/redux/slices/form-validation/singleForm'
+
+//component
 import ErrorMessage from '@/components/ui/FieldError/ErrorMessage'
-import { clearError } from '@/redux/slices/authSlice'
+import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
+
 
 const rules: Record<string, FieldRules> = {
   nama: ['required'],
@@ -20,18 +28,20 @@ const rules: Record<string, FieldRules> = {
   role: ['required'],
 }
 
-
 function AdminEditModal({data}: {data: Admin}) {
   const [open, setOpen] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.formAdmin.data)
-  const errors = useSelector((state:RootState) => state.formAdmin.errors)
+  const formData = useSelector((state:RootState) => state.singleForm.data)
+  const errors = useSelector((state:RootState) => state.singleForm.errors)
+  const res = useSelector((state:RootState) => state.admin.success)
 
   useEffect(() => {
     if(data) {
+      dispatch(clearForm())
+      dispatch(clearErrors())
       dispatch(setForm({
         nama: data.nama,
         no_telepon: data.no_telepon || '',
@@ -47,8 +57,9 @@ function AdminEditModal({data}: {data: Admin}) {
     dispatch(setForm({...formData, [name]: value}))
   }
 
-  const formSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+  const formSubmit = (e : React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
+    dispatch(clearErrors())
     const formError = validateForm(formData, rules)
     if(formError.length > 0) {
       dispatch(setErrors(formError))
@@ -56,10 +67,11 @@ function AdminEditModal({data}: {data: Admin}) {
       setShowConfirm(false)
     } else {
       setShowConfirm(true)
-      dispatch(clearError())
-      dispatch(clearForm())
+      toast.success('Data has verified', {
+        description: 'Clik update to save changes',
+        position: "top-center"
+      })
     }  
-    console.log(formError)
   }
 
   const getErrorMessage = (fieldName: string) => {
@@ -68,15 +80,23 @@ function AdminEditModal({data}: {data: Admin}) {
 
   useEffect(() => {
     if(!open) {
-      dispatch(clearError())
+      dispatch(clearErrors())
     }
   }, [open, dispatch])
 
   useEffect(() => {
     setDisabled(false)
+    if(showConfirm){
+      setShowConfirm(false)
+    }
   }, [formData])
 
-console.log(formData)
+  useEffect(() => {
+    if(res === "ok") {
+      setOpen(false)
+    }
+  }, [res])
+
   return (
     <AlertDialog.Root open={open}>
       <AlertDialog.Trigger>
@@ -84,14 +104,14 @@ console.log(formData)
           <Pencil1Icon />Edit
         </DropdownMenu.Item>
       </AlertDialog.Trigger>
-      <AlertDialog.Content maxWidth="550px">
+      <AlertDialog.Content maxWidth="600px">
         <AlertDialog.Title>Edit Admin</AlertDialog.Title>
 
         <AlertDialog.Description >
           Ubah data yang diperlukan
         </AlertDialog.Description>
 
-        <form onSubmit={(e) => formSubmit(e)}>
+        <form>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
               <Flex className='w-full' gap="3">
@@ -99,7 +119,7 @@ console.log(formData)
                   <Text size="2" weight="bold">Nama</Text>
                   <TextField.Root 
                     size="3" 
-                    className='mb-1' 
+                    className={`mb-1 ${getErrorMessage('nama') ? 'border border-red-500' : ''}`}
                     name='nama' 
                     onChange={formChange} 
                     defaultValue={data?.nama}
@@ -113,7 +133,7 @@ console.log(formData)
                   <Text size="2" weight="bold">Nomer Telepon</Text>
                   <TextField.Root 
                     size="3" 
-                    className='mb-1' 
+                    className={`mb-1 ${getErrorMessage('no_telepon') ? 'border border-red-500' : ''}`}
                     name='no_telepon' 
                     type='number' 
                     onChange={formChange} 
@@ -127,7 +147,7 @@ console.log(formData)
                   <Text size="2" weight="bold">Username</Text>
                   <TextField.Root 
                     size="3" 
-                    className='mb-1' 
+                    className={`mb-1 ${getErrorMessage('username') ? 'border border-red-500' : ''}`}
                     name='username' 
                     onChange={formChange} 
                     defaultValue={data?.username}
@@ -179,19 +199,18 @@ console.log(formData)
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange
-                onConfirm={() => dispatch(updateAdmin({ id: data.id, admin: formData }))} 
+                onConfirm={() => dispatch(updateAdmin({ id: String(data.id), admin: formData }))} 
                 customButton={
                   showConfirm ? (
                     <Button color='green'>Update</Button>
                   ) : (
-                    <Button disabled={disabled} color='green' onClick={(e) => formSubmit(e)}>Update</Button>
+                    <Button disabled={disabled} color='green' onClick={(e) => formSubmit(e)}>Verify</Button>
                   )
                 }
               />
             </AlertDialog.Action>
           </Flex>
         </form>
-
       </AlertDialog.Content>
     </AlertDialog.Root>
   )

@@ -127,14 +127,19 @@ export const deleteMesinCuci = createAsyncThunk<
 )
 
 export const updateMesinCuci = createAsyncThunk<
-  { updatedAdmin: MesinCuci; message: string }, 
+  { updatedAdmin: MesinCuci; message: string, status: string }, 
   { id: string, mesinCuci: Partial<MesinCuci>},
   { rejectValue: string }
 >(
   "admin/updateAdmin",
   async ({id, mesinCuci}, { rejectWithValue }) => {
     try{
-      const { data, error } = await supabase.from("mesin_cuci").update(mesinCuci).eq("id", id).select()
+      const { data, error } = await supabase
+        .from("mesin_cuci")
+        .update(mesinCuci)
+        .eq("id", id)
+        .select()
+        
       if (error) {
         toast.error('Something went wrong',{
           description: 'Failed to update mesin cuci',
@@ -146,7 +151,8 @@ export const updateMesinCuci = createAsyncThunk<
       
       return {
         updatedAdmin: data[0],
-        message: "Mesin cuci updated successfully"
+        message: "Mesin cuci updated successfully",
+        status: "ok"
       }
     }catch (error) {
       toast.error('Failed to update mesin cuci');

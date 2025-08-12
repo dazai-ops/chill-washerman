@@ -111,7 +111,7 @@ function MesinCuciLayout() {
                     <Box className='mt-2'>
                       
                       <Text as="div" size="1" color="gray">
-                        {row.status_mesin === 'digunakan' ? '-' : 'Last Used: ' + formatDateWIB(row.terakhir_digunakan)}
+                        {row.status_mesin === 'digunakan' ? '-' : row.terakhir_digunakan === null ? 'Belum Digunakan' : 'Last Used: ' + formatDateWIB(row.terakhir_digunakan)}
                       </Text>
                     </Box>
                   </Box>

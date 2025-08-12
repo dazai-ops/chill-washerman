@@ -74,7 +74,7 @@ const adminSlice = createSlice({
       })
       .addCase(updateAdmin.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.success = action.payload.status
       })
       .addCase(updateAdmin.rejected, (state, action) => {
         state.loading = false

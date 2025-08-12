@@ -9,4 +9,5 @@ export interface Admin {
   last_login?: string
   jumlah_input?: number
   created_at?: string
+  is_login: boolean
 }

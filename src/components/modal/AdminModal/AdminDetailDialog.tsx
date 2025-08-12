@@ -1,8 +1,10 @@
-import React from 'react'
-import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
+//lib
 import { EyeOpenIcon } from '@radix-ui/react-icons'
-import { formatDateWIB } from '@/utils/dateFormatter'
+import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
+
+//utils
 import { Admin } from '@/models/admin.model';
+import { formatDateWIB } from '@/utils/dateFormatter'
 
 function AdminDetailDialog({data}: {data: Admin}) {
   return (
@@ -13,7 +15,7 @@ function AdminDetailDialog({data}: {data: Admin}) {
         </DropdownMenu.Item>
       </Dialog.Trigger>
 
-      <Dialog.Content maxWidth="450px">
+      <Dialog.Content maxWidth="550px">
         <Dialog.Title>{data.nama}</Dialog.Title>
         <DropdownMenu.Separator />
         
@@ -41,12 +43,12 @@ function AdminDetailDialog({data}: {data: Admin}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Last Login</DataList.Label>
             <DataList.Value>
-              {data.last_login != null ? (
-                <Badge color="yellow" variant="soft">Last login: {data.last_login && formatDateWIB(data.last_login)}</Badge>
+              {data.is_login ? (
+                <Badge color="jade" variant="soft">Sedang Online</Badge>
               ) : data.last_login == null ?(
                 <Badge color="red" variant="soft">Belum login / Baru Ditambahkan</Badge>
               ) : (
-                <Badge color="jade" variant="soft">Sedang Online</Badge>
+                <Badge color="yellow" variant="soft">Last login: {data.last_login && formatDateWIB(data.last_login)}</Badge>
               )}
             </DataList.Value>
           </DataList.Item>

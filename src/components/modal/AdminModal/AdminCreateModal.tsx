@@ -1,18 +1,17 @@
 // lib
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, Box } from '@radix-ui/themes'
 import { PersonIcon } from '@radix-ui/react-icons';
+import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, Box } from '@radix-ui/themes'
 
 // redux
 import { AppDispatch, RootState } from '@/redux/store'
-import { clearError } from '@/redux/slices/authSlice'
 import { addAdmin } from '@/lib/thunk/admin/adminThunk'
+import { clearForm, setErrors, setField, clearErrors } from '@/redux/slices/form-validation/singleForm'
 
-// form validate
+// utils
 import { validateForm } from '@/utils/form-validation/validateForm'
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
-import { clearForm, setErrors, setField } from '@/redux/slices/form-validation/formAdminSlice'
 
 // component
 import ErrorMessage from '../../ui/FieldError/ErrorMessage';
@@ -31,8 +30,8 @@ function AdminAddModal() {
   const [disabled, setDisabled] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.formAdmin.data)
-  const errors = useSelector((state:RootState) => state.formAdmin.errors)
+  const formData = useSelector((state:RootState) => state.singleForm.data)
+  const errors = useSelector((state:RootState) => state.singleForm.errors)
 
   const formChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target
@@ -47,7 +46,7 @@ function AdminAddModal() {
       dispatch(setErrors(formError))
       setDisabled(true)
     } else {
-      dispatch(clearError())
+      dispatch(clearErrors())
       dispatch(addAdmin(formData as {password_hash: string}))
       setOpen(false)
     } 
@@ -59,7 +58,7 @@ function AdminAddModal() {
   
   useEffect(() => {
     if(!open) {
-      dispatch(clearError())
+      dispatch(clearErrors())
       dispatch(clearForm())
     }
   }, [open, dispatch])
@@ -71,9 +70,14 @@ function AdminAddModal() {
   return (
     <AlertDialog.Root open={open}>
       <AlertDialog.Trigger>
-        <Button size="3" color='gray' onClick={() => setOpen(true)} highContrast><PersonIcon/>Add new...</Button>
+        <Button 
+          size="3" 
+          color='gray' 
+          onClick={() => setOpen(true)} highContrast
+        >
+          <PersonIcon/>Add new...</Button>
       </AlertDialog.Trigger>
-      <AlertDialog.Content maxWidth="550px">
+      <AlertDialog.Content maxWidth="600px">
         <AlertDialog.Title>Tambah Admin</AlertDialog.Title>
 
         <AlertDialog.Description >
@@ -89,8 +93,8 @@ function AdminAddModal() {
                   <Text size="2" weight="bold">Nama</Text>
                   <TextField.Root 
                     size="3" 
-                    className={`mb-1 ${getErrorMessage('nama') ? 'border border-red-500' : ''}`}
                     name='nama' 
+                    className={`mb-1 ${getErrorMessage('nama') ? 'border border-red-500' : ''}`}
                     aria-invalid='true'
                     onChange={formChange}
                   />
@@ -104,10 +108,10 @@ function AdminAddModal() {
                 <Box className='w-full'>
                   <Text size="2" weight="bold">Nomer Telepon</Text>
                   <TextField.Root 
-                    size="3" 
-                    className={`mb-1 ${getErrorMessage('no_telepon') ? 'border border-red-500' : ''}`}
-                    name='no_telepon' 
                     type='number'
+                    size="3" 
+                    name='no_telepon' 
+                    className={`mb-1 ${getErrorMessage('no_telepon') ? 'border border-red-500' : ''}`}
                     onChange={formChange}
                   />
                   <ErrorMessage message={getErrorMessage('no_telepon') ?? ''}/>
@@ -119,8 +123,8 @@ function AdminAddModal() {
                   <Text size="2" weight="bold">Username</Text>
                   <TextField.Root 
                     size="3" 
-                    className={`mb-1 ${getErrorMessage('username') ? 'border border-red-500' : ''}`}
                     name='username' 
+                    className={`mb-1 ${getErrorMessage('username') ? 'border border-red-500' : ''}`}
                     onChange={formChange}
                   />
                   <ErrorMessage message={getErrorMessage('username') ?? ''}/>
@@ -130,10 +134,10 @@ function AdminAddModal() {
                 <Box className='w-full'>
                   <Text size="2" weight="bold">Password</Text>
                   <TextField.Root 
+                    type='password' 
+                    name='password_hash' 
                     size="3" 
                     className={`mb-1 ${getErrorMessage('password_hash') ? 'border border-red-500' : ''}`}
-                    name='password_hash' 
-                    type='password' 
                     onChange={formChange}
                   />
                   <ErrorMessage message={getErrorMessage('password_hash') ?? ''}/>
@@ -155,9 +159,9 @@ function AdminAddModal() {
               {/* Select role admin */}
               <Text size="2" weight="bold">Role Admin</Text>
               <Select.Root 
-                defaultValue="apple" 
                 size="3" 
                 name='role' 
+                defaultValue="apple" 
                 onValueChange={(val) => dispatch(setField({field: 'role', value: val}))}
               >
                 <Select.Trigger 
@@ -175,7 +179,6 @@ function AdminAddModal() {
               <ErrorMessage message={getErrorMessage('role') ?? ''}/>
             </Grid>
           </Flex>
-
           <Flex gap="3" mt="4" justify="end">
             <AlertDialog.Cancel>
               <Button 
@@ -196,7 +199,7 @@ function AdminAddModal() {
             </AlertDialog.Action>
           </Flex>
         </form>
-        
+
       </AlertDialog.Content>
     </AlertDialog.Root>
   )

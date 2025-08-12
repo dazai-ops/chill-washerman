@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   
   const {error} = await supabase
     .from('admin')
-    .update({last_login: new Date()})
+    .update({last_login: new Date(), is_login: false})
     .eq('id', id)
     .single()
   

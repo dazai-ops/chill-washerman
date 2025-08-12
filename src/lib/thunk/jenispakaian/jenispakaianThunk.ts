@@ -14,6 +14,7 @@ export const retriveJenisPakaian = createAsyncThunk<
       .from("pakaian")
       .select("*")
       .order("jenis_pakaian", { ascending: false })
+
     if (error) {
       toast.error('Something went wrong', {
         description: 'Failed to retrive jenis pakaian',
@@ -26,7 +27,7 @@ export const retriveJenisPakaian = createAsyncThunk<
 )
 
 export const addJenisPakaian = createAsyncThunk<
-  { jenisPakaian : JenisPakaian; message: string },
+  { jenisPakaian : JenisPakaian; message: string, status: string },
   JenisPakaian,
   { rejectValue: string }
 >(
@@ -34,7 +35,10 @@ export const addJenisPakaian = createAsyncThunk<
   async (payload, { rejectWithValue }) => {
     try{
 
-      const { data, error } = await supabase.from("pakaian").insert(payload).select()
+      const { data, error } = await supabase
+        .from("pakaian")
+        .insert(payload)
+        .select()
 
       if(error) {
         toast.error('Something went wrong',{
@@ -46,7 +50,8 @@ export const addJenisPakaian = createAsyncThunk<
       toast.success('Jenis pakaian added successfully')
       return {
         jenisPakaian: data[0] as JenisPakaian,
-        message: "Jenis pakaian added successfully"
+        message: "Jenis pakaian added successfully",
+        status: "ok"
       }
     } catch (error ) {
       toast.error('Failed to add jenis pakaian');
@@ -91,14 +96,19 @@ export const deleteJenisPakaian = createAsyncThunk<
 )
 
 export const updateJenisPakaian = createAsyncThunk<
-  { updatedAdmin: JenisPakaian; message: string }, 
-  { id: string | number, jenisPakaian: Partial<JenisPakaian>},
+  { updatedAdmin: JenisPakaian; message: string, status: string }, 
+  { id: string | number, payload: Partial<JenisPakaian>},
   { rejectValue: string }
 >(
-  "admin/updateAdmin",
-  async ({id, jenisPakaian}, { rejectWithValue }) => {
+  "jenisPakaian/updateJenisPakaian",
+  async ({id, payload}, { rejectWithValue }) => {
     try{
-      const { data, error } = await supabase.from("pakaian").update(jenisPakaian).eq("id", id).select()
+      const { data, error } = await supabase
+        .from("pakaian")
+        .update(payload)
+        .eq("id", id)
+        .select()
+
       if (error) {
         toast.error('Something went wrong',{
           description: 'Failed to update jenis pakaian',
@@ -110,7 +120,8 @@ export const updateJenisPakaian = createAsyncThunk<
       
       return {
         updatedAdmin: data[0],
-        message: "Jenis pakaian updated successfully"
+        message: "Jenis pakaian updated successfully",
+        status: "ok"
       }
     }catch (error) {
       toast.error('Failed to update jenis pakaian');

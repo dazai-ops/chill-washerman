@@ -74,27 +74,12 @@ const jenisPakaianSlice = createSlice({
       })
       .addCase(updateJenisPakaian.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.success = action.payload.status
       })
       .addCase(updateJenisPakaian.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
-
-      // // change role
-      // .addCase(changeActive.pending, (state) => {
-      //   state.loading = true
-      //   state.error = null
-      //   state.success = null
-      // })
-      // .addCase(changeActive.fulfilled, (state, action) => {
-      //   state.loading = false
-      //   state.success = action.payload.message
-      // })
-      // .addCase(changeActive.rejected, (state, action) => {
-      //   state.loading = false
-      //   state.error = action.payload as string
-      // })
   }
 })
 

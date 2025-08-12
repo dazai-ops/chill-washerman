@@ -1,6 +1,8 @@
-import React from 'react'
+//lib
 import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
 import { EyeOpenIcon } from '@radix-ui/react-icons'
+
+//utils
 import { formatDateWIB } from '@/utils/dateFormatter'
 import { JenisPakaian } from '@/models/jenispakaian.model'
 
@@ -46,7 +48,7 @@ function JenisPakaianDetailDialog({data}: {data: JenisPakaian}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Ditambahkan</DataList.Label>
             <DataList.Value>
-              {formatDateWIB(data.created_at)}
+              {formatDateWIB(String(data.created_at))}
             </DataList.Value>
           </DataList.Item>
         </DataList.Root>
