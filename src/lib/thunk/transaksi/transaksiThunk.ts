@@ -93,7 +93,7 @@ export const addTransaksi = createAsyncThunk(
         })
         return rejectWithValue(transaksiError.message)
 
-      } else if(!transaksiData){
+      } else if(transaksiData){
         const transaksiId = transaksiData[0].id
         const detailWithParent = transaksiDetail.map(({acuan_harga,...detail}) => ({
           ...detail,
@@ -117,26 +117,6 @@ export const addTransaksi = createAsyncThunk(
             await supabase.rpc("increment_jumlah_input", {
               admin_id: transaksiData[0].dibuat_oleh
             })
-
-            const mesinCuciId = transaksiDetail
-              .map((detail) => detail.mesin_cuci)
-              .filter((id): id is number => typeof id === 'number')
-            
-            if(mesinCuciId.length > 0){
-              const {error: mesinCuciError} = await supabase
-                .from("mesin_cuci")
-                .update({
-                  status_mesin: "digunakan"
-                })
-                .in("id", mesinCuciId)
-
-              if(mesinCuciError){
-                toast.error('Something went wrong',{
-                  description: 'Failed to update mesin cuci',
-                })
-                return rejectWithValue(mesinCuciError.message)
-              }
-            }
           }
         }
         toast.success('transaksi added successfully')
@@ -151,41 +131,6 @@ export const addTransaksi = createAsyncThunk(
     }
   }
 )
-
-// export const addMesinCuci = createAsyncThunk<
-//   { mesinCuci: MesinCuci; message: string },
-//   MesinCuci,
-//   { rejectValue: string }
-// >(
-//   "mesinCuci/addAdmin",
-//   async (payload, { rejectWithValue }) => {
-//     try{
-
-//       const mesinCuciPayload ={
-//         ...payload,
-//         nama: payload.merk + " " + payload.seri
-//       }
-
-//       const { data, error } = await supabase.from("mesin_cuci").insert(mesinCuciPayload).select()
-
-//       if(error) {
-//         toast.error('Something went wrong',{
-//           description: 'Failed to add mesin cuci',
-//         })
-//         return rejectWithValue(error.message)
-//       }
-
-//       toast.success('mesin cuci added successfully')
-//       return {
-//         mesinCuci: data[0] as MesinCuci,
-//         message: "mesin cuci added successfully"
-//       }
-//     } catch (error ) {
-//       toast.error('Failed to add mesin cuci');
-//       return rejectWithValue((error as Error).message)
-//     }
-//   }
-// )
 
 export const deleteTransaksi = createAsyncThunk<
   { deletedTransaksi: Transaksi; message: string }, 

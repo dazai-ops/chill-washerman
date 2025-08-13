@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { loginAdmin, logoutAdmin } from "@/lib/thunk/auth/authThunk";
 import { Admin } from "@/models/admin.model";
 
@@ -25,12 +25,13 @@ const authSlice = createSlice({
       state.user = userStr ? JSON.parse(userStr) : null
       console.log(state.user, 'from rehydrate')
     },
+
     logout: (state) => {
       state.user = null
     },
     clearError: (state) => {
       state.error = null
-    }
+    },
   },
   extraReducers: (builder) => {
     builder

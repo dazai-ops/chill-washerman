@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dialog, DataList, Badge, DropdownMenu, Table, Box } from '@radix-ui/themes'
+import { Dialog, DataList, Badge, DropdownMenu, Table, Box, Flex } from '@radix-ui/themes'
 import { EyeOpenIcon } from '@radix-ui/react-icons'
 import { formatDateWIB } from '@/utils/dateFormatter'
 import { formatRupiah } from '@/utils/rupiahFormatter';
@@ -55,13 +55,13 @@ function TransaksiDetailDialog({data}: {data: Transaksi}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Selesai</DataList.Label>
             <DataList.Value>
-              {formatDateWIB(data.tanggal_selesai) || '-' }
+              {data.tanggal_selesai &&formatDateWIB(data.tanggal_selesai) || '-' }
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Keluar</DataList.Label>
             <DataList.Value>
-              {formatDateWIB(data.tanggal_keluar) || '-' }
+              {data.tanggal_keluar && formatDateWIB(data.tanggal_keluar) || '-' }
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
@@ -91,21 +91,24 @@ function TransaksiDetailDialog({data}: {data: Transaksi}) {
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell align='center'>Jenis Pakaian</Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell align='center'>Mesin Cuci</Table.ColumnHeaderCell>
+                  {/* <Table.ColumnHeaderCell align='center'>Mesin Cuci</Table.ColumnHeaderCell> */}
                   <Table.ColumnHeaderCell align='center'>Status Proses</Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell align='center'>Layanan Setrika</Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell align='center'>Detail</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell align='center'>Aksi</Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
                 {data.transaksi_detail.map((detail, index) => (
                   <Table.Row key={index}>
                     <Table.RowHeaderCell align='center'>{detail.jenis_pakaian.jenis_pakaian}</Table.RowHeaderCell>
-                    <Table.Cell align='center'>{detail.mesin_cuci.merk + ' ' + detail.mesin_cuci.seri}</Table.Cell>
+                    {/* <Table.Cell align='center'>{detail.mesin_cuci.merk + ' ' + detail.mesin_cuci.seri}</Table.Cell> */}
                     <Table.Cell align='center'>{formatToTitleCase(detail.status_proses)}</Table.Cell>
                     <Table.Cell align='center'>{detail.layanan_setrika ? 'Ya' : 'Tidak'}</Table.Cell>
                     <Table.Cell align='center'>
-                      <LayananDetailDialog data={detail}/>
+                      <Flex>
+                        <LayananDetailDialog data={detail}/>
+                        <LayananDetailDialog data={detail}/>
+                      </Flex>
                     </Table.Cell>
                   </Table.Row>
                 ))}

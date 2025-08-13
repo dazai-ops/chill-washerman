@@ -12,7 +12,7 @@ function LayananDetailDialog({data}) {
     <Dialog.Root>
       <Dialog.Trigger>
         <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
-          <EyeOpenIcon />Detail
+          <EyeOpenIcon />
         </DropdownMenu.Item>
       </Dialog.Trigger>
 
@@ -36,10 +36,10 @@ function LayananDetailDialog({data}) {
             <DataList.Label minWidth="88px">Jenis Pakaian</DataList.Label>
             <DataList.Value>{data.jenis_pakaian.jenis_pakaian}</DataList.Value>
           </DataList.Item>
-          <DataList.Item>
+          {/* <DataList.Item>
             <DataList.Label minWidth="88px">Mesin Cuci</DataList.Label>
             <DataList.Value>{data.mesin_cuci.merk + ' ' + data.mesin_cuci.seri}</DataList.Value>
-          </DataList.Item>
+          </DataList.Item> */}
           <DataList.Item>
             <DataList.Label minWidth="88px">Berat (kg)</DataList.Label>
             <DataList.Value>{data.berat_kg || '-'}</DataList.Value>
@@ -66,7 +66,7 @@ function LayananDetailDialog({data}) {
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Diubah</DataList.Label>
-            <DataList.Value>{formatDateWIB(data.updated_at) || '-'}</DataList.Value>
+            <DataList.Value>{ data.updated_at !== null && formatDateWIB(data.updated_at) || '-'}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Diubah Oleh</DataList.Label>

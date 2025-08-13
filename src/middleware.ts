@@ -28,5 +28,6 @@ export const config = {
     '/admin/:path*',
     '/mesin-cuci/:path*',
     '/jenis-pakaian/:path*',
+    '/transaksi/:path*'
   ]
 }

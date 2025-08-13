@@ -17,6 +17,7 @@ import EditModal from '@/components/modal/AdminModal/AdminEditModal';
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
+// import { setAdmin } from '@/redux/slices/authSlice';
 
 
 function AdminLayout() {
@@ -27,7 +28,12 @@ function AdminLayout() {
   
   const columns = adminColumns
   const data = useSelector((state: RootState) => state.admin.adminCollection)
-  
+
+  // dispatch(setAdmin(admin))
+
+  if(admin) {
+    console.log(admin)
+  }
   useEffect(() => {
     dispatch(retriveAdmin())
   }, [dispatch, success])

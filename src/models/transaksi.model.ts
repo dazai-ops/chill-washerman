@@ -53,7 +53,7 @@ export interface CreateTransaksiOverview {
   },
   kode_transaksi: string,
   nama_pelanggan: string,
-  telepon_pelanggan: string,
+  telepon_pelanggan: number | null,
   catatan: string
   dibayarkan: number,
   total_harga: number,
@@ -73,7 +73,7 @@ export interface CreateTransaksiDetail {
   berat_kg: number,
   jumlah_item: number,
   layanan_setrika: boolean | null,
-  mesin_cuci: number | string,
+  mesin_cuci?: number | string,
   total_harga_layanan: number,
   catatan_pelanggan: string,
   catatan_admin: string
