@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CreateTransactionDetail, CreateTransactionOverview, Transaction } from "@/models/transaksi.model";
 import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction } from "@/lib/thunk/transaksi/transaksiThunk";
 import { generateTransaksiCode } from "@/utils/generateCode";
+import { Transaction, CreateTransaction, CreateTransactionDetail, TransactionDetail  } from "@/models/transaksitwo.model";
 interface TransaksiState {
   transactionList: Partial<Transaction[]>
-  transactionOverview: Partial<CreateTransactionOverview>
-  transactionDetail: Partial<CreateTransactionDetail[]>
+  transactionOverview: Partial<CreateTransaction> | Partial<Transaction>
+  transactionDetail: Partial<CreateTransactionDetail[]> | Partial<TransactionDetail[]>
   transactionDetailDelete: number[] 
   currentTransaction: Partial<Transaction> | null
   loading: boolean,
@@ -60,11 +60,11 @@ const transaksiSlice = createSlice({
   name: "transaksi",
   initialState,
   reducers: {
-    setTransactionOverviewField: <K extends keyof CreateTransactionOverview> (
+    setTransactionOverviewField: <K extends keyof CreateTransaction> (
       state: TransaksiState,
       action: PayloadAction<{
         key: K,
-        value: CreateTransactionOverview[K]
+        value: CreateTransaction[K]
       }>
     ) => {
       const { key, value } = action.payload
@@ -72,7 +72,7 @@ const transaksiSlice = createSlice({
 
       if(!detail) return
       if(key === "dibuat_oleh" && typeof value === "object" && value !== null) {
-        detail.dibuat_oleh = value as CreateTransactionOverview["dibuat_oleh"]
+        detail.dibuat_oleh = value as CreateTransaction["dibuat_oleh"]
       } else {
         detail[key] = value
       }

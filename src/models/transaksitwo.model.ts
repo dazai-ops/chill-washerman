@@ -9,8 +9,8 @@ export interface BaseUser {
 
 export interface BaseEntity {
   id?: number | null
-  created_at: string
-  updated_at: string
+  created_at?: string
+  updated_at?: string
   updated_by?: BaseUser
 }
 
@@ -27,13 +27,13 @@ export interface Transaction extends BaseEntity{
   status_proses: string
   catatan: string
   dibuat_oleh: BaseUser
-  transaksi_detail: TrasactionDetail[]
+  transaksi_detail: TransactionDetail[]
 
   sisa_bayar?: number
   kembalian?: number
 }
 
-export interface TrasactionDetail extends BaseEntity {
+export interface TransactionDetail extends BaseEntity {
   berat_kg: number
   jumlah_item: number
   layanan_setrika: boolean | null
@@ -41,7 +41,7 @@ export interface TrasactionDetail extends BaseEntity {
   catatan_admin: string
   status_proses?: string
   acuan_harga?: string
-  total_harga_layanan?: number
+  total_harga_layanan: number
   transaksi_parent?: number | string
   mesin_cuci?: Washer
   jenis_pakaian: Apparel
@@ -54,12 +54,15 @@ export interface ApiResponse<T> {
   error?: string | null
 }
 
-export type CreateTransaction = Omit<Transaction, "id" | "created_at" | "updated_at" | "updated_by" | "transaksi_detail"> & {
+export type CreateTransaction = Omit<Transaction, "created_at" | "updated_at" | "updated_by" | "transaksi_detail" | "tanggal_masuk" | "tanggal_selesai" | "tanggal_keluar" | "status_proses"> & {
   sisa_bayar?: number
   kembalian?: number
 }
-export type CreateTransactionDetail = Omit<TrasactionDetail, "id" | "created_at" | "updated_at" | "updated_by">
+export type CreateTransactionDetail = Omit<TransactionDetail, "created_at" | "updated_at" | "updated_by" | "status_proses" | "mesin_cuci">
 export type SingleTransaction = {
-  overview: Omit<Transaction, "transaksi_detail" | "mesin">
-  detail: TrasactionDetail[]
+  overview: Omit<Transaction, "transaksi_detail" | "mesin_cuci">
+  detail: Omit<TransactionDetail[], "jenis_pakaian" | "mesin_cuci" | "updated_by"> & {
+    jenis_pakaian: Apparel[]
+    updated_by: BaseUser[]
+  }
 }

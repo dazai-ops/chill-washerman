@@ -1,5 +1,5 @@
 export interface Apparel {
-  id: number
+  id: number | null
   jenis_pakaian?: string
   harga_per_item: number
   harga_per_kg: number
