@@ -1,6 +1,5 @@
 //lib
 import { useState, useEffect } from 'react'
-import { PersonIcon } from '@radix-ui/react-icons';
 import { Button, Flex, AlertDialog, Grid, TextField, Text, Box, RadioCards } from '@radix-ui/themes'
 
 //redux
@@ -73,7 +72,7 @@ function MesinCuciCreateModal() {
   return (
     <AlertDialog.Root open={open}>
       <AlertDialog.Trigger>
-        <Button size="3" color='gray' onClick={() => setOpen(true)} highContrast><PersonIcon/>Add new...</Button>
+        <Button size="3" color='gray' onClick={() => setOpen(true)} highContrast>Add new...</Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
         <AlertDialog.Title>Tambah Mesin Cuci</AlertDialog.Title>

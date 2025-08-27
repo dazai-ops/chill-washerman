@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { Button, Flex, AlertDialog, Grid, TextField, Text, Box } from '@radix-ui/themes'
 import { useDispatch, useSelector } from 'react-redux'
-import { PersonIcon } from '@radix-ui/react-icons';
 
 //redux
 import { AppDispatch, RootState } from '@/redux/store'
@@ -86,8 +85,7 @@ function JenisPakaianCreateModal() {
           onClick={() => setOpen(true)} 
           color='gray' 
           highContrast
-        >
-          <PersonIcon/>Add new...
+        >Add new...
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">

@@ -77,9 +77,11 @@ function AdminAddModal() {
         <Button 
           size="3" 
           color='gray' 
-          onClick={() => setOpen(true)} highContrast
+          onClick={() => setOpen(true)} 
+          highContrast
         >
-          <PersonIcon/>Add new...</Button>
+          <PersonIcon/>Add new...
+        </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="600px">
         <AlertDialog.Title>Tambah Admin</AlertDialog.Title>

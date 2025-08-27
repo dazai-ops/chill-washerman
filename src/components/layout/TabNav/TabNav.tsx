@@ -2,6 +2,7 @@ import React from 'react'
 import { TabNav } from '@radix-ui/themes'
 import { usePathname } from 'next/navigation'
 import Profile from '@/components/layout/AdminProfile/AdminProfile';
+import ThemeToggle from '@/components/layout/ThemeToggle/ThemeToggel';
 
 function Tabnav() {
 
@@ -15,6 +16,7 @@ function Tabnav() {
       <TabNav.Link href="#" active={pathName === '/histori'}>Histori</TabNav.Link>
       <TabNav.Link href="/mesin-cuci" active={pathName === '/mesin-cuci'}>Mesin Cuci</TabNav.Link>
       <TabNav.Link href="/jenis-pakaian" active={pathName === '/jenis-pakaian'}>Jenis Pakaian</TabNav.Link>
+      {/* <ThemeToggle/> */}
     </TabNav.Root>
   )
 }

@@ -66,8 +66,10 @@ function TransaksiLayout() {
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
-                <Button variant="solid" size="3">
-                  <Link href="/transaksi/create" target='_blank' underline='none' >Add new...</Link>
+                <Button asChild size="3" color="gray" highContrast>
+                  <Link href="/transaksi/create" target="_blank" underline='none'>
+                    Add new...
+                  </Link>
                 </Button>
               </>
             }
@@ -134,8 +136,10 @@ function TransaksiLayout() {
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
-                <Button variant="solid" size="3">
-                  <Link href="/transaksi/create" target='_blank' underline='none' >Add new...</Link>
+                <Button asChild size="3" color="gray" highContrast>
+                  <Link href="/transaksi/create" target="_blank" underline='none'>
+                    Add new...
+                  </Link>
                 </Button>
               </>
             }
