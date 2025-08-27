@@ -1,101 +1,127 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { addMesinCuci, changeActive, deleteMesinCuci, retriveMesinCuci, updateMesinCuci } from '@/lib/thunk/mesincuci/mesincuciThunk';
-import { MesinCuci } from "@/models/mesincuci.model";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { addWasher, changeWasherStatus, deleteWasher, getWasher, updateWasher } from '@/lib/thunk/mesincuci/mesincuciThunk';
+import { Washer } from "@/models/mesincuci.model";
 
 interface MesinCuciState {
-  mesinCuciCollection: MesinCuci[]
+  washerList: Washer[]
+  washerForm: Partial<Washer>
   loading: boolean,
   error: string | null
-  success: string | null
+  status: string | null
 }
 
 const initialState: MesinCuciState = {
-  mesinCuciCollection: [],
+  washerList: [],
+  washerForm: {
+    nama: "",
+    merk: "",
+    seri: "",
+    is_active: false,
+    tahun_pembuatan: "",
+    tanggal_dibeli: "",
+  },
   loading: false, 
   error: null,
-  success: null
+  status: null
 }
 
 const mesinCuciSlice = createSlice({
   name: "mesinCuci",
   initialState,
-  reducers: {},
+  reducers: {
+    setWasherForm: (state, action: PayloadAction<Partial<Washer>>) => {
+      state.washerForm = {
+        ...state.washerForm,
+        ...action.payload
+      }
+    },
+    resetWasherForm: (state) => {
+      state.washerForm = {
+        ...initialState.washerForm
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       // retrive admin
-      .addCase(retriveMesinCuci.pending, (state) => {
+      .addCase(getWasher.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(retriveMesinCuci.fulfilled, (state, action) => {
-        state.mesinCuciCollection = action.payload
+      .addCase(getWasher.fulfilled, (state, action) => {
+        state.washerList = action.payload.result
         state.loading = false
       })
-      .addCase(retriveMesinCuci.rejected, (state, action) => {
+      .addCase(getWasher.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
 
       // add admin
-      .addCase(addMesinCuci.pending, (state) => {
+      .addCase(addWasher.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(addMesinCuci.fulfilled, (state, action) => {
+      .addCase(addWasher.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.status = action.payload.status
       })
-      .addCase(addMesinCuci.rejected, (state, action) => {
+      .addCase(addWasher.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
 
       // delete admin
-      .addCase(deleteMesinCuci.pending, (state) => {
+      .addCase(deleteWasher.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(deleteMesinCuci.fulfilled, (state, action) => {
+      .addCase(deleteWasher.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.status = action.payload.status
       })
-      .addCase(deleteMesinCuci.rejected, (state, action) => {
+      .addCase(deleteWasher.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
+        state.status = null
       })
 
       //update admin
-      .addCase(updateMesinCuci.pending, (state) => {
+      .addCase(updateWasher.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(updateMesinCuci.fulfilled, (state, action) => {
+      .addCase(updateWasher.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.status
+        state.status = action.payload.status
       })
-      .addCase(updateMesinCuci.rejected, (state, action) => {
+      .addCase(updateWasher.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
+        state.status = null
       })
 
       // change role
-      .addCase(changeActive.pending, (state) => {
+      .addCase(changeWasherStatus.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(changeActive.fulfilled, (state, action) => {
+      .addCase(changeWasherStatus.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.status = action.payload.status
       })
-      .addCase(changeActive.rejected, (state, action) => {
+      .addCase(changeWasherStatus.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
+        state.status = null
       })
   }
 })
+
+export const { setWasherForm, resetWasherForm } = mesinCuciSlice.actions
 
 export default mesinCuciSlice.reducer

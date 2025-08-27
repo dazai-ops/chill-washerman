@@ -13,11 +13,12 @@ import { updateAdmin } from '@/lib/thunk/admin/adminThunk'
 import { Admin } from '@/models/admin.model'
 import { validateForm } from '@/utils/form-validation/validateForm'
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
-import { clearForm, setErrors, setForm, clearErrors } from '@/redux/slices/form-validation/singleForm'
+import { setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm'
 
 //component
 import ErrorMessage from '@/components/ui/FieldError/ErrorMessage'
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
+import { setAdminForm } from '@/redux/slices/adminSlice';
 
 
 const rules: Record<string, FieldRules> = {
@@ -34,33 +35,35 @@ function AdminEditModal({data}: {data: Admin}) {
   const [showConfirm, setShowConfirm] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.singleForm.data)
+  const {adminForm, status} = useSelector((state:RootState) => state.admin)
   const errors = useSelector((state:RootState) => state.singleForm.errors)
-  const res = useSelector((state:RootState) => state.admin.success)
 
   useEffect(() => {
     if(data) {
-      dispatch(clearForm())
       dispatch(clearErrors())
-      dispatch(setForm({
+      dispatch(setAdminForm({
         nama: data.nama,
-        no_telepon: data.no_telepon || '',
-        alamat_rumah: data.alamat_rumah,
         username: data.username,
-        role: data.role
+        role: data.role,
+        no_telepon: data.no_telepon,
+        alamat_rumah: data.alamat_rumah 
       }))
     }
   }, [data, dispatch])
 
-  const formChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target
-    dispatch(setForm({...formData, [name]: value}))
+    dispatch(setAdminForm({
+      ...adminForm,
+      [name]: value
+    }))
   }
 
-  const formSubmit = (e : React.MouseEvent<HTMLButtonElement>) => {
+  const handleFormVerify = (e : React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     dispatch(clearErrors())
-    const formError = validateForm(formData, rules)
+
+    const formError = validateForm(adminForm, rules)
     if(formError.length > 0) {
       dispatch(setErrors(formError))
       setDisabled(true)
@@ -89,18 +92,29 @@ function AdminEditModal({data}: {data: Admin}) {
     if(showConfirm){
       setShowConfirm(false)
     }
-  }, [formData])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminForm])
 
   useEffect(() => {
-    if(res === "ok") {
+    if(status === "success") {
       setOpen(false)
     }
-  }, [res])
+  }, [status])
+
+  // DEBUG -------------
+  // useEffect(() => {
+  //   console.log(adminForm)
+  // }, [adminForm])
+  // DEBUG ------------
 
   return (
     <AlertDialog.Root open={open}>
       <AlertDialog.Trigger>
-        <DropdownMenu.Item color='yellow' onClick={() => setOpen(true)} onSelect={(e) => e.preventDefault()}>
+        <DropdownMenu.Item 
+          color='yellow' 
+          onClick={() => setOpen(true)} 
+          onSelect={(e) => e.preventDefault()}
+        >
           <Pencil1Icon />Edit
         </DropdownMenu.Item>
       </AlertDialog.Trigger>
@@ -121,8 +135,8 @@ function AdminEditModal({data}: {data: Admin}) {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('nama') ? 'border border-red-500' : ''}`}
                     name='nama' 
-                    onChange={formChange} 
-                    defaultValue={data?.nama}
+                    onChange={handleFormChange} 
+                    defaultValue={adminForm.nama}
                   />
                   <ErrorMessage
                     message={getErrorMessage('nama') ?? ''}
@@ -136,8 +150,8 @@ function AdminEditModal({data}: {data: Admin}) {
                     className={`mb-1 ${getErrorMessage('no_telepon') ? 'border border-red-500' : ''}`}
                     name='no_telepon' 
                     type='number' 
-                    onChange={formChange} 
-                    defaultValue={data?.no_telepon}
+                    onChange={handleFormChange} 
+                    defaultValue={adminForm.no_telepon}
                   />
                   <ErrorMessage message={getErrorMessage('no_telepon') ?? ''}/>
                 </Box>
@@ -149,8 +163,8 @@ function AdminEditModal({data}: {data: Admin}) {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('username') ? 'border border-red-500' : ''}`}
                     name='username' 
-                    onChange={formChange} 
-                    defaultValue={data?.username}
+                    onChange={handleFormChange} 
+                    defaultValue={adminForm.username}
                   />
                   <ErrorMessage message={getErrorMessage('username') ?? ''}/>
                 </Box>
@@ -161,8 +175,11 @@ function AdminEditModal({data}: {data: Admin}) {
                   <Select.Root 
                     size="3" 
                     name='role' 
-                    onValueChange={(value) => dispatch(setForm({ ...formData, role: value }))} 
-                    defaultValue={data?.role}
+                    onValueChange={(value) => dispatch(setAdminForm({ 
+                      ...adminForm, 
+                      role: value }
+                    ))} 
+                    defaultValue={adminForm.role}
                   >
                     <Select.Trigger style={{ width: '100%'}}/>
                       <Select.Content>
@@ -182,8 +199,8 @@ function AdminEditModal({data}: {data: Admin}) {
                 size="3" 
                 className='mb-1' 
                 name='alamat_rumah' 
-                onChange={formChange} 
-                defaultValue={data?.alamat_rumah}
+                onChange={handleFormChange} 
+                defaultValue={adminForm.alamat_rumah}
               />
               <ErrorMessage 
                 message={getErrorMessage('alamat_rumah') ?? ''}
@@ -191,7 +208,7 @@ function AdminEditModal({data}: {data: Admin}) {
             </Grid>
           </Flex>
 
-          <Flex gap="3" mt="4" justify="end">
+          <Flex gap="2" mt="4" justify="end">
             <AlertDialog.Cancel>
               <Button color='gray' onClick={() => setOpen(false)}>
                 Batal
@@ -199,17 +216,17 @@ function AdminEditModal({data}: {data: Admin}) {
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange
-                onConfirm={() => dispatch(updateAdmin({ id: String(data.id), admin: formData }))} 
+                onConfirm={() => dispatch(updateAdmin({ id: String(data.id), payload: adminForm }))} 
                 customButton={
                   showConfirm ? (
                     <Button color='green'>Update</Button>
                   ) : (
-                    <Button disabled={disabled} color='green' onClick={(e) => formSubmit(e)}>Verify</Button>
+                    <Button disabled={disabled} color='green' onClick={(e) => handleFormVerify(e)}>Verify</Button>
                   )
                 }
               />
             </AlertDialog.Action>
-          </Flex>
+          </Flex>        
         </form>
       </AlertDialog.Content>
     </AlertDialog.Root>

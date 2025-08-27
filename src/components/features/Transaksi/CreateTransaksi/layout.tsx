@@ -1,77 +1,93 @@
 "use client"
 
-import { Box, Tabs, Text, Card, Flex, Grid,TextField, Select, RadioCards, TextArea, Button } from '@radix-ui/themes';
+//lib
+import { toast } from 'sonner';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
+import { Box, Text, Card, Flex,TextField, Select, RadioCards, TextArea, Button, Table, Callout } from '@radix-ui/themes';
+
+//redux
 import { AppDispatch, RootState } from '@/redux/store';
-import { retriveJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk';
-import { retriveMesinCuci } from '@/lib/thunk/mesincuci/mesincuciThunk';
-import { addTransaksiDetailForm, calculateChangePrice, calculatePriceService, calculateTotalPrice, removeTransaksiDetailForm, setDetailedField, setOverview, clearForm } from '@/redux/slices/transaksiSlice';
-import { CreateTransaksiDetail, CreateTransaksiOverview } from '@/models/transaksi.model';
+import { getApparel } from '@/lib/thunk/jenispakaian/jenispakaianThunk';
+import { addTransaction } from '@/lib/thunk/transaksi/transaksiThunk';
+import { addTransactionDetailForm, calculateBalance, calculateServicePrice, calculateTotalPrice, removeTransactionDetailForm, setTransactionDetailField, setTransactionOverviewField } from '@/redux/slices/transaksiSlice';
+
+//utils
 import { formatRupiah } from '@/utils/rupiahFormatter';
-import { addTransaksi } from '@/lib/thunk/transaksi/transaksiThunk';
-import { FieldRules } from '@/utils/form-validation/singleFormValidation.model';
-import { validateForm } from '@/utils/form-validation/validateForm';
-import { setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm';
-import ErrorMessage from '@/components/ui/FieldError/ErrorMessage';
-import { toast } from 'sonner';
-// import { validateTransaction } from '@/redux/slices/transaksiSlice';
+import { CreateTransactionDetail, CreateTransactionOverview } from '@/models/transaksi.model';
 
-const overviewRules: Record<string, FieldRules> = {
-  nama_pelanggan: ['required'],
-}
 
-function CreateTransaksi() {
+function CreateTransaksiForm() {
   const dispatch = useDispatch<AppDispatch>()
+
   const admin = useSelector((state: RootState) => state.auth.user)
+  const {apparelList} = useSelector((state: RootState) => state.jenisPakaian)
+  const {transactionOverview, transactionDetail, status} = useSelector((state: RootState) => state.transaksi)
 
-  const jenisPakaianList = useSelector((state: RootState) => state.jenisPakaian.jenisPakaianCollection)
-  // const mesinCuciList = useSelector((state: RootState) => state.mesinCuci.mesinCuciCollection)
+  const totalWeight = transactionDetail.reduce((sum, detail) => sum + detail!.berat_kg, 0);
+  const totalItems = transactionDetail.reduce((sum, detail) => sum + detail!.jumlah_item, 0);
+  const totalPrice = transactionDetail.reduce((sum, detail) => sum + detail!.total_harga_layanan, 0);
 
-  const transaksiOverview = useSelector((state: RootState) => state.transaksi.transaksiOverview)
-  const transaksiDetailList = useSelector((state: RootState) => state.transaksi.transaksiDetailList)
-  const success = useSelector((state:RootState) => state.transaksi.success)
-
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
-
-  const overviewService = (key: keyof CreateTransaksiOverview, value: string | number | boolean) => {
-    dispatch(setOverview({key, value}))
-
-    const keyTriggerCalculate = ['total_harga', 'dibayarkan', 'acuan_harga']
-    if(keyTriggerCalculate.includes(key)) {
-      dispatch(calculateChangePrice())
+  // set current admin
+  useEffect(() => {
+    if(admin) {
+      dispatch(setTransactionOverviewField({
+        key: 'dibuat_oleh',
+        value: admin
+      }))
     }
+  }, [admin, dispatch])
+
+  // fetch clothing types
+  useEffect(() => {
+    dispatch(getApparel())
+  },[dispatch])
+  
+  // update overview
+  const updateTransactionOverview = (key: keyof CreateTransactionOverview, value: string | number | boolean) => {
+    dispatch(setTransactionOverviewField({key, value}))
   }
 
-  const detailJenisPakaian = (value: string | object, key: keyof CreateTransaksiDetail, index: number) => {
-    const selectedJenisPakaian = jenisPakaianList.find(jP => jP.id === Number(value))
-    if(selectedJenisPakaian){
-      dispatch(setDetailedField({index, key, value: selectedJenisPakaian}))
-    }
-  }
-
-  const detailService = (index: number, key: keyof CreateTransaksiDetail, value: string | number | boolean) => {
-    dispatch(setDetailedField({index, key, value}))
+  // update detail (service)
+  const updateTransactionDetail = (index: number, key: keyof CreateTransactionDetail, value: string | number | boolean) => {
+    dispatch(setTransactionDetailField({index, key, value}))
 
     const keyTriggerCalculate = ['jenis_pakaian', 'layanan_setrika', 'mesin_cuci', 'berat_kg', 'jumlah_item', 'acuan_harga']
     if(keyTriggerCalculate.includes(key)) {
-      dispatch(calculatePriceService({index: index}))
+      dispatch(calculateServicePrice({index: index}))
       dispatch(calculateTotalPrice())
     }
   }
 
+  // update clothing type (calculate price as well)
+  const updateClothingType = (value: string | object, key: keyof CreateTransactionDetail, index: number) => {
+    const selectedClothing = apparelList.find(jP => jP.id === Number(value))
+
+    if(selectedClothing) dispatch(setTransactionDetailField({index, key, value: selectedClothing}))
+
+    dispatch(calculateServicePrice({index: index}))
+    dispatch(calculateTotalPrice())
+  }
+
+  // handle submit form
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    for(let i = 0; i < transaksiDetailList.length; i++) {
-      const item = transaksiDetailList[i]
-      const nomorService = i + 1
-      if(item.jenis_pakaian.id === null) {
-        return toast.error(`Select at least one item for service ${nomorService}`, {
+    if(transactionOverview.nama_pelanggan === '') {
+      return toast.error('Nama pelanggan is required', {
+        position: "top-center"
+      })
+    }
+    for(let i = 0; i < transactionDetail.length; i++) {
+      const item = transactionDetail[i]
+      const serviceNumber = i + 1
+      if(item!.jenis_pakaian.id === null) {
+        return toast.error(`Select at least one item for service ${serviceNumber}`, {
           position: "top-center"
         })
       }
-      if((item.berat_kg === 0 || item.jumlah_item === 0) && item.total_harga_layanan === 0) {
+      if(item!.total_harga_layanan === 0){
         return toast.error(`Fill the form with valid data for service ${i+1}`, {
           description: 'Jumlah item/berat, layanan setrika, acuan harga',
           position: "top-center"
@@ -79,385 +95,406 @@ function CreateTransaksi() {
       }
     }
 
-    dispatch(addTransaksi({
-      transaksi: transaksiOverview, 
-      transaksiDetail: transaksiDetailList
+    dispatch(addTransaction({
+      transaction: transactionOverview, 
+      transactionDetail: transactionDetail
     }))
   }
-  
-  const verifyOverview = () => {
-    const overviewFormError = validateForm({...transaksiOverview, dibuat_oleh: transaksiOverview.dibuat_oleh.id}, overviewRules)
-    if (overviewFormError.length > 0) {
-      dispatch(setErrors(overviewFormError))
-      console.log(errors)
-    } else {
-      toast.success('Form valid', {
-        description: 'Clik "service" tab for continue',
-        position: "top-center"
-      })
-      dispatch(clearErrors())
-    }
-  }
 
-  const getErrorMessage = (fieldName: string) => {
-    return errors.find((error) => error.field === fieldName)?.message
-  }
-  console.log(getErrorMessage('nama_pelanggan'))
-
+  // trigger calculate balance when (dibayarkan or total_harga) change
   useEffect(() => {
-    if(admin) {
-      dispatch(setOverview({
-        key: 'dibuat_oleh',
-        value: admin
-      }))
-    }
-  }, [admin, dispatch])
+    dispatch(calculateBalance())
+  }, [transactionOverview.dibayarkan, transactionOverview.total_harga, dispatch])
 
+  // trigger calculate total price when (transaction detail) change
   useEffect(() => {
-    dispatch(retriveJenisPakaian())
-    dispatch(retriveMesinCuci({status_mesin: 'tidak_digunakan', is_active: 'true'}))
-  },[dispatch])
+    dispatch(calculateTotalPrice())
+  },[transactionDetail, dispatch])
 
+  // reload page when transaction success (status)
   useEffect(() => {
-    if(success) {
+    if(status === 'success') {
       const timer = setTimeout(() => {
         window.location.reload()
-      }, 1500)
+      }, 1000)
   
       return () => clearTimeout(timer)
     }
-  }, [success])
+  }, [status])
+
+  // DEBUG ------------------------------------------
+  // useEffect(() => {
+  //   console.log("Overviw", transactionOverview)
+  //   console.log("Detail",transactionDetail)
+  // },[transactionOverview, transactionDetail])
 
   return (
     <div className='w-full flex flex-col items-center'>
-      <Tabs.Root defaultValue="overview" className='w-full sm:w-[600px] md:w-[700px] lg:w-[1000px] mt-10'>
-        <Tabs.List >
-          <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
-          {!errors.length && transaksiOverview.nama_pelanggan !== "" && (
-            <Tabs.Trigger value="service">Service</Tabs.Trigger>
-          )}
-        </Tabs.List>
-
-        <Box pt="2">
+      <div className='w-full sm:w-[600px] md:w-[900px] lg:w-[1200px] mt-10'>
+        <Callout.Root className='mb-2'>
+          <Callout.Icon>
+            <InfoCircledIcon />
+          </Callout.Icon>
+          <Callout.Text>
+            Your changes will be saved untill you click the <b>save button.</b>
+          </Callout.Text>
+        </Callout.Root>
+        {admin?.nama ? (
           <form onSubmit={handleSubmit}>
-            <Tabs.Content value="overview">
-              <Box>
-                <Card size="2">
-                  <Flex direction="column" gap="2">
-                    <Grid gap="1">
-                      <Flex gap={"2"} className='mb-1'>
+            <Box>
+              <Card size="2" className='mb-3'>
+                <Flex gap="2">
+                  <Flex direction={"column"}>
+                    <Flex gap={"2"} className='mb-1'>
+                      <Box>
+                        <Text size={"1"} weight={"bold"}>Nama Admin</Text>
+                        <TextField.Root 
+                          type='text'
+                          name='dibuat_oleh'
+                          size={"2"} 
+                          value={transactionOverview.dibuat_oleh?.nama}
+                          readOnly 
+                        />
+                      </Box>
+                      <Box>
+                        <Text size={"1"} weight={"bold"}>Kode Transaksi</Text>
+                        <TextField.Root 
+                          type='text'
+                          name='kode_transaksi'
+                          size={"2"} 
+                          value={transactionOverview.kode_transaksi}
+                          onChange={(event) => updateTransactionOverview('kode_transaksi', event.target.value)}
+                          readOnly 
+                        />
+                      </Box>
+                    </Flex>
+                    <Flex gap={"2"} className='mb-1'>
+                      <Box>
+                        <Text size={"1"} weight={"bold"}>Nama Customer</Text>
+                        <TextField.Root 
+                          type='text'
+                          name='nama_pelanggan'
+                          size={"2"}
+                          className='mb-1'
+                          value={transactionOverview.nama_pelanggan}
+                          onChange={(event) => updateTransactionOverview('nama_pelanggan', event.target.value)}
+                        />
+                      </Box>
+                      <Box>
+                        <Text size={"1"} weight={"bold"}>Telepon Customer</Text>
+                        <TextField.Root 
+                          type='number'
+                          name='telepon_pelanggan'
+                          size={"2"}
+                          value={transactionOverview?.telepon_pelanggan || ""}
+                          onChange={(event) => updateTransactionOverview('telepon_pelanggan', event.target.value)}
+                        />
+                      </Box>
+                    </Flex>
+                    <Flex>
+                      <Box width="100%">
+                        <Text size={"1"} weight="bold">Catatan</Text>
+                        <TextArea
+                          value={transactionOverview.catatan}
+                          onChange={(event) => updateTransactionOverview('catatan', event.target.value)}
+                          name='catatan' 
+                        />
+                      </Box>
+                    </Flex>
+                  </Flex>
+                  <Flex direction={"column"}>
+                    <Flex gap={"2"}>
+                      <Box>
+                        <Text size={"1"} weight={"bold"}>Sisa Bayar</Text>
+                        <TextField.Root 
+                          size={"2"} 
+                          value={ transactionOverview.status_pembayaran && formatRupiah(transactionOverview.sisa_bayar)}
+                          readOnly
+                        />
+                      </Box>
+                      <Box>
+                        <Text size={"1"} weight={"bold"}>Kembalian</Text>
+                        <TextField.Root 
+                          size={"2"} 
+                          value={formatRupiah(transactionOverview.kembalian)}
+                          readOnly
+                        />
+                      </Box>
+                    </Flex>
+                    <Flex gap={"2"}>
+                      <Box>
                         <Box>
-                          <Text size={"1"} weight={"bold"}>Nama Admin</Text>
-                          <TextField.Root 
-                            type='text'
-                            name='dibuat_oleh'
-                            size={"2"} 
-                            value={transaksiOverview.dibuat_oleh?.nama}
-                            // onChange={(event) => handleOverview('dibuat_oleh', event)} 
-                            readOnly 
-                          />
-                        </Box>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Kode Transaksi</Text>
-                          <TextField.Root 
-                            type='text'
-                            name='kode_transaksi'
-                            size={"2"} 
-                            value={transaksiOverview.kode_transaksi}
-                            onChange={(event) => overviewService('kode_transaksi', event.target.value)}
-                            readOnly 
-                          />
-                        </Box>
-                      </Flex>
-                      <Flex gap={"2"} className='mb-1'>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Nama Customer</Text>
-                          <TextField.Root 
-                            type='text'
-                            name='nama_pelanggan'
-                            size={"2"}
-                            className={`mb-1 ${getErrorMessage('nama_pelanggan') ? 'border border-red-500' : ''}`}
-                            value={transaksiOverview.nama_pelanggan}
-                            onChange={(event) => overviewService('nama_pelanggan', event.target.value)}
-                          />
-                          <ErrorMessage message={getErrorMessage('nama_pelanggan') ?? ''}/>
-                        </Box>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Telepon Customer</Text>
-                          <TextField.Root 
-                            type='number'
-                            name='telepon_pelanggan'
-                            size={"2"}
-                            value={transaksiOverview?.telepon_pelanggan || ""}
-                            onChange={(event) => overviewService('telepon_pelanggan', event.target.value)}
-                          />
-                        </Box>
-                      </Flex>
-                      <Flex gap={"2"}>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Total Harga</Text>
+                          <Text size={"1"} weight={"bold"} color='yellow'>Total Harga</Text>
                           <TextField.Root 
                             name='total_harga'
                             size={"2"}
-                            value={ transaksiOverview.total_harga && formatRupiah(transaksiOverview.total_harga) || "Rp 0"}
+                            value={formatRupiah(transactionOverview?.total_harga)}
                             readOnly
                           />
                         </Box>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Dibayarkan</Text>
-                          <TextField.Root 
-                            type='number'
-                            name='dibayarkan'
-                            size={"2"}
-                            value={String(transaksiOverview.dibayarkan)}
-                            disabled={transaksiOverview.total_harga === 0}
-                            onChange={(event) => overviewService('dibayarkan', Number(event.target.value))}
-                          >
-                            <TextField.Slot>
-                              Rp
-                            </TextField.Slot>
-                          </TextField.Root>
-                        </Box>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Sisa Bayar</Text>
-                          <TextField.Root 
-                            size={"2"} 
-                            value={formatRupiah(transaksiOverview.sisa_bayar)}
-                            readOnly
-                          />
-                        </Box>
-                        <Box>
-                          <Text size={"1"} weight={"bold"}>Kembalian</Text>
-                          <TextField.Root 
-                            size={"2"} 
-                            value={formatRupiah(transaksiOverview.kembalian)}
-                            readOnly
-                          />
-                        </Box>
-                      </Flex>
-                      <Flex>
-                        <Box width="250px">
-                          <Text size={"1"} weight="bold">Catatan</Text>
-                          <TextArea
-                            value={transaksiOverview.catatan}
-                            onChange={(event) => overviewService('catatan', event.target.value)}
-                            name='catatan' 
-                          />
-                        </Box>
-                      </Flex>
-                    </Grid>
-                  </Flex>
-                  <Flex style={{marginTop: "10px"}}>
-                    <Button size={"1"} type='button' color='gray' onClick={(e) => verifyOverview(e)}>
-                      Verify
-                    </Button>
-                  </Flex>
-                </Card>
-              </Box>
-            </Tabs.Content>
-
-            <Tabs.Content value="service">
-              <Box>
-                {transaksiDetailList.map((transaksiDetailData, index) => (
-                  <Card size="2" key={index} className='mb-1'>
-                    <Flex justify={"between"}>
-                      <Text size="4" weight={"bold"}>
-                        Service 
-                        <Text color='red'> #{index + 1}</Text>
-                      </Text>
+                      </Box>
                       <Box>
-                        {index > 0 && (
-                          <Button color='red' size={"1"} type='button' onClick={() => dispatch(removeTransaksiDetailForm(index))}>
-                            Hapus
-                          </Button>
-                        )}
-                      </Box>
-                    </Flex>
-                    
-                    <Flex gap="4" className='mb-1'>
-                      <Box width="200px">
-                        <Box>
-                          <Text size="1" weight="bold">Jenis Pakaian</Text>
-                        </Box>
-                        <Select.Root 
-                          value={String(transaksiDetailData.jenis_pakaian?.id)} 
+                        <Text size={"1"} weight={"bold"} color='green'>Dibayarkan</Text>
+                        <TextField.Root 
+                          // type='number'
+                          style={{width: "155px"}}
+                          name='dibayarkan'
                           size={"2"}
-                          name='jenis_pakaian'
-                          onValueChange={(value) => detailJenisPakaian(value, 'jenis_pakaian', index)}
+                          value={String(transactionOverview.dibayarkan)}
+                          disabled={transactionOverview.total_harga === 0}
+                          onChange={(event) => updateTransactionOverview('dibayarkan', Number(event.target.value))}
                         >
-                          <Select.Trigger placeholder='Pilih Jenis Pakaian' style={{ width: "100%" }} />
-                          <Select.Content>
-                            <Select.Group>
-                              <Select.Label>Jenis Pakaian</Select.Label>
-                              {jenisPakaianList.map(( jenis_pakaian, index ) => (
-                                <Select.Item key={index} value={String(jenis_pakaian.id)}>
-                                  {jenis_pakaian.jenis_pakaian}
-                                </Select.Item>
-                              ))}
-                            </Select.Group>
-                          </Select.Content>
-                        </Select.Root>
+                          <TextField.Slot>
+                            Rp
+                          </TextField.Slot>
+                        </TextField.Root>
                       </Box>
-                     
-                      
-                      {transaksiDetailData.jenis_pakaian?.jenis_pakaian && (
-                        <>
-                          <Box width="200px">
-                            <Text size="1" weight="bold">Satuan Pakaian</Text>
-                            <TextField.Root 
-                              type='text'
-                              className="w-full" 
-                              size={"2"}
-                              value={transaksiDetailData.jenis_pakaian?.satuan || "-"}
-                              readOnly
-                            />
-                          </Box>
-                          <Box width="200px">
-                            <Text size="1" weight="bold">Harga / Kg</Text>
-                            <TextField.Root 
-                              // type='number'
-                              className="w-full" 
-                              size={"2"} 
-                              value={ transaksiDetailData.jenis_pakaian?.harga_per_kg && formatRupiah(transaksiDetailData.jenis_pakaian?.harga_per_kg) || "-"}
-                              readOnly
-                            />
-                          </Box>
-                          <Box width="200px">
-                            <Text size="1" weight="bold">Harga / Item</Text>
-                            <TextField.Root 
-                              className="w-full" 
-                              size={"2"} 
-                              value={ transaksiDetailData.jenis_pakaian?.harga_per_item && formatRupiah(transaksiDetailData.jenis_pakaian?.harga_per_item) || "-"}
-                              readOnly
-                            />
-                          </Box>
-                        </>       
-                      )}
                     </Flex>
-                    {transaksiDetailData.jenis_pakaian?.jenis_pakaian && (
+
+                  </Flex>
+                  <Box width={"40%"}>
+                    <Table.Root size="1" variant='surface'>
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.ColumnHeaderCell align='center'>No</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell align='center'>Jenis Pakaian</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell align='center'>Berat (kg)</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell align='center'>Jumlah</Table.ColumnHeaderCell>
+                          <Table.ColumnHeaderCell align='center'>Biaya</Table.ColumnHeaderCell>
+                        </Table.Row>
+                      </Table.Header>
+                      <Table.Body>
+                        {transactionDetail.map((detail, index) => (
+                          <Table.Row key={index}>
+                            <Table.RowHeaderCell align='center'>{index + 1}</Table.RowHeaderCell>
+                            <Table.RowHeaderCell align='center'>{detail.jenis_pakaian.jenis_pakaian}</Table.RowHeaderCell>
+                            <Table.Cell align='center'>{detail.berat_kg}</Table.Cell>
+                            <Table.Cell align='center'>{detail.jumlah_item}</Table.Cell>
+                            <Table.Cell align='center'>{formatRupiah(detail.total_harga_layanan)}</Table.Cell>
+                          </Table.Row>
+                        ))}
+                          <Table.Row>
+                            <Table.Cell colSpan={2} align='center' className='font-bold'>Total</Table.Cell>
+                            <Table.Cell align='center' className='font-bold'>{totalWeight}</Table.Cell>
+                            <Table.Cell align='center' className='font-bold'>{totalItems}</Table.Cell>
+                            <Table.Cell align='center' className='font-bold'>{formatRupiah(totalPrice)}</Table.Cell>
+                          </Table.Row>
+                      </Table.Body>
+                    </Table.Root>
+                  </Box>
+                </Flex>
+              </Card>
+            </Box>
+
+            <Box>
+              {transactionDetail.map((detail, index) => (
+                <Card size="2" key={index} className='mb-1'>
+                  <Flex justify={"between"}>
+                    <Text size="4" weight={"bold"}>
+                      Service 
+                      <Text color='red'> #{index + 1}</Text>
+                    </Text>
+                    <Box>
+                      {transactionDetail.length > 1 && (
+                        <Button color='red' size={"1"} type='button' onClick={() => dispatch(removeTransactionDetailForm({index}))}>
+                          Hapus
+                        </Button>
+                      )}
+                    </Box>
+                  </Flex>
+                  
+                  <Flex gap="4" className='mb-1'>
+                    <Box width="200px">
+                      <Box>
+                        <Text size="1" weight="bold">Jenis Pakaian</Text>
+                      </Box>
+                      <Select.Root 
+                        value={String(detail.jenis_pakaian?.id)} 
+                        size={"2"}
+                        name='jenis_pakaian'
+                        onValueChange={(value) => updateClothingType(value, 'jenis_pakaian', index)}
+                      >
+                        <Select.Trigger placeholder='Pilih Jenis Pakaian' style={{ width: "100%" }} />
+                        <Select.Content>
+                          <Select.Group>
+                            <Select.Label>Jenis Pakaian</Select.Label>
+                            {apparelList.map(( jenis_pakaian, index ) => (
+                              <Select.Item key={index} value={String(jenis_pakaian.id)}>
+                                {jenis_pakaian.jenis_pakaian}
+                              </Select.Item>
+                            ))}
+                          </Select.Group>
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+                    
+                    
+                    {detail.jenis_pakaian?.jenis_pakaian && (
                       <>
-                        <Flex gap={"4"} className='mb-1'>
-                          <Box width="200px">
-                            <Text size="1" weight="bold">Berat (kg)</Text>
-                            <TextField.Root
-                              type='number'
-                              className="w-full"
-                              name='berat_kg'
-                              size={"2"}
-                              value={String(transaksiDetailData.berat_kg)}
-                              onChange={(event) => detailService(index, 'berat_kg', Number(event.target.value))}
-                            />
-                          </Box>
-                          <Box width="200px">
-                            <Text size="1" weight="bold">Jumlah Item</Text>
-                            <TextField.Root 
-                              type='number'
-                              className="w-full" 
-                              name='jumlah_item' 
-                              size={"2"}
-                              value={String(transaksiDetailData.jumlah_item)}
-                              onChange={(event) => detailService(index, 'jumlah_item', Number(event.target.value))}
-                            />
-                          </Box>
-                          <Box maxWidth="600px">
-                            <Text size="1" weight="bold">Layanan Setrika</Text>
-                            <RadioCards.Root
-                              name="layanan_setrika"
-                              columns={{ initial: "1", sm: "1" }} 
-                              size={"1"}
-                              value={String(transaksiDetailData.layanan_setrika)}
-                              onValueChange={(value) => detailService(index, 'layanan_setrika', value === "true" ? true : false)}
-                            >
-                              <Flex gap={"2"}>
-                                <RadioCards.Item value="true" style={{ width: "80px", height: "33px" }}>
-                                  <Flex direction="column" width="100%">
-                                    <Text className='text-center'>Iya</Text>
+                        <Flex direction={"column"}>
+                          <Flex gap={"2"} className='mb-1 w-full' justify={"between"}>
+                            <Flex gap={"2"} width={"350px"}>
+                              <Box width="50%">
+                                <Text size="1" weight="bold">Satuan Pakaian</Text>
+                                <TextField.Root 
+                                  type='text'
+                                  className="w-full" 
+                                  size={"2"}
+                                  value={detail.jenis_pakaian?.satuan || "-"}
+                                  readOnly
+                                />
+                              </Box>
+                              <Box width="50%">
+                                <Text size="1" weight="bold">Harga / Kg</Text>
+                                <TextField.Root 
+                                  // type='number'
+                                  className="w-full" 
+                                  size={"2"} 
+                                  value={ detail.jenis_pakaian?.harga_per_kg && formatRupiah(detail.jenis_pakaian?.harga_per_kg) || "-"}
+                                  readOnly
+                                />
+                              </Box>
+                            </Flex>
+                            <Flex gap={"2"} width={"350px"}>
+                              <Box width="50%">
+                                <Text size="1" weight="bold">Harga / Item</Text>
+                                <TextField.Root 
+                                  className="w-full" 
+                                  size={"2"} 
+                                  value={ detail.jenis_pakaian?.harga_per_item && formatRupiah(detail.jenis_pakaian?.harga_per_item) || "-"}
+                                  readOnly
+                                />
+                              </Box>
+                              <Box width="50%">
+                                <Text size={"1"} weight={"bold"} color='yellow'>Total Harga</Text>
+                                <TextField.Root 
+                                  name='total_harga'
+                                  size={"2"}
+                                  value={ detail.total_harga_layanan && formatRupiah(detail.total_harga_layanan) || "Rp 0"}
+                                  readOnly
+                                />
+                              </Box>
+                            </Flex>
+                          </Flex>
+                          <Flex gap={"2"}>
+                            <Flex gap={"2"} width={"350px"}>
+                              <Box width="50%">
+                                <Text size="1" weight="bold">Berat (kg)</Text>
+                                <TextField.Root
+                                  type='number'
+                                  className="w-full"
+                                  name='berat_kg'
+                                  size={"2"}
+                                  value={String(detail.berat_kg)}
+                                  onChange={(event) => updateTransactionDetail(index, 'berat_kg', Number(event.target.value))}
+                                />
+                              </Box>
+                              <Box width="50%">
+                                <Text size="1" weight="bold">Jumlah Item</Text>
+                                <TextField.Root 
+                                  type='number'
+                                  className="w-full" 
+                                  name='jumlah_item' 
+                                  size={"2"}
+                                  value={String(detail.jumlah_item)}
+                                  onChange={(event) => updateTransactionDetail(index, 'jumlah_item', Number(event.target.value))}
+                                />
+                              </Box>
+                            </Flex>
+                            <Flex gap={"2"} width={"350px"}>
+                              <Box width="50%">
+                                <Text size="1" weight="bold">Layanan Setrika</Text>
+                                <RadioCards.Root
+                                  name="layanan_setrika"
+                                  columns={{ initial: "1", sm: "1" }} 
+                                  size={"1"}
+                                  value={String(detail.layanan_setrika)}
+                                  onValueChange={(value) => updateTransactionDetail(index, 'layanan_setrika', value === "true" ? true : false)}
+                                >
+                                  <Flex gap={"2"}>
+                                    <RadioCards.Item value="true" style={{ width: "50%", height: "33px" }}>
+                                      <Flex direction="column" width="100%">
+                                        <Text className='text-center'>Iya</Text>
+                                      </Flex>
+                                    </RadioCards.Item>
+                                    <RadioCards.Item value="false" style={{ width: "50%", height: "33px" }}>
+                                      <Flex direction="column" width="100%">
+                                        <Text className='text-center'>Tidak</Text>
+                                      </Flex>
+                                    </RadioCards.Item>
                                   </Flex>
-                                </RadioCards.Item>
-                                <RadioCards.Item value="false" style={{ width: "80px", height: "33px" }}>
-                                  <Flex direction="column" width="100%">
-                                    <Text className='text-center'>Tidak</Text>
-                                  </Flex>
-                                </RadioCards.Item>
-                              </Flex>
-                            </RadioCards.Root>
-                          </Box>
-                        </Flex>
-                        <Flex gap={"4"} className='mb-1'>
-                          <Box width="200px">
-                            <Box>
-                              <Text size="1" weight="bold">Acuan Harga</Text>
-                            </Box>
-                            <Select.Root 
-                              size={"2"}
-                              name='mesin_cuci'
-                              value={String(transaksiDetailData.acuan_harga)}
-                              onValueChange={(value) => detailService(index, 'acuan_harga', value)}
-                            >
-                              <Select.Trigger style={{ width: "100%" }} />
-                              <Select.Content>
-                                <Select.Group>
-                                  <Select.Label>Acuan harga</Select.Label>
-                                  <Select.Item value="berat">Berat</Select.Item>
-                                  <Select.Item value="item">Item</Select.Item>
-                                </Select.Group>
-                              </Select.Content>
-                            </Select.Root>
-                          </Box>
-                          <Box>
-                            <Text size="1" weight="bold">Total Harga</Text>
-                            <TextField.Root 
-                              className="w-full" 
-                              name='total_harga_layanan'
-                              size={"2"}
-                              value={formatRupiah(transaksiDetailData.total_harga_layanan)}
-                              readOnly
-                            />
-                          </Box>
-                        </Flex>
-                        <Flex className='mb-1' justify={"between"} align={"end"}>
-                          <Flex gap={"4"}>
-                            <Box width="250px">
+                                </RadioCards.Root>
+                              </Box>
+                              <Box width="50%">
+                                <Box>
+                                  <Text size="1" weight="bold">Acuan Harga</Text>
+                                </Box>
+                                <Select.Root 
+                                  size={"2"}
+                                  name='mesin_cuci'
+                                  value={String(detail.acuan_harga)}
+                                  onValueChange={(value) => updateTransactionDetail(index, 'acuan_harga', value)}
+                                >
+                                  <Select.Trigger style={{ width: "100%" }} />
+                                  <Select.Content>
+                                    <Select.Group>
+                                      <Select.Label>Acuan harga</Select.Label>
+                                      <Select.Item value="berat">Berat</Select.Item>
+                                      <Select.Item value="item">Item</Select.Item>
+                                    </Select.Group>
+                                  </Select.Content>
+                                </Select.Root>
+                              </Box>
+                            </Flex>
+                          </Flex>
+                          <Flex gap={"2"}>
+                            <Box width="50%">
                               <Text size={"1"} weight="bold">Catatan Admin</Text>
                               <TextArea 
                                 name='catatan_admin'
-                                value={String(transaksiDetailData.catatan_admin)}
-                                onChange={(event) => detailService(index, 'catatan_admin', event.target.value)}
+                                value={String(detail.catatan_admin)}
+                                onChange={(event) => updateTransactionDetail(index, 'catatan_admin', event.target.value)}
                               />
                             </Box>
-                            <Box width="250px">
+                            <Box width="50%">
                               <Text size={"1"} weight="bold">Catatan Pelanggan</Text>
                               <TextArea 
                                 name='catatan_pelanggan' 
-                                value={String(transaksiDetailData.catatan_pelanggan)}
-                                onChange={(event) => detailService(index, 'catatan_pelanggan', event.target.value)}
+                                value={String(detail.catatan_pelanggan)}
+                                onChange={(event) => updateTransactionDetail(index, 'catatan_pelanggan', event.target.value)}
                               />
                             </Box>
                           </Flex>
                         </Flex>
-                        
-                      </>
+                      </>       
                     )}
-                    
-                  </Card>
-                ))}
-                <Flex gap="2" className='mb-5'>
-                  <Button type='submit'>
-                      Save(simpan)
-                  </Button>
-                  <Button 
-                    type='button'
-                    onClick={() => dispatch(addTransaksiDetailForm())}>
-                      New Service
-                  </Button>
-                </Flex>
-              </Box>
-            </Tabs.Content>
+                  </Flex>
+                </Card>
+              ))}
+              <Flex gap="2" className='mb-5 mt-2'>
+                <Button type='submit' color='green'>
+                    Save(simpan)
+                </Button>
+                <Button 
+                  type='button'
+                  onClick={() => dispatch(addTransactionDetailForm())}>
+                    New Service
+                </Button>
+              </Flex>
+            </Box>
           </form>
-        </Box>
-      </Tabs.Root>
+        ) : (
+          <Box width={"100%"} className='mb-3'>
+            <Card size="2">
+              <Flex direction="column" gap="2">
+                <Text size={"1"} weight={"bold"}>Preparing esentials...</Text>
+              </Flex>
+            </Card>
+          </Box>
+        )}
+      </div>
     </div>
   )
 }
 
-export default CreateTransaksi
+export default CreateTransaksiForm

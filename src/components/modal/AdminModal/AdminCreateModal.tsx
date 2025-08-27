@@ -7,7 +7,7 @@ import { Button, Flex, AlertDialog, Grid, TextField, Text, TextArea, Select, Box
 // redux
 import { AppDispatch, RootState } from '@/redux/store'
 import { addAdmin } from '@/lib/thunk/admin/adminThunk'
-import { clearForm, setErrors, setField, clearErrors } from '@/redux/slices/form-validation/singleForm'
+import { clearForm, setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm'
 
 // utils
 import { validateForm } from '@/utils/form-validation/validateForm'
@@ -15,6 +15,7 @@ import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
 
 // component
 import ErrorMessage from '../../ui/FieldError/ErrorMessage';
+import { setAdminForm } from '@/redux/slices/adminSlice';
 
 const rules: Record<string, FieldRules> = {
   nama: ['required'],
@@ -30,24 +31,27 @@ function AdminAddModal() {
   const [disabled, setDisabled] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.singleForm.data)
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
+  const {adminForm} = useSelector((state:RootState) => state.admin)
+  const {errors} = useSelector((state:RootState) => state.singleForm)
 
-  const formChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target
-    dispatch(setField({field: name, value: value}))
+    dispatch(setAdminForm({
+      ...adminForm,
+      [name]: value
+    }))
   }
 
-  const formSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formError = validateForm(formData, rules)
+    const formError = validateForm(adminForm, rules)
     
     if (formError.length > 0) {
       dispatch(setErrors(formError))
       setDisabled(true)
     } else {
       dispatch(clearErrors())
-      dispatch(addAdmin(formData as {password_hash: string}))
+      dispatch(addAdmin(adminForm as {password_hash: string}))
       setOpen(false)
     } 
   }
@@ -65,7 +69,7 @@ function AdminAddModal() {
 
   useEffect(() => {
     setDisabled(false)
-  }, [formData])
+  }, [adminForm])
 
   return (
     <AlertDialog.Root open={open}>
@@ -84,7 +88,7 @@ function AdminAddModal() {
           Isi form dibawah ini
         </AlertDialog.Description>
 
-        <form onSubmit={(e) => formSubmit(e)}>
+        <form onSubmit={(e) => handleFormSubmit(e)}>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
               <Flex className='w-full' gap="2">
@@ -96,7 +100,7 @@ function AdminAddModal() {
                     name='nama' 
                     className={`mb-1 ${getErrorMessage('nama') ? 'border border-red-500' : ''}`}
                     aria-invalid='true'
-                    onChange={formChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('nama') ?? ''}
@@ -112,7 +116,7 @@ function AdminAddModal() {
                     size="3" 
                     name='no_telepon' 
                     className={`mb-1 ${getErrorMessage('no_telepon') ? 'border border-red-500' : ''}`}
-                    onChange={formChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('no_telepon') ?? ''}/>
                 </Box>
@@ -125,7 +129,7 @@ function AdminAddModal() {
                     size="3" 
                     name='username' 
                     className={`mb-1 ${getErrorMessage('username') ? 'border border-red-500' : ''}`}
-                    onChange={formChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('username') ?? ''}/>
                 </Box>
@@ -138,7 +142,7 @@ function AdminAddModal() {
                     name='password_hash' 
                     size="3" 
                     className={`mb-1 ${getErrorMessage('password_hash') ? 'border border-red-500' : ''}`}
-                    onChange={formChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('password_hash') ?? ''}/>
                 </Box>
@@ -151,7 +155,7 @@ function AdminAddModal() {
                   size="3" 
                   className='mb-1' 
                   name='alamat_rumah' 
-                  onChange={formChange}
+                  onChange={handleFormChange}
                 />
                 <ErrorMessage message={getErrorMessage('alamat_rumah') ?? ''}/>
               </Box>
@@ -162,7 +166,10 @@ function AdminAddModal() {
                 size="3" 
                 name='role' 
                 defaultValue="apple" 
-                onValueChange={(val) => dispatch(setField({field: 'role', value: val}))}
+                onValueChange={(value) => dispatch(setAdminForm({
+                  ...adminForm,
+                  role: value
+                }))}
               >
                 <Select.Trigger 
                   className={`mb-1 ${getErrorMessage('role') ? 'border border-red-500' : ''}`}
@@ -179,24 +186,29 @@ function AdminAddModal() {
               <ErrorMessage message={getErrorMessage('role') ?? ''}/>
             </Grid>
           </Flex>
-          <Flex gap="3" mt="4" justify="end">
-            <AlertDialog.Cancel>
-              <Button 
-                color='gray' 
-                onClick={() => setOpen(false)}
-              >
-                Batal
-              </Button>
-            </AlertDialog.Cancel>
-            <AlertDialog.Action>
-              <Button 
-                type='submit' 
-                color='green'
-                disabled={disabled}
-              >
-                Submit
-              </Button>
-            </AlertDialog.Action>
+          <Flex gap="3" mt="4" justify="between">
+            <Button type='reset' color='yellow'>
+              Reset
+            </Button>
+            <Flex gap={"2"}>
+              <AlertDialog.Cancel>
+                <Button 
+                  color='gray' 
+                  onClick={() => setOpen(false)}
+                >
+                  Batal
+                </Button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action>
+                <Button 
+                  type='submit' 
+                  color='green'
+                  disabled={disabled}
+                >
+                  Submit
+                </Button>
+              </AlertDialog.Action>
+            </Flex>
           </Flex>
         </form>
 

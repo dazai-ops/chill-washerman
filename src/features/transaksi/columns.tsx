@@ -1,7 +1,7 @@
 import { formatDateWIB } from "@/utils/dateFormatter"
 import { Badge } from "@radix-ui/themes"
 
-export const transaksiColumns = [
+export const transactionColumns = [
     {
       header: 'No',
       cell: ({row}: {row: {index: number}}) => row.index + 1

@@ -1,14 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner";
-import { MesinCuci } from "@/models/mesincuci.model";
+import { Washer, WasherListResponse } from '@/models/mesincuci.model';
 
-export const retriveMesinCuci = createAsyncThunk<
-  MesinCuci[], 
-  Partial<{status_mesin: string; is_active: string}> | undefined, 
+export const getWasher = createAsyncThunk<
+  WasherListResponse, Partial<{status_mesin: string; is_active: string}> | undefined, 
   { rejectValue: string }
 >(
-  "mesinCuci/retriveMesinCuci",
+  "mesinCuci/getWasher",
   async (params, { rejectWithValue }) => {
 
     let query = supabase
@@ -32,17 +31,21 @@ export const retriveMesinCuci = createAsyncThunk<
       });
       return rejectWithValue(error.message)
     }
-
-    return data as MesinCuci[]
+    return {
+      result: data as Washer[],
+      message: "Mesin cucis retrived successfully",
+      status: "success",
+      error: null
+    }
   }
 )
 
-export const addMesinCuci = createAsyncThunk<
-  { mesinCuci: MesinCuci; message: string },
-  MesinCuci,
+export const addWasher = createAsyncThunk<
+  { result: Washer; message: string, status: string, error: string | null },
+  Washer,
   { rejectValue: string }
 >(
-  "mesinCuci/addAdmin",
+  "mesinCuci/addWasher",
   async (payload, { rejectWithValue }) => {
     try{
 
@@ -62,8 +65,10 @@ export const addMesinCuci = createAsyncThunk<
 
       toast.success('mesin cuci added successfully')
       return {
-        mesinCuci: data[0] as MesinCuci,
-        message: "mesin cuci added successfully"
+        result: data[0] as Washer,
+        message: "Mesin cuci added successfully",
+        status: "success",
+        error: null
       }
     } catch (error ) {
       toast.error('Failed to add mesin cuci');
@@ -72,12 +77,12 @@ export const addMesinCuci = createAsyncThunk<
   }
 )
 
-export const deleteMesinCuci = createAsyncThunk<
-  { deletedMesinCuci: MesinCuci; message: string }, 
-  string, 
+export const deleteWasher = createAsyncThunk<
+  { result: Washer; message: string, status: string, error: string | null }, 
+  number, 
   { rejectValue: string }
 >(
-  "admin/deleteMesinCuci",
+  "admin/deleteWasher",
   async (id, { rejectWithValue }) => {
     try{
 
@@ -116,8 +121,10 @@ export const deleteMesinCuci = createAsyncThunk<
       toast.success('Mesin cuci deleted successfully')
 
       return {
-        deletedMesinCuci: data[0],
-        message: "Mesin cuci deleted successfully"
+        result: data[0],
+        message: "Mesin cuci deleted successfully",
+        status: "success",
+        error: null
       }
     }catch (error) {
       toast.error('Failed to delete mesin cuci');
@@ -126,12 +133,12 @@ export const deleteMesinCuci = createAsyncThunk<
   }
 )
 
-export const updateMesinCuci = createAsyncThunk<
-  { updatedAdmin: MesinCuci; message: string, status: string }, 
-  { id: string, mesinCuci: Partial<MesinCuci>},
+export const updateWasher = createAsyncThunk<
+  { result: Washer; message: string, status: string }, 
+  { id: string, mesinCuci: Partial<Washer>},
   { rejectValue: string }
 >(
-  "admin/updateAdmin",
+  "admin/updateWasher",
   async ({id, mesinCuci}, { rejectWithValue }) => {
     try{
       const { data, error } = await supabase
@@ -150,9 +157,9 @@ export const updateMesinCuci = createAsyncThunk<
       toast.success('Mesin cuci updated successfully')
       
       return {
-        updatedAdmin: data[0],
+        result: data[0],
         message: "Mesin cuci updated successfully",
-        status: "ok"
+        status: "success"
       }
     }catch (error) {
       toast.error('Failed to update mesin cuci');
@@ -161,12 +168,12 @@ export const updateMesinCuci = createAsyncThunk<
   }
 )
 
-export const changeActive = createAsyncThunk<
-  { changedMesinCuci: MesinCuci; message: string }, 
-  {id: string, is_active: boolean}, 
+export const changeWasherStatus = createAsyncThunk<
+  { result: Washer; message: string, status: string, error: string | null }, 
+  {id: number, is_active: boolean}, 
   { rejectValue: string }
 >(
-  "admin/changeRole",
+  "admin/changeWasherStatus",
   async ({id, is_active}, { rejectWithValue }) => {
     try{
       const { data: currentData, error: fetchError } = await supabase
@@ -197,16 +204,18 @@ export const changeActive = createAsyncThunk<
 
       if (error) {
         toast.error('Something went wrong',{
-          description: 'Failed to change mesin cuci',
+          description: 'Failed to change Mesin cuci',
         })
         return rejectWithValue(error.message as string)
       }
 
       toast.success('Mesin cuci changed successfully');
-
+      
       return {
-        changedMesinCuci: data[0],
-        message: "Mesin cuci changed successfully"
+        result: data[0],
+        message: "Mesin cuci changed successfully",
+        status: "success",
+        error: null
       }
     }catch (error) {
       toast.error('Failed to change mesin cuci');

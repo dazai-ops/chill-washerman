@@ -1,13 +1,14 @@
+//lin
 import React from 'react'
-import { Dialog, DataList, Badge, DropdownMenu, Table, Box } from '@radix-ui/themes'
+import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
 import { EyeOpenIcon } from '@radix-ui/react-icons'
-import { formatDateToDDMMYYYY, formatDateWIB } from '@/utils/dateFormatter'
-import { Admin } from '@/models/admin.model';
-import { formatRupiah } from '@/utils/rupiahFormatter';
-import { formatToTitleCase } from '@/utils/titleFormatter';
-import { format } from 'path';
 
-function LayananDetailDialog({data}) {
+//utils
+import { formatDateWIB } from '@/utils/dateFormatter'
+import { formatToTitleCase } from '@/utils/titleFormatter';
+import { TransactionDetail } from '@/models/transaksi.model';
+
+function LayananDetailDialog({data}: {data: TransactionDetail }) {
   return (
     <Dialog.Root>
       <Dialog.Trigger>
@@ -27,7 +28,15 @@ function LayananDetailDialog({data}) {
           <DataList.Item>
             <DataList.Label minWidth="100px">Proses</DataList.Label>
             <DataList.Value>
-              <Badge color={data.status_proses === 'menunggu' ? 'yellow' : data.status_proses === 'dikerjakan' ? 'blue' : data.status_proses === 'selesai' ? 'green' : 'gray'} variant="soft" radius="full">
+              <Badge 
+                color={
+                  data.status_proses === 'menunggu' ? 'yellow' 
+                  : data.status_proses === 'dikerjakan' ? 'blue' 
+                  : data.status_proses === 'selesai' ? 'green' : 'gray'
+                } 
+                variant="soft" 
+                radius="full"
+              >
                 {formatToTitleCase(data.status_proses)}
               </Badge>
             </DataList.Value>
@@ -36,10 +45,6 @@ function LayananDetailDialog({data}) {
             <DataList.Label minWidth="88px">Jenis Pakaian</DataList.Label>
             <DataList.Value>{data.jenis_pakaian.jenis_pakaian}</DataList.Value>
           </DataList.Item>
-          {/* <DataList.Item>
-            <DataList.Label minWidth="88px">Mesin Cuci</DataList.Label>
-            <DataList.Value>{data.mesin_cuci.merk + ' ' + data.mesin_cuci.seri}</DataList.Value>
-          </DataList.Item> */}
           <DataList.Item>
             <DataList.Label minWidth="88px">Berat (kg)</DataList.Label>
             <DataList.Value>{data.berat_kg || '-'}</DataList.Value>
@@ -62,11 +67,11 @@ function LayananDetailDialog({data}) {
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Ditambahkan</DataList.Label>
-            <DataList.Value>{formatDateWIB(data.created_at)}</DataList.Value>
+            <DataList.Value>{ data.created_at && formatDateWIB(data.created_at)}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Diubah</DataList.Label>
-            <DataList.Value>{ data.updated_at !== null && formatDateWIB(data.updated_at) || '-'}</DataList.Value>
+            <DataList.Value>{ data.updated_at && formatDateWIB(data.updated_at) || '-'}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Diubah Oleh</DataList.Label>

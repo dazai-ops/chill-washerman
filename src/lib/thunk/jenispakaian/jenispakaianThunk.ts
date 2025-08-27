@@ -1,14 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner";
-import { JenisPakaian } from "@/models/jenispakaian.model";
+import { Apparel, ApparelListResponse } from "@/models/jenispakaian.model";
 
-export const retriveJenisPakaian = createAsyncThunk<
-  JenisPakaian[], 
+export const getApparel = createAsyncThunk<
+  ApparelListResponse, 
   void, 
   { rejectValue: string }
 >(
-  "jenisPakaian/retriveJenisPakaian",
+  "Apparel/getApparel",
   async (_, { rejectWithValue }) => {
     const { data, error } = await supabase
       .from("pakaian")
@@ -22,19 +22,22 @@ export const retriveJenisPakaian = createAsyncThunk<
       return rejectWithValue(error.message)
     }
 
-    return data as JenisPakaian[]
+    return {
+      status: "success",
+      message: "Jenis pakaian retrieved successfully",
+      result: data as Apparel[],
+    }
   }
 )
 
-export const addJenisPakaian = createAsyncThunk<
-  { jenisPakaian : JenisPakaian; message: string, status: string },
-  JenisPakaian,
+export const addApparel = createAsyncThunk<
+  { result : Apparel; message: string, status: string },
+  Apparel,
   { rejectValue: string }
 >(
-  "jenisPakaian/addAdmin",
+  "Apparel/addApparel",
   async (payload, { rejectWithValue }) => {
     try{
-
       const { data, error } = await supabase
         .from("pakaian")
         .insert(payload)
@@ -49,9 +52,9 @@ export const addJenisPakaian = createAsyncThunk<
 
       toast.success('Jenis pakaian added successfully')
       return {
-        jenisPakaian: data[0] as JenisPakaian,
+        result: data[0] as Apparel,
         message: "Jenis pakaian added successfully",
-        status: "ok"
+        status: "success"
       }
     } catch (error ) {
       toast.error('Failed to add jenis pakaian');
@@ -60,15 +63,14 @@ export const addJenisPakaian = createAsyncThunk<
   }
 )
 
-export const deleteJenisPakaian = createAsyncThunk<
-  { deleteJenisPakaian: JenisPakaian; message: string }, 
+export const deleteApparel = createAsyncThunk<
+  { result: Apparel; message: string, status: string }, 
   string, 
   { rejectValue: string }
 >(
-  "jenisPakaian/deleteJenisPakaian",
+  "Apparel/deleteApparel",
   async (id, { rejectWithValue }) => {
     try{
-      
       const { data, error } = await supabase
         .from("pakaian")
         .delete()
@@ -85,7 +87,8 @@ export const deleteJenisPakaian = createAsyncThunk<
       toast.success('Jenis pakaian deleted successfully')
 
       return {
-        deleteJenisPakaian: data[0],
+        status: "success",
+        result: data[0],
         message: "Jenis pakaian deleted successfully"
       }
     }catch (error) {
@@ -95,12 +98,12 @@ export const deleteJenisPakaian = createAsyncThunk<
   }
 )
 
-export const updateJenisPakaian = createAsyncThunk<
-  { updatedAdmin: JenisPakaian; message: string, status: string }, 
-  { id: string | number, payload: Partial<JenisPakaian>},
+export const updateApparel = createAsyncThunk<
+  { updatedAdmin: Apparel; message: string, status: string }, 
+  { id: string | number, payload: Partial<Apparel>},
   { rejectValue: string }
 >(
-  "jenisPakaian/updateJenisPakaian",
+  "Apparel/updateApparel",
   async ({id, payload}, { rejectWithValue }) => {
     try{
       const { data, error } = await supabase
@@ -121,7 +124,7 @@ export const updateJenisPakaian = createAsyncThunk<
       return {
         updatedAdmin: data[0],
         message: "Jenis pakaian updated successfully",
-        status: "ok"
+        status: "success"
       }
     }catch (error) {
       toast.error('Failed to update jenis pakaian');

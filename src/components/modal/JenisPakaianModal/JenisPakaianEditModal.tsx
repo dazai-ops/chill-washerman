@@ -7,11 +7,12 @@ import { toast } from 'sonner'
 //redux
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
-import { clearForm, setErrors, setForm, clearErrors } from '@/redux/slices/form-validation/singleForm'
-import { updateJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk'
+import { setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm'
+import { updateApparel } from '@/lib/thunk/jenispakaian/jenispakaianThunk'
+import { setApparelForm } from '@/redux/slices/jenispakaianSlice';
 
 //utils
-import { JenisPakaian } from '@/models/jenispakaian.model'
+import { Apparel } from '@/models/jenispakaian.model'
 import { validateForm } from '@/utils/form-validation/validateForm'
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
 
@@ -27,21 +28,19 @@ const rules: Record<string, FieldRules> = {
   estimasi_waktu: ['required'],
 }
 
-function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
+function JenisPakaianEditModal({data}: {data: Apparel}) {
   const [open, setOpen] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.singleForm.data)
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
-  const res = useSelector((state:RootState) => state.jenisPakaian.success)
+  const {apparelForm, status} = useSelector((state:RootState) => state.jenisPakaian)
+  const {errors} = useSelector((state:RootState) => state.singleForm)
 
   useEffect(() => {
     if(data) {
-      dispatch(clearForm())
       dispatch(clearErrors())
-      dispatch(setForm({
+      dispatch(setApparelForm({
         jenis_pakaian: data.jenis_pakaian,
         harga_per_kg: data.harga_per_kg,
         harga_per_item: data.harga_per_item,
@@ -51,15 +50,18 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
     }
   }, [data, dispatch])
 
-  const formChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const {name, value} = e.target
-      dispatch(setForm({...formData, [name]: value}))
+      dispatch(setApparelForm({
+        ...apparelForm, 
+        [name]: value
+      }))
     }
   
-  const formSubmit = (e : React.MouseEvent<HTMLButtonElement>) => {
+  const handleFormVerify = (e : React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     dispatch(clearErrors())
-    const formError = validateForm(formData, rules)
+    const formError = validateForm(apparelForm, rules)
     if(formError.length > 0) {
       dispatch(setErrors(formError))
       setDisabled(true)
@@ -88,14 +90,20 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
     if(showConfirm){
       setShowConfirm(false)
     }
-  }, [formData])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apparelForm])
 
   useEffect(() => {
-    console.log(res)
-    if(res === "ok") {
+    if(status === "success") {
       setOpen(false)
     }
-  }, [res])
+  }, [status])
+
+  // DEBUG ---------------
+  useEffect(() => {
+    console.log('apparelForm', apparelForm)
+  }, [apparelForm])
+  // DEBUG ---------------
 
   return (
     <AlertDialog.Root open={open}>
@@ -119,8 +127,8 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('jenis_pakaian') ? 'border border-red-500' : ''}`}
                     name='jenis_pakaian' 
-                    onChange={formChange} 
-                    defaultValue={data?.jenis_pakaian} 
+                    onChange={handleFormChange} 
+                    value={apparelForm.jenis_pakaian} 
                   />
                   <ErrorMessage 
                     message={getErrorMessage('jenis_pakaian') ?? ''} 
@@ -132,8 +140,8 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('satuan') ? 'border border-red-500' : ''}`}
                     name='satuan' 
-                    onChange={formChange} 
-                    defaultValue={data?.satuan}
+                    onChange={handleFormChange} 
+                    value={apparelForm.satuan}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('satuan') ?? ''} 
@@ -147,8 +155,8 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('harga_per_kg') ? 'border border-red-500' : ''}`}
                     name='harga_per_kg' 
-                    onChange={formChange} 
-                    defaultValue={String(data?.harga_per_kg)}
+                    onChange={handleFormChange} 
+                    value={String(apparelForm.harga_per_kg)}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('harga_per_kg') ?? ''} 
@@ -160,8 +168,8 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('harga_per_item') ? 'border border-red-500' : ''}`}
                     name='harga_per_item' 
-                    onChange={formChange} 
-                    defaultValue={String(data?.harga_per_item)}
+                    onChange={handleFormChange} 
+                    value={String(apparelForm.harga_per_item)}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('harga_per_item') ?? ''} 
@@ -174,8 +182,8 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
                 type='number'
                 className={`mb-1 ${getErrorMessage('estimasi_waktu') ? 'border border-red-500' : ''}`}
                 name='estimasi_waktu' 
-                onChange={formChange} 
-                defaultValue={String(data?.estimasi_waktu)}
+                onChange={handleFormChange} 
+                value={String(apparelForm.estimasi_waktu)}
               />
               <ErrorMessage 
                 message={getErrorMessage('estimasi_waktu') ?? ''} 
@@ -191,12 +199,12 @@ function JenisPakaianEditModal({data}: {data: JenisPakaian}) {
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange
-                onConfirm={() => dispatch(updateJenisPakaian({ id: String(data.id), payload: formData }))} 
+                onConfirm={() => dispatch(updateApparel({ id: String(data.id), payload: apparelForm }))} 
                 customButton={
                   showConfirm ? (
                     <Button color='green'>Update</Button>
                   ) : (
-                    <Button disabled={disabled} color='green' onClick={(e) => formSubmit(e)}>Verify</Button>
+                    <Button disabled={disabled} color='green' onClick={(e) => handleFormVerify(e)}>Verify</Button>
                   )
                 }
               />

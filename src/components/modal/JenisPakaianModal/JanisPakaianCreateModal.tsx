@@ -7,16 +7,17 @@ import { PersonIcon } from '@radix-ui/react-icons';
 //redux
 import { AppDispatch, RootState } from '@/redux/store'
 import { clearErrors } from '@/redux/slices/form-validation/singleForm'
-import { addJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk'
+import { addApparel } from '@/lib/thunk/jenispakaian/jenispakaianThunk'
 
 // utils
-import { JenisPakaian } from '@/models/jenispakaian.model';
+import { Apparel } from '@/models/jenispakaian.model';
 import { validateForm } from '@/utils/form-validation/validateForm'
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
-import { clearForm, setErrors, setField } from '@/redux/slices/form-validation/singleForm'
+import { clearForm, setErrors } from '@/redux/slices/form-validation/singleForm'
 
 // component
 import ErrorMessage from '../../ui/FieldError/ErrorMessage';
+import { clearApparelForm, setApparelForm } from '@/redux/slices/jenispakaianSlice';
 
 const rules: Record<string, FieldRules> = {
   jenis_pakaian: ['required'],
@@ -31,25 +32,28 @@ function JenisPakaianCreateModal() {
   const [disabled, setDisabled] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.singleForm.data)
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
+  const {apparelForm} = useSelector((state:RootState) => state.jenisPakaian)
+  const {errors} = useSelector((state:RootState) => state.singleForm)
 
 
   const formChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target
-    dispatch(setField({field: name, value: value}))
+    dispatch(setApparelForm({
+      ...apparelForm,
+      [name]: value
+    }))
   }
 
   const formSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formError = validateForm(formData, rules)
+    const formError = validateForm(apparelForm, rules)
     
     if (formError.length > 0) {
       dispatch(setErrors(formError))
       setDisabled(true)
     } else {
       dispatch(clearErrors())
-      dispatch(addJenisPakaian(formData as JenisPakaian))
+      dispatch(addApparel(apparelForm as Apparel))
       setOpen(false)
     } 
   }
@@ -59,15 +63,20 @@ function JenisPakaianCreateModal() {
   }
   
   useEffect(() => {
-    if(!open) {
-      dispatch(clearErrors())
+      dispatch(clearApparelForm())
       dispatch(clearForm())
-    }
-  }, [open, dispatch])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   useEffect(() => {
     setDisabled(false)
-  }, [formData])
+  }, [apparelForm])
+
+  //DEBUG --------------------
+  // useEffect(() => {
+  //   console.log(apparelForm)
+  // }, [apparelForm])
+  //DEBUG --------------------
 
   return (
     <AlertDialog.Root open={open} >
@@ -125,7 +134,8 @@ function JenisPakaianCreateModal() {
                   <TextField.Root 
                     type='number' 
                     min="0"
-                    size="3" 
+                    size="3"
+                    defaultValue={0}
                     className={`mb-1 ${getErrorMessage('harga_per_kg') ? 'border border-red-500' : ''}`} 
                     name='harga_per_kg' 
                     onChange={formChange}
@@ -140,7 +150,8 @@ function JenisPakaianCreateModal() {
                   <TextField.Root 
                     type='number'
                     min="0" 
-                    size="3" 
+                    size="3"
+                    defaultValue={0}
                     className={`mb-1 ${getErrorMessage('harga_per_item') ? 'border border-red-500' : ''}`} 
                     name='harga_per_item' 
                     onChange={formChange}
@@ -154,7 +165,7 @@ function JenisPakaianCreateModal() {
               <Text size="2" weight="bold">Estimasi Waktu</Text>
               <TextField.Root 
                 size="3"
-                min="0" 
+                min="0"
                 type='number'
                 className={`mb-1 ${getErrorMessage('estimasi_waktu') ? 'border border-red-500' : ''}`} 
                 name='estimasi_waktu' 
@@ -166,24 +177,29 @@ function JenisPakaianCreateModal() {
               />
             </Grid>
           </Flex>
-          <Flex gap="3" mt="4" justify="end">
-            <AlertDialog.Cancel>
-              <Button 
-                color='gray' 
-                onClick={() => setOpen(false)}
-              >
-                Batal
-              </Button>
-            </AlertDialog.Cancel>
-            <AlertDialog.Action>
-              <Button 
-                type='submit' 
-                color='green'
-                disabled={disabled}
-              >
-                Submit
-              </Button>
-            </AlertDialog.Action>
+          <Flex gap="3" mt="4" justify="between">
+            <Button type='reset' color='yellow'>
+              Reset
+            </Button>
+            <Flex gap={"3"}>
+              <AlertDialog.Cancel>
+                <Button 
+                  color='gray' 
+                  onClick={() => setOpen(false)}
+                >
+                  Batal
+                </Button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action>
+                <Button 
+                  type='submit' 
+                  color='green'
+                  disabled={disabled}
+                >
+                  Submit
+                </Button>
+              </AlertDialog.Action>
+            </Flex>
           </Flex>
         </form>
 

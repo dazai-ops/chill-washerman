@@ -1,86 +1,107 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { retriveJenisPakaian, updateJenisPakaian, addJenisPakaian, deleteJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk';
-import { JenisPakaian } from "@/models/jenispakaian.model";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getApparel, updateApparel, addApparel, deleteApparel } from '@/lib/thunk/jenispakaian/jenispakaianThunk';
+import { Apparel } from "@/models/jenispakaian.model";
 
-interface JenisPakaianState {
-  jenisPakaianCollection: JenisPakaian[]
+interface ApparelState {
+  apparelList: Apparel[],
+  apparelForm: Partial<Apparel>,
   loading: boolean,
   error: string | null
-  success: string | null
+  status: string | null
 }
 
-const initialState: JenisPakaianState = {
-  jenisPakaianCollection: [],
+const initialState: ApparelState = {
+  apparelList: [],
+  apparelForm: {
+    jenis_pakaian: "",
+    satuan: "",
+    harga_per_item: 0,
+    harga_per_kg: 0,
+    estimasi_waktu: "",
+  },
   loading: false, 
   error: null,
-  success: null
+  status: null
 }
 
 const jenisPakaianSlice = createSlice({
   name: "jenisPakaian",
   initialState,
-  reducers: {},
+  reducers: {
+    setApparelForm: (state, action: PayloadAction<Partial<Apparel>>) => {
+      state.apparelForm = {
+        ...state.apparelForm,
+        ...action.payload
+      }
+    },
+    clearApparelForm: (state) => {
+      state.apparelForm = {
+        ...initialState.apparelForm
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       // retrive admin
-      .addCase(retriveJenisPakaian.pending, (state) => {
+      .addCase(getApparel.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(retriveJenisPakaian.fulfilled, (state, action) => {
-        state.jenisPakaianCollection = action.payload
+      .addCase(getApparel.fulfilled, (state, action) => {
+        state.apparelList = action.payload.result
         state.loading = false
       })
-      .addCase(retriveJenisPakaian.rejected, (state, action) => {
+      .addCase(getApparel.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
 
       // add admin
-      .addCase(addJenisPakaian.pending, (state) => {
+      .addCase(addApparel.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(addJenisPakaian.fulfilled, (state, action) => {
+      .addCase(addApparel.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.status = action.payload.status
       })
-      .addCase(addJenisPakaian.rejected, (state, action) => {
+      .addCase(addApparel.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
 
       // delete admin
-      .addCase(deleteJenisPakaian.pending, (state) => {
+      .addCase(deleteApparel.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(deleteJenisPakaian.fulfilled, (state, action) => {
+      .addCase(deleteApparel.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.message
+        state.status = action.payload.status
       })
-      .addCase(deleteJenisPakaian.rejected, (state, action) => {
+      .addCase(deleteApparel.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
 
       //update admin
-      .addCase(updateJenisPakaian.pending, (state) => {
+      .addCase(updateApparel.pending, (state) => {
         state.loading = true
         state.error = null
-        state.success = null
+        state.status = null
       })
-      .addCase(updateJenisPakaian.fulfilled, (state, action) => {
+      .addCase(updateApparel.fulfilled, (state, action) => {
         state.loading = false
-        state.success = action.payload.status
+        state.status = action.payload.status
       })
-      .addCase(updateJenisPakaian.rejected, (state, action) => {
+      .addCase(updateApparel.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
       })
   }
 })
 
+export const { setApparelForm, clearApparelForm } = jenisPakaianSlice.actions
 export default jenisPakaianSlice.reducer

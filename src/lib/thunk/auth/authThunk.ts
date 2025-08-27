@@ -36,7 +36,7 @@ export const loginAdmin = createAsyncThunk(
 
 export const logoutAdmin = createAsyncThunk(
   "auth/logout",
-  async ({id}: {id: string | undefined}, {rejectWithValue}) => {
+  async ({id}: {id: string}, {rejectWithValue}) => {
     const res = await fetch('api/auth/logout', {
       method: 'POST',
       headers: {
@@ -55,8 +55,8 @@ export const logoutAdmin = createAsyncThunk(
       return rejectWithValue('Failed to logout')
     }
 
-    localStorage.removeItem('auth')
     window.location.reload()
+    localStorage.removeItem('auth')
     return result
   }
 )

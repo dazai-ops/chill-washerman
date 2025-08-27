@@ -7,13 +7,14 @@ import { toast } from 'sonner'
 //redux
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
-import { updateMesinCuci } from '@/lib/thunk/mesincuci/mesincuciThunk'
+import { updateWasher } from '@/lib/thunk/mesincuci/mesincuciThunk'
+import { setWasherForm } from '@/redux/slices/mesinCuciSlice';
 
 //utils
 import { validateForm } from '@/utils/form-validation/validateForm'
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
-import { MesinCuci } from '@/models/mesincuci.model'
-import { clearForm, setErrors, setForm, clearErrors } from '@/redux/slices/form-validation/singleForm'
+import { Washer } from '@/models/mesincuci.model'
+import { setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm'
 
 //components
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
@@ -28,21 +29,25 @@ const rules: Record<string, FieldRules> = {
   is_active: ['required'],
 }
 
-function MesinCuciEditModal({data}: {data: MesinCuci}) {
+function MesinCuciEditModal({data}: {data: Washer}) {
   const [open, setOpen] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.singleForm.data)
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
-  const res = useSelector((state:RootState) => state.mesinCuci.success)
+  const {washerForm, status} = useSelector((state:RootState) => state.mesinCuci)
+  const {errors} = useSelector((state:RootState) => state.singleForm)
+
+  // DEBUG --------------------------
+  //   useEffect(() => {
+  //   console.log(washerForm)
+  // }, [washerForm])
+  // DEBUG -------------------------
 
   useEffect(() => {
     if(data) {
-      dispatch(clearForm())
       dispatch(clearErrors())
-      dispatch(setForm({
+      dispatch(setWasherForm({
         nama: data.nama,
         merk: data.merk,
         seri: data.seri,
@@ -55,13 +60,16 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
 
   const formChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target
-    dispatch(setForm({...formData, [name]: value}))
+    dispatch(setWasherForm({
+      ...washerForm, 
+      [name]: value
+    }))
   }
 
   const formSubmit = (e : React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     dispatch(clearErrors())
-    const formError = validateForm(formData, rules)
+    const formError = validateForm(washerForm, rules)
     if(formError.length > 0) {
       dispatch(setErrors(formError))
       setDisabled(true)
@@ -86,17 +94,18 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
   }, [open, dispatch])
 
   useEffect(() => {
-    setDisabled(false)
-    if(showConfirm){
+    if(showConfirm || disabled){
+      setDisabled(false)
       setShowConfirm(false)
     }
-  }, [formData])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [washerForm])
 
   useEffect(() => {
-    if(res === "ok") {
+    if(status === "success") {
       setOpen(false)
     }
-  }, [res])
+  }, [status])
 
   return (
     <AlertDialog.Root open={open}>
@@ -120,7 +129,7 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
                   className='mb-1' 
                   name='nama' 
                   onChange={formChange} 
-                  defaultValue={data?.nama}
+                  defaultValue={washerForm.nama}
                 />
                 <ErrorMessage 
                   message={getErrorMessage('nama') ?? ''}
@@ -134,7 +143,7 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
                     className='mb-1' 
                     name='merk' 
                     onChange={formChange} 
-                    defaultValue={data?.merk}
+                    defaultValue={washerForm.merk}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('merk') ?? ''}
@@ -147,7 +156,7 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
                     className='mb-1' 
                     name='seri' 
                     onChange={formChange} 
-                    defaultValue={data?.seri}
+                    defaultValue={washerForm.seri}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('seri') ?? ''}
@@ -162,7 +171,7 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
                     className='mb-1' 
                     name='tahun_pembuatan' 
                     onChange={formChange} 
-                    defaultValue={data?.tahun_pembuatan}
+                    defaultValue={washerForm.tahun_pembuatan}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('tahun_pembuatan') ?? ''}
@@ -175,7 +184,7 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
                     className='mb-1' 
                     name='tanggal_dibeli' 
                     onChange={formChange} 
-                    defaultValue={data?.tanggal_dibeli}
+                    defaultValue={washerForm.tanggal_dibeli}
                   />
                   <ErrorMessage 
                     message={getErrorMessage('tanggal_dibeli') ?? ''}
@@ -186,8 +195,11 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
               <Box maxWidth="600px">
                 <RadioCards.Root 
                   name='is_active' 
-                  onChange={formChange} 
-                  defaultValue={data?.is_active.toString()} 
+                  onChange={() => dispatch(setWasherForm({
+                    ...washerForm, 
+                    is_active: !washerForm.is_active
+                  }))} 
+                  defaultValue={washerForm.is_active?.toString()} 
                   columns={{ initial: "1", sm: "3" }}
                 >
                   <RadioCards.Item value="true">
@@ -216,7 +228,7 @@ function MesinCuciEditModal({data}: {data: MesinCuci}) {
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange
-                onConfirm={() => dispatch(updateMesinCuci({ id: String(data.id), mesinCuci: formData }))} 
+                onConfirm={() => dispatch(updateWasher({ id: String(data.id), mesinCuci: washerForm }))} 
                 customButton={
                   showConfirm ? (
                     <Button color='green'>Update</Button>

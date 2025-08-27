@@ -1,14 +1,20 @@
-import { CreateTransaksiDetail, CreateTransaksiOverview, Transaksi, TransaksiDetail } from '@/models/transaksi.model';
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { supabase } from '@/lib/supabase'
+//lib
 import { toast } from "sonner";
+import { supabase } from '@/lib/supabase'
 
-export const retriveTransaksi = createAsyncThunk<
-  Transaksi[], 
+//redux
+import { createAsyncThunk } from "@reduxjs/toolkit";
+
+//utils
+import { TransactionDetail } from '@/models/transaksi.model';
+import { ApiResponse, Transaction, CreateTransaction, CreateTransactionDetail, SingleTransaction } from "@/models/transaksitwo.model";
+
+export const getTransaction = createAsyncThunk<
+  ApiResponse<Partial<Transaction[]>>, 
   void, 
   { rejectValue: string }
 >(
-  "transaksi/retriveTransaksi",
+  "transaction/getTransaction",
   async (_, { rejectWithValue }) => {
     const { data, error } = await supabase
       .from("transaksi")
@@ -63,187 +69,295 @@ export const retriveTransaksi = createAsyncThunk<
 
     if (error) {
       toast.error('Something went wrong', {
-        description: 'Failed to retrive transaksi',
+        description: 'Failed to retrive transaction',
       });
       return rejectWithValue(error.message)
     }
 
-    return data as unknown as Transaksi[]
+    return {
+      status: "success",
+      result: data as unknown as Transaction[],
+      message: "Transaction retrieved successfully"
+    }
   }
 )
 
-export const addTransaksi = createAsyncThunk(
-  "transaksi/addTransaksi",
-  async ({transaksi, transaksiDetail}: {transaksi: CreateTransaksiOverview, transaksiDetail: CreateTransaksiDetail[]}, { rejectWithValue }) => {
+export const addTransaction = createAsyncThunk(
+  "transaction/addTransaction",
+  async (
+    {transaction, transactionDetail}: {transaction: CreateTransaction, transactionDetail: CreateTransactionDetail[]}, 
+    { rejectWithValue }
+  ) => {
     try{
-      const {sisa_bayar, kembalian, ...transaksiPayload} = transaksi
-      const payload = {
-        ...transaksiPayload,
-        dibuat_oleh: transaksi.dibuat_oleh.id
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const {sisa_bayar, kembalian, ...transactionPayload} = transaction
+      const overviewPayload = {
+        ...transactionPayload,
+        dibuat_oleh: transaction.dibuat_oleh.id
       }
 
-      const { data: transaksiData, error: transaksiError } = await supabase
+      const { data: overviewData, error: overviewError } = await supabase
         .from("transaksi")
-        .insert([payload])
+        .insert([overviewPayload])
         .select()
 
-      if(transaksiError){
+      if(overviewError){
         toast.error('Something went wrong',{
-          description: 'Failed to add transaksi',
+          description: 'Failed to add transaction',
         })
-        return rejectWithValue(transaksiError.message)
+        return rejectWithValue(overviewError.message)
 
-      } else if(transaksiData){
-        const transaksiId = transaksiData[0].id
-        const detailWithParent = transaksiDetail.map(({acuan_harga,...detail}) => ({
+      } else if(overviewData){
+        const transactionId = overviewData[0].id
+        const detailPayload = transactionDetail.map((detail) => ({
           ...detail,
-          transaksi_parent: Number(transaksiId),
-          jenis_pakaian: detail.jenis_pakaian?.id
+          jenis_pakaian: detail.jenis_pakaian.id,
+          transaksi_parent: Number(transactionId)
         }))
   
-        const { data: transaksiDetailData, error: transaksiDetailError } = await supabase
+        const { data: detailData, error: detailError } = await supabase
           .from("transaksi_detail")
-          .insert(detailWithParent)
+          .insert(detailPayload)
           .select()
   
-        if(transaksiDetailError){
+        if(detailError){
           toast.error('Something went wrong',{
-            description: 'Failed to add detail transaksi',
+            description: 'Failed to add detail transaction',
           })
-          return rejectWithValue(transaksiDetailError.message)
+          return rejectWithValue(detailError.message)
 
-        } else if(transaksiDetailData){
-          if(transaksiData && transaksiDetailData){
+        } else if(detailData){
+          if(overviewData && detailData){
             await supabase.rpc("increment_jumlah_input", {
-              admin_id: transaksiData[0].dibuat_oleh
+              admin_id: overviewData[0].dibuat_oleh
             })
           }
         }
-        toast.success('transaksi added successfully')
+
+        toast.success('transaction added successfully')
         return {
-          transaksi: transaksiDetailData[0] as Transaksi,
-          message: "transaksi added successfully"
+          status: "success",
+          message: "Transaction added successfully"
         }
       }
     } catch (error ) {
-      toast.error('Failed to add transaksi');
+      toast.error('Failed to add transaction');
       return rejectWithValue((error as Error).message)
     }
   }
 )
 
-export const deleteTransaksi = createAsyncThunk<
-  { deletedTransaksi: Transaksi; message: string }, 
+export const deleteTransaction = createAsyncThunk<
+  { status: string;message: string }, 
   { id: number},
   { rejectValue: string }
 >(
-  "transaksi/deleteTransaksi",
+  "transaction/deleteTransaction",
   async ({id}, { rejectWithValue }) => {
     try{
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("transaksi")
         .delete()
         .eq("id", id)
         .select()
       if (error) {
         toast.error('Something went wrong',{
-          description: 'Failed to delete transaksi',
+          description: 'Failed to delete transaction',
         })
         return rejectWithValue(error.message)
       }
 
-      toast.success('Transaksi deleted successfully')
+      toast.success('Transaction deleted successfully')
 
       return {
-        deletedTransaksi: data[0],
-        message: "Transaksi deleted successfully"
+        status: "success",
+        message: "Transaction deleted successfully"
       }
     }catch (error) {
-      toast.error('Failed to delete transaksi');
+      toast.error('Failed to delete transaction');
       return rejectWithValue((error as Error).message)
     }
   }
 )
 
-// export const updateMesinCuci = createAsyncThunk<
-//   { updatedAdmin: MesinCuci; message: string }, 
-//   { id: string, mesinCuci: Partial<MesinCuci>},
-//   { rejectValue: string }
-// >(
-//   "admin/updateAdmin",
-//   async ({id, mesinCuci}, { rejectWithValue }) => {
-//     try{
-//       const { data, error } = await supabase.from("mesin_cuci").update(mesinCuci).eq("id", id).select()
-//       if (error) {
-//         toast.error('Something went wrong',{
-//           description: 'Failed to update mesin cuci',
-//         })
-//         return rejectWithValue(error.message)
-//       }
+export const getSingleTransaction = createAsyncThunk<
+  ApiResponse<SingleTransaction>,
+  {id: number},
+  {rejectValue: string}
+>(
+  "transaction/getSingleTransaction",
+  async ({id}, { rejectWithValue }) => {
+    try{
+      const {data, error} = await supabase
+        .from("transaksi")
+        .select(`
+          id,
+          kode_transaksi,
+          nama_pelanggan,
+          telepon_pelanggan,
+          tanggal_masuk,
+          tanggal_selesai,
+          tanggal_keluar,
+          total_harga,
+          dibayarkan,
+          status_pembayaran,
+          status_proses,
+          catatan,
+          created_at,
+          updated_at,
+          updated_by,
+          dibuat_oleh(*),
+          transaksi_detail(
+            id,
+            transaksi_parent,
+            berat_kg,
+            jumlah_item,
+            layanan_setrika,
+            catatan_pelanggan,
+            catatan_admin,
+            status_proses,
+            created_at,
+            updated_at,
+            total_harga_layanan,
+            acuan_harga,
+            jenis_pakaian(*),
+            mesin_cuci(*),
+            updated_by(*)
+          )
+        `)
+        .eq("id", id)
+        .single()
 
-//       toast.success('Mesin cuci updated successfully')
+      if(error){
+        toast.error('Something went wrong',{
+          description: 'Failed to retrieve transaction',
+        })
+        return rejectWithValue(error.message) 
+      }
+
+      if(!data){
+        return rejectWithValue("Transaction not found")
+      }
+
+      const {transaksi_detail, dibuat_oleh, ...rest} = data
       
-//       return {
-//         updatedAdmin: data[0],
-//         message: "Mesin cuci updated successfully"
-//       }
-//     }catch (error) {
-//       toast.error('Failed to update mesin cuci');
-//       return rejectWithValue((error as Error).message)
-//     }
-//   }
-// )
+      let sisa_bayar
+      let kembalian
 
-// export const changeActive = createAsyncThunk<
-//   { changedMesinCuci: MesinCuci; message: string }, 
-//   {id: string, is_active: boolean}, 
-//   { rejectValue: string }
-// >(
-//   "admin/changeRole",
-//   async ({id, is_active}, { rejectWithValue }) => {
-//     try{
-//       const { data: currentData, error: fetchError } = await supabase
-//         .from("mesin_cuci")
-//         .select("status_mesin")
-//         .eq("id", id)
-//         .single()
+      if(data.status_pembayaran === "lunas"){
+        sisa_bayar = 0
+        kembalian = data.dibayarkan - data.total_harga
+      } else {
+        sisa_bayar = data.total_harga - data.dibayarkan
+        kembalian = 0
+      }
 
-//       if(fetchError || !currentData) {
-//         toast.error('Something went wrong',{
-//           description: 'Failed to change mesin cuci',
-//         })
-//         return rejectWithValue(fetchError.message as string)
-//       }
+      const transaction_overview = {
+        ...rest,
+        dibuat_oleh: dibuat_oleh[0] ?? null,
+        sisa_bayar: sisa_bayar,
+        kembalian: kembalian
+      }
 
-//       if(!is_active && currentData.status_mesin === 'digunakan'){
-//         toast.error('Failed to change mesin cuci', {
-//           description: 'Mesin cuci sedang digunakan',
-//         });
-//         return rejectWithValue("Failed to change mesin cuci")
-//       }
+      const detail = transaksi_detail ?? []
+      
+      return {
+        status: "success",
+        message: "Transaction retrieved successfully",
+        result: {
+          overview: transaction_overview,
+          detail: detail
+        }
+      }
+    } catch (error) {
+      toast.error('Failed to retrieve transaction');
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)
 
-//       const { data, error } = await supabase
-//         .from("mesin_cuci")
-//         .update({is_active})
-//         .eq("id", id)
-//         .select()
+export const updateTransaction = createAsyncThunk<
+  { message: string, res: string}, 
+  { id: number, overview: Partial<Transaction>, detailTransaction: Partial<TransactionDetail>[], deletedDetail: []},
+  { rejectValue: string }
+>(
+  "transaction/updateTransaction",
+  async ({id, overview, detailTransaction, deletedDetail}, { rejectWithValue }) => {
+    try{
+      const { error } = await supabase
+        .from("transaksi")
+        .update(overview)
+        .eq("id", id)
+        .select()
+        
+      if (error) {
+        toast.error('Something went wrong',{
+          description: 'Failed to update transaksi',
+        })
+        return rejectWithValue(error.message)
+      }
 
-//       if (error) {
-//         toast.error('Something went wrong',{
-//           description: 'Failed to change mesin cuci',
-//         })
-//         return rejectWithValue(error.message as string)
-//       }
+      if(deletedDetail.length > 0){
+        const { error: deleteError } = await supabase
+          .from("transaksi_detail")
+          .delete()
+          .in("id", deletedDetail)
+        if(deleteError){
+          toast.error('Something went wrong',{
+            description: 'Failed to delete detail transaksi',
+          })
+          return rejectWithValue(deleteError.message)
+        }
+      }
+      for (const detail of detailTransaction){
+        if(detail.id){
+          const detailUpdate = {
+            ...detail,
+            jenis_pakaian: detail.jenis_pakaian?.id,
+            updated_at: new Date(),
+            updated_by: overview.updated_by
+          }
+          const {error: updateError } = await supabase
+            .from("transaksi_detail")
+            .update([detailUpdate])
+            .eq("id", detail.id)
 
-//       toast.success('Mesin cuci changed successfully');
+          if(updateError){
+            toast.error('Something went wrong',{
+              description: 'Failed to update detail transaksi',
+            })
+            return rejectWithValue(updateError.message)
+          }
+        } else {
+          const detailInsert = {
+            ...detail,
+            transaksi_parent: id,
+            jenis_pakaian: detail.jenis_pakaian?.id
+          }
+          const {error: insertError } = await supabase
+            .from("transaksi_detail")
+            .insert([detailInsert])
 
-//       return {
-//         changedMesinCuci: data[0],
-//         message: "Mesin cuci changed successfully"
-//       }
-//     }catch (error) {
-//       toast.error('Failed to change mesin cuci');
-//       return rejectWithValue((error as Error).message)
-//     }
-//   }
-// )
+          if(insertError){
+            toast.error('Something went wrong',{
+              description: 'Failed to insert detail transaction',
+            })
+            return rejectWithValue(insertError.message)
+          }
+        }
+      }
+
+      toast.success('Transaction updated successfully')
+      
+      return {
+        message: "Transaction updated successfully",
+        res: "ok"
+      }
+    }catch (error) {
+      toast.error('Failed to update transaction', {
+        description: (error as Error).message
+      });
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)

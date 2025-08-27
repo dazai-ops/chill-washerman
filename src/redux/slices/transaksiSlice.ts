@@ -1,19 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CreateTransaksiDetail, CreateTransaksiOverview, Transaksi } from "@/models/transaksi.model";
-import { deleteTransaksi, retriveTransaksi, addTransaksi } from "@/lib/thunk/transaksi/transaksiThunk";
+import { CreateTransactionDetail, CreateTransactionOverview, Transaction } from "@/models/transaksi.model";
+import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction } from "@/lib/thunk/transaksi/transaksiThunk";
 import { generateTransaksiCode } from "@/utils/generateCode";
 interface TransaksiState {
-  transaksiCollection: Transaksi[]
-  transaksiOverview: CreateTransaksiOverview
-  transaksiDetailList: CreateTransaksiDetail[]
+  transactionList: Partial<Transaction[]>
+  transactionOverview: Partial<CreateTransactionOverview>
+  transactionDetail: Partial<CreateTransactionDetail[]>
+  transactionDetailDelete: number[] 
+  currentTransaction: Partial<Transaction> | null
   loading: boolean,
   error: string | null
-  success: boolean
+  status: string | null
 }
 
 const initialState: TransaksiState = {
-  transaksiCollection: [],
-  transaksiOverview: {
+  transactionList: [],
+  transactionOverview: {
     dibuat_oleh: {
       id: null,
       nama: ""
@@ -28,7 +30,7 @@ const initialState: TransaksiState = {
     kembalian: 0,
     status_pembayaran: "belum_lunas"
   },
-  transaksiDetailList: [
+  transactionDetail: [
     {
       jenis_pakaian: {
         id: null,
@@ -47,56 +49,57 @@ const initialState: TransaksiState = {
       acuan_harga: "",
     }
   ],
+  transactionDetailDelete: [],
+  currentTransaction: null,
   loading: false,
   error: null,
-  success: false,
+  status: "",
 }
 
 const transaksiSlice = createSlice({
   name: "transaksi",
   initialState,
   reducers: {
-    setOverview: (
-      state,
+    setTransactionOverviewField: <K extends keyof CreateTransactionOverview> (
+      state: TransaksiState,
       action: PayloadAction<{
-        key: keyof CreateTransaksiOverview,
-        value: string | number | boolean | object
+        key: K,
+        value: CreateTransactionOverview[K]
       }>
     ) => {
       const { key, value } = action.payload
-      const detail = state.transaksiOverview
+      const detail = state.transactionOverview
 
       if(!detail) return
       if(key === "dibuat_oleh" && typeof value === "object" && value !== null) {
-        detail.dibuat_oleh = value as CreateTransaksiOverview["dibuat_oleh"]
+        detail.dibuat_oleh = value as CreateTransactionOverview["dibuat_oleh"]
       } else {
         detail[key] = value
       }
     },
-    setDetailedField: (
-      state,
+    setTransactionDetailField: <K extends keyof CreateTransactionDetail> (
+      state: TransaksiState,
       action: PayloadAction<{
         index: number,
-        key: keyof CreateTransaksiDetail,
-        value: string | number | boolean | object
+        key: K,
+        value: CreateTransactionDetail[K]
       }>
     ) => {
       const { index, key, value } = action.payload
-      const detail = state.transaksiDetailList[index]
+      const detail = state.transactionDetail[index]
 
       if(!detail) return
 
       if(key === "jenis_pakaian" && typeof value === "object" && value !== null) {
-        detail.jenis_pakaian = value as CreateTransaksiDetail["jenis_pakaian"]
+        detail.jenis_pakaian = value as CreateTransactionDetail["jenis_pakaian"]
       } else {
         detail[key] = value
       }
     },
-    addTransaksiDetailForm: (state) => {
-      state.transaksiDetailList.push({
+    addTransactionDetailForm: (state) => {
+      state.transactionDetail.push({
         jenis_pakaian: {
           id: null,
-          jenis_pakaian: "",
           harga_per_item: 0,
           harga_per_kg: 0,
           satuan: ""
@@ -111,58 +114,65 @@ const transaksiSlice = createSlice({
         acuan_harga: ""
       })
     },
-    calculatePriceService: (
+    calculateServicePrice: (
       state,
       action: PayloadAction<{
         index: number,
       }>
     ) => {
       const {index} = action.payload
-      const detail = state.transaksiDetailList[index]
+      const detail = state.transactionDetail[index]
 
       let total = 0
-      if(detail.acuan_harga === 'berat') {
-        total = detail.berat_kg * detail.jenis_pakaian?.harga_per_kg
-      } else if(detail.acuan_harga === 'item') {
-        total = detail.jumlah_item * detail.jenis_pakaian?.harga_per_item
-      }
 
-      if(detail.layanan_setrika) {
-        total += total * 0.1
+      if(detail) {
+        if(detail.acuan_harga === 'berat') {
+          total = detail.berat_kg * detail.jenis_pakaian?.harga_per_kg
+        } else if(detail.acuan_harga === 'item') {
+          total = detail.jumlah_item * detail.jenis_pakaian?.harga_per_item
+        }
+  
+        if(detail.layanan_setrika) {
+          total += total * 0.1
+        }
+        detail.total_harga_layanan = total || 0
       }
-      detail.total_harga_layanan = total || 0
     },
     calculateTotalPrice: (state) => {
       let total = 0
-      state.transaksiDetailList.forEach(detail => {
-        total += detail.total_harga_layanan
+      state.transactionDetail.forEach(detail => {
+        if(detail?.total_harga_layanan){
+          total += detail.total_harga_layanan
+        }
       })
-      state.transaksiOverview.total_harga = total
+      state.transactionOverview.total_harga = total
     },
-    calculateChangePrice : (state) => {
+    calculateBalance : (state) => {
       let result = 0
-      const totalharga = state.transaksiOverview.total_harga
-      const dibayarkan = state.transaksiOverview.dibayarkan
+      const totalharga = state.transactionOverview.total_harga || 0
+      const dibayarkan = state.transactionOverview.dibayarkan || 0
 
       result = dibayarkan - totalharga
 
-      console.log(result)
       if(result > 0) {
-        state.transaksiOverview.kembalian = result
-        state.transaksiOverview.sisa_bayar = 0
-        state.transaksiOverview.status_pembayaran = "lunas"
+        state.transactionOverview.kembalian = result
+        state.transactionOverview.sisa_bayar = 0
+        state.transactionOverview.status_pembayaran = "lunas"
       } else {
-        state.transaksiOverview.kembalian = 0
-        state.transaksiOverview.sisa_bayar = Math.abs(result)
-        state.transaksiOverview.status_pembayaran = "belum_lunas"
+        state.transactionOverview.kembalian = 0
+        state.transactionOverview.sisa_bayar = Math.abs(result)
+        state.transactionOverview.status_pembayaran = "belum_lunas"
       }
 
     },
-    removeTransaksiDetailForm: (state, action: PayloadAction<number>) => {
-      state.transaksiDetailList.splice(action.payload, 1)
+    removeTransactionDetailForm: (state, action: PayloadAction<{index: number, id?: number}>) => {
+      state.transactionDetail.splice(action.payload.index, 1)
+      if(action.payload.id){
+        state.transactionDetailDelete.push(action.payload.id)
+      }
     },
-    resetTransaksiDetailForm: (state) => {
-      state.transaksiDetailList = [
+    resetTransactionDetailForm: (state) => {
+      state.transactionDetail = [
         {
           jenis_pakaian: {
             id: null,
@@ -183,7 +193,7 @@ const transaksiSlice = createSlice({
       ]
     },
     clearForm: (state) => {
-      state.transaksiOverview = {
+      state.transactionOverview = {
         dibuat_oleh: {
           id: null,
           nama: ""
@@ -198,66 +208,82 @@ const transaksiSlice = createSlice({
         nama_pelanggan: "",
         telepon_pelanggan: null
       }
-      state.transaksiDetailList = []
+      state.transactionDetail = []
     }
   },
   extraReducers: (builder) => {
     builder
       // retrive admin
-      .addCase(retriveTransaksi.pending, (state) => {
+      .addCase(getTransaction.pending, (state) => {
         state.loading = true
-        state.error = null
       })
-      .addCase(retriveTransaksi.fulfilled, (state, action) => {
-        state.transaksiCollection = action.payload
+      .addCase(getTransaction.fulfilled, (state, action) => {
+        state.transactionList = action.payload.result
         state.loading = false
       })
-      .addCase(retriveTransaksi.rejected, (state, action) => {
+      .addCase(getTransaction.rejected, (state) => {
         state.loading = false
-        state.error = action.payload as string
       })
 
       // add admin
-      .addCase(addTransaksi.pending, (state) => {
+      .addCase(addTransaction.pending, (state) => {
         state.loading = true
-        state.error = null
-        state.success = false
       })
-      .addCase(addTransaksi.fulfilled, (state) => {
+      .addCase(addTransaction.fulfilled, (state, action) => {
         state.loading = false
-        state.success = true
+        state.status = action.payload?.status as string
       })
-      .addCase(addTransaksi.rejected, (state, action) => {
+      .addCase(addTransaction.rejected, (state) => {
         state.loading = false
-        state.error = action.payload as string
       })
 
       // delete admin
-      .addCase(deleteTransaksi.pending, (state) => {
+      .addCase(deleteTransaction.pending, (state) => {
         state.loading = true
-        state.error = null
-        state.success = false
+        state.status = ''
       })
-      .addCase(deleteTransaksi.fulfilled, (state) => {
+      .addCase(deleteTransaction.fulfilled, (state, action) => {
         state.loading = false
-        state.success = false
+        state.status = action.payload.status
       })
-      .addCase(deleteTransaksi.rejected, (state, action) => {
+      .addCase(deleteTransaction.rejected, (state) => {
         state.loading = false
-        state.error = action.payload as string
+        state.status = ''
+      })
+
+      .addCase(getSingleTransaction.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(getSingleTransaction.fulfilled, (state, action) => {
+        state.loading = false
+        state.transactionOverview = action.payload.result.overview
+        state.transactionDetail = action.payload.result.detail
+      })
+      .addCase(getSingleTransaction.rejected, (state) => {
+        state.loading = false
+      })
+      .addCase(updateTransaction.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(updateTransaction.fulfilled, (state, action) => {
+        state.loading = false
+        state.status = action.payload.res
+      })
+      .addCase(updateTransaction.rejected, (state) => {
+        state.loading = false
       })
   }
 })
 
 export const {
-  setOverview,
-  setDetailedField,
-  addTransaksiDetailForm,
-  removeTransaksiDetailForm,
-  resetTransaksiDetailForm,
-  calculatePriceService,
+  setTransactionOverviewField,
+  setTransactionDetailField,
+  addTransactionDetailForm,
+  removeTransactionDetailForm,
+  resetTransactionDetailForm,
+  calculateServicePrice,
   calculateTotalPrice,
-  calculateChangePrice,
+  calculateBalance,
   clearForm
 } = transaksiSlice.actions
 

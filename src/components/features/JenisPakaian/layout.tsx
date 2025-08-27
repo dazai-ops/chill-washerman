@@ -1,34 +1,48 @@
 "use client"
+
+//lib
 import { useEffect, useState } from 'react'
-import { DataTable } from '@/components/layout/DataTable/DataTable';
-import { DataCard } from '@/components/layout/DataCard/DataCard';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import { deleteJenisPakaian, retriveJenisPakaian } from '@/lib/thunk/jenispakaian/jenispakaianThunk';
-import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { jenisPakaianColumns } from '@/features/jenispakaian/columns';
-import { formatRupiah } from '@/utils/rupiahFormatter';
+import { useDispatch, useSelector } from 'react-redux';
+import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 
-import Tabnav from '@/components/layout/TabNav/TabNav'
+//redux
+import { AppDispatch, RootState } from '@/redux/store';
+import { deleteApparel, getApparel } from '@/lib/thunk/jenispakaian/jenispakaianThunk';
+
+// components
+import { DataTable } from '@/components/layout/DataTable/DataTable';
+import { DataCard } from '@/components/layout/DataCard/DataCard';
 import JenisPakaianDetail from '@/components/modal/JenisPakaianModal/JenisPakaianDetailDialog';
-import AddModal from '@/components/modal/JenisPakaianModal/JanisPakaianCreateModal';
 import EditModal from '@/components/modal/JenisPakaianModal/JenisPakaianEditModal';
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
+import AddModal from '@/components/modal/JenisPakaianModal/JanisPakaianCreateModal';
+import Tabnav from '@/components/layout/TabNav/TabNav'
 
+//utils
+import { formatRupiah } from '@/utils/rupiahFormatter';
 
 function JenisPakaianLayout() {
   const dispatch = useDispatch<AppDispatch>()
-  const { loading, success } = useSelector((state: RootState) => state.jenisPakaian)
+  const { loading, status } = useSelector((state: RootState) => state.jenisPakaian)
   const [ segmented, setSegmented ] = useState('card')
   
   const columns = jenisPakaianColumns
-  const data = useSelector((state: RootState) => state.jenisPakaian.jenisPakaianCollection)
+  const {apparelList} = useSelector((state: RootState) => state.jenisPakaian)
   
   useEffect(() => {
-    dispatch(retriveJenisPakaian())
-  }, [dispatch, success])
+    dispatch(getApparel())
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if(status === 'success'){
+      dispatch(getApparel())
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status])
 
   return (
     <div className='w-full flex flex-col items-center'>
@@ -38,7 +52,7 @@ function JenisPakaianLayout() {
         {segmented === 'table' ? (
           <DataTable 
             columns={columns} 
-            data={data}
+            data={apparelList}
             renderAction={(row) => (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
@@ -48,7 +62,7 @@ function JenisPakaianLayout() {
                   <JenisPakaianDetail data={row}/>
                   <EditModal data={row}/>
                   <DropdownMenu.Separator />
-                  <ConfirmDelete onConfirm={() => row.id && dispatch(deleteJenisPakaian(String(row.id)))}/>
+                  <ConfirmDelete onConfirm={() => row.id && dispatch(deleteApparel(String(row.id)))}/>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             )}
@@ -60,7 +74,7 @@ function JenisPakaianLayout() {
             }
           /> ) : 
           ( <DataCard
-            data={data}
+            data={apparelList}
             renderCard={(row) => (
               <Box maxWidth="350px">
                 <Card>
@@ -88,7 +102,7 @@ function JenisPakaianLayout() {
                       <DropdownMenu.Content>
                         <JenisPakaianDetail data={row}/>
                         <EditModal data={row}/>
-                        <ConfirmDelete onConfirm={() => row.id && dispatch(deleteJenisPakaian(String(row.id)))}/>
+                        <ConfirmDelete onConfirm={() => row.id && dispatch(deleteApparel(String(row.id)))}/>
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>
                   </Flex>

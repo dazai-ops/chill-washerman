@@ -6,12 +6,13 @@ import { Button, Flex, AlertDialog, Grid, TextField, Text, Box, RadioCards } fro
 //redux
 import { AppDispatch, RootState } from '@/redux/store'
 import { useSelector, useDispatch } from 'react-redux'
-import { clearForm, setErrors, setField, clearErrors } from '@/redux/slices/form-validation/singleForm'
-import { addMesinCuci } from '@/lib/thunk/mesincuci/mesincuciThunk'
+import { clearForm, setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm'
+import { addWasher } from '@/lib/thunk/mesincuci/mesincuciThunk'
+import { resetWasherForm, setWasherForm } from '@/redux/slices/mesinCuciSlice'
 
 
 //utils
-import { MesinCuci } from '@/models/mesincuci.model';
+import { Washer } from '@/models/mesincuci.model';
 import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
 import { validateForm } from '@/utils/form-validation/validateForm'
 
@@ -30,25 +31,27 @@ function MesinCuciCreateModal() {
   const [disabled, setDisabled] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const formData = useSelector((state:RootState) => state.singleForm.data)
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
+  const {washerForm} = useSelector((state:RootState) => state.mesinCuci)
+  const {errors} = useSelector((state:RootState) => state.singleForm)
 
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    dispatch(setField({field: name, value: value}))
+    dispatch(setWasherForm({
+      ...washerForm,
+      [name]: value
+    }))
   }
 
-  const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formError = validateForm(formData, rules)
+    const formError = validateForm(washerForm, rules)
     
     if (formError.length > 0) {
       dispatch(setErrors(formError))
       setDisabled(true)
     } else {
       dispatch(clearErrors())
-      dispatch(addMesinCuci(formData as MesinCuci))
+      dispatch(addWasher(washerForm as Washer))
       setOpen(false)
     } 
   }
@@ -58,15 +61,14 @@ function MesinCuciCreateModal() {
   }
   
   useEffect(() => {
-    if(!open) {
-      dispatch(clearErrors())
-      dispatch(clearForm())
-    }
-  }, [open, dispatch])
+    dispatch(resetWasherForm())
+    dispatch(clearForm())
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   useEffect(() => {
     setDisabled(false)
-  }, [formData])
+  }, [washerForm])
 
   return (
     <AlertDialog.Root open={open}>
@@ -80,7 +82,7 @@ function MesinCuciCreateModal() {
           Isi form dibawah ini
         </AlertDialog.Description>
 
-        <form onSubmit={(e) => handleSubmit(e)}>
+        <form onSubmit={(e) => handleFormSubmit(e)}>
           <Flex direction="column" gap="3" className='mt-4'>
             <Grid gap="1">
               <Flex className='w-full' gap="3">
@@ -90,7 +92,7 @@ function MesinCuciCreateModal() {
                     size="3" 
                     className={`mb-1 ${getErrorMessage('merk') ? 'border border-red-500' : ''}`}
                     name='merk' 
-                    onChange={handleInputChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('merk') ?? ''}/>
                 </Box>
@@ -100,7 +102,7 @@ function MesinCuciCreateModal() {
                     size="3"  
                     name='seri' 
                     className={`mb-1 ${getErrorMessage('seri') ? 'border border-red-500' : ''}`}
-                    onChange={handleInputChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('seri') ?? ''}/>
                 </Box>
@@ -116,7 +118,7 @@ function MesinCuciCreateModal() {
                     max={new Date().getFullYear().toString()}  
                     name='tahun_pembuatan' 
                     className={`mb-1 ${getErrorMessage('tahun_pembuatan') ? 'border border-red-500' : ''}`}
-                    onChange={handleInputChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('tahun_pembuatan') ?? ''}/>
                 </Box>
@@ -128,7 +130,7 @@ function MesinCuciCreateModal() {
                     type='date'  
                     name='tanggal_dibeli' 
                     className={`mb-1 ${getErrorMessage('tanggal_dibeli') ? 'border border-red-500' : ''}`}
-                    onChange={handleInputChange}
+                    onChange={handleFormChange}
                   />
                   <ErrorMessage message={getErrorMessage('tanggal_dibeli') ?? ''}/>
                 </Box>
@@ -138,7 +140,7 @@ function MesinCuciCreateModal() {
               <Box maxWidth="600px">
                 <RadioCards.Root 
                   name='is_active' 
-                  onChange={handleInputChange} 
+                  onValueChange={(value: string) => dispatch(setWasherForm({...washerForm, is_active: value === 'true' ? true : false}))} 
                   defaultValue='true'
                 >
                   <RadioCards.Item value="true">
@@ -155,24 +157,29 @@ function MesinCuciCreateModal() {
               </Box>
             </Grid>
           </Flex>
-          <Flex gap="3" mt="4" justify="end">
-            <AlertDialog.Cancel>
-              <Button 
-                color='gray' 
-                onClick={() => setOpen(false)}
-              >
-                Batal
-              </Button>
-            </AlertDialog.Cancel>
-            <AlertDialog.Action>
-              <Button 
-                type='submit' 
-                color='green'
-                disabled={disabled}
-              >
-                Submit
-              </Button>
-            </AlertDialog.Action>
+          <Flex gap="3" mt="4" justify="between">
+            <Button type='reset' color='yellow'>
+              Reset
+            </Button>
+            <Flex gap={"3"}>
+              <AlertDialog.Cancel>
+                <Button 
+                  color='gray' 
+                  onClick={() => setOpen(false)}
+                >
+                  Batal
+                </Button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action>
+                <Button 
+                  type='submit' 
+                  color='green'
+                  disabled={disabled}
+                >
+                  Submit
+                </Button>
+              </AlertDialog.Action>
+            </Flex>
           </Flex>
         </form>
 

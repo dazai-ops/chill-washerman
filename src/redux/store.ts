@@ -4,7 +4,7 @@ import adminReducer from "@/redux/slices/adminSlice";
 import mesinCuciReducer from "@/redux/slices/mesinCuciSlice";
 import jenisPakaianReducer from "@/redux/slices/jenispakaianSlice";
 import transaksiReducer from "@/redux/slices/transaksiSlice";
-
+import modalControlReducer from "@/redux/slices/modalControl"
 import singleFormReducer from "./slices/form-validation/singleForm"
 
 export const store = configureStore({
@@ -14,7 +14,9 @@ export const store = configureStore({
     mesinCuci: mesinCuciReducer,
     jenisPakaian: jenisPakaianReducer,
     transaksi: transaksiReducer,
-    singleForm: singleFormReducer
+    singleForm: singleFormReducer,
+
+    modalControl: modalControlReducer
   }
 })
 

@@ -2,36 +2,49 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import bcrypt from "bcryptjs";
 import { toast } from "sonner";
-import { Admin } from "@/models/admin.model";
+import { Admin, AdminListResponse, CreateAdminForm, UpdateAdminForm } from "@/models/admin.model";
 
-export const retriveAdmin = createAsyncThunk<
-  Admin[], 
+export const getAdmin = createAsyncThunk<
+  AdminListResponse, 
   void, 
   { rejectValue: string }
 >(
-  "admin/retriveAdmin",
+  "admin/getAdmin",
   async (_, { rejectWithValue }) => {
-    const { data, error } = await supabase
+    try{
+      const { data, error } = await supabase
       .from("admin")
       .select(
         "id, nama, username, no_telepon, alamat_rumah, jumlah_input, last_login, created_at, role, is_login"
       )
       .order("role", { ascending: false })
 
-    if (error) {
-      toast.error('Something went wrong', {
-        description: 'Failed to retrive admin',
-      });
-      return rejectWithValue(error.message)
-    }
+      if (error) {
+        toast.error('Something went wrong', {
+          description: 'Failed to retrive admin',
+        });
+        return rejectWithValue(error.message)
+      }
 
-    return data as Admin[]
+      return {
+        result: data as Admin[],
+        message: "Admin retrieved successfully",
+        status: "success",
+        error: null
+      }
+    } catch(error) {
+      toast.error('Failed to retrive admin', {
+        description: 'Call the IT department',
+      });
+      return rejectWithValue((error as Error).message)
+    }
+    
   }
 )
 
 export const addAdmin = createAsyncThunk<
-  {newAdmin: Partial<Admin>; message: string, status: string},
-  {password_hash: string}, 
+  { result: CreateAdminForm; message: string, status: string, error: string | null },
+  { password_hash: string }, 
   { rejectValue: string }
 >(
   "admin/addAdmin",
@@ -39,14 +52,14 @@ export const addAdmin = createAsyncThunk<
     try{
       const hashedPassword = await bcrypt.hash(admin.password_hash, 10)
 
-      const adminPayload = {
+      const payload = {
         ...admin,
         password_hash: hashedPassword,
       }
 
       const { data, error } = await supabase
         .from("admin")
-        .insert(adminPayload)
+        .insert(payload)
         .select("nama, username, role")
 
       if(error) {
@@ -58,20 +71,23 @@ export const addAdmin = createAsyncThunk<
 
       toast.success('Admin added successfully')
       return {
-        newAdmin: data[0] as Admin,
+        result: data[0] as CreateAdminForm,
         message: "Admin added successfully",
-        status: "ok"
+        status: "success",
+        error: null
       }
     } catch (error) {
-      toast.error('Failed to add admin');
+      toast.error('Failed to add admin', {
+        description: 'Call the IT department',
+      });
       return rejectWithValue((error as Error).message)
     }
   }
 )
 
 export const deleteAdmin = createAsyncThunk<
-  { deletedAdmin: Partial<Admin>; message: string, status: string }, 
-  string, 
+  { result: Partial<Admin>; message: string, status: string, error: string | null }, 
+  number, 
   { rejectValue: string }
 >(
   "admin/deleteAdmin",
@@ -81,7 +97,7 @@ export const deleteAdmin = createAsyncThunk<
         .from("admin")
         .delete()
         .eq("id", id)
-        .select("nama")
+        .select("id, nama, username, role")
 
       if (error) {
         toast.error('Something went wrong',{
@@ -93,28 +109,31 @@ export const deleteAdmin = createAsyncThunk<
       toast.success('Admin deleted successfully')
 
       return {
-        deletedAdmin: data[0],
+        result: data[0],
         message: "Admin deleted successfully",
-        status: "ok"
+        status: "success",
+        error: null
       }
     }catch (error) {
-      toast.error('Failed to delete admin');
+      toast.error('Failed to delete admin', {
+        description: 'Call the IT department',
+      });
       return rejectWithValue((error as Error).message)
     }
   }
 )
 
 export const updateAdmin = createAsyncThunk<
-  { updatedAdmin: Partial<Admin>; message: string; status: string }, 
-  { id: string, admin: Partial<Admin>},
+  { result: Admin ; message: string; status: string }, 
+  { id: string, payload: Partial<UpdateAdminForm>},
   { rejectValue: string }
 >(
   "admin/updateAdmin",
-  async ({id, admin}, { rejectWithValue }) => {
+  async ({id, payload}, { rejectWithValue }) => {
     try{
       const { data, error } = await supabase
         .from("admin")
-        .update(admin)
+        .update(payload)
         .eq("id", id)
         .select("nama, username, role")
         
@@ -128,23 +147,26 @@ export const updateAdmin = createAsyncThunk<
       toast.success('Admin updated successfully')
       
       return {
-        updatedAdmin: data[0],
+        result: data[0] as Admin,
         message: "Admin updated successfully",
-        status: "ok"
+        status: "success",
+        error: null
       }
     }catch (error) {
-      toast.error('Failed to update admin');
+      toast.error('Failed to update admin', {
+        description: 'Call the IT department',
+      });
       return rejectWithValue((error as Error).message)
     }
   }
 )
 
-export const changeRole = createAsyncThunk<
-  { changedAdmin: Partial<Admin>; message: string }, 
-  { id: string, role: string}, 
+export const updateAdminRole = createAsyncThunk<
+  { result: Admin; message: string, status: string, error: string | null }, 
+  { id: number, role: string}, 
   { rejectValue: string }
 >(
-  "admin/changeRole",
+  "admin/updateAdminRole",
   async ({id, role}, { rejectWithValue }) => {
     try{
       const { data, error } = await supabase
@@ -163,11 +185,15 @@ export const changeRole = createAsyncThunk<
       toast.success('Role changed successfully');
 
       return {
-        changedAdmin: data[0],
-        message: "Admin role changed successfully"
+        result: data[0] as Admin,
+        message: "Admin role changed successfully",
+        status: "success",
+        error: null
       }
     }catch (error) {
-      toast.error('Failed to change admin role');
+      toast.error('Failed to change admin role', {
+        description: 'Call the IT department',
+      });
       return rejectWithValue((error as Error).message)
     }
   }

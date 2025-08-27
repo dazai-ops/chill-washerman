@@ -1,34 +1,47 @@
 "use client"
+
+//lib
 import { useEffect, useState } from 'react'
-import { DataTable } from '@/components/layout/DataTable/DataTable';
-import { DataCard } from '@/components/layout/DataCard/DataCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
 import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { ArchiveIcon, DotsVerticalIcon } from '@radix-ui/react-icons';
-import { mesinCuciColumns } from '@/features/mesincuci/columns';
-import { retriveMesinCuci, changeActive, deleteMesinCuci } from '@/lib/thunk/mesincuci/mesincuciThunk';
-import { formatDateWIB } from '@/utils/dateFormatter';
 
-import Tabnav from '@/components/layout/TabNav/TabNav'
-import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
-import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
+//redux
+import { AppDispatch, RootState } from '@/redux/store';
+import { getWasher, changeWasherStatus, deleteWasher } from '@/lib/thunk/mesincuci/mesincuciThunk';
+
+//components
+import { DataTable } from '@/components/layout/DataTable/DataTable';
+import { DataCard } from '@/components/layout/DataCard/DataCard';
+import ConfirmChangeDialog from '@/components/dialog/ConfirmChange/ConfirmChange';
+import ConfirmDeleteDialog from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import DetailDialog from '@/components/modal/MesinCuciModal/MesinCuciDetailDialog';
 import EditModal from '@/components/modal/MesinCuciModal/MesinCuciEditModal';
 import AddModal from '@/components/modal/MesinCuciModal/MesinCuciCreateModal';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
+import Tabnav from '@/components/layout/TabNav/TabNav'
+
+//utils
+import { mesinCuciColumns } from '@/features/mesincuci/columns';
+import { formatDateWIB } from '@/utils/dateFormatter';
 
 function MesinCuciLayout() {
-  const dispatch = useDispatch<AppDispatch>()
-  const { loading, success } = useSelector((state: RootState) => state.mesinCuci)
-  const [segmented, setSegmented] = useState('card')
-  
   const columns = mesinCuciColumns
-  const data = useSelector((state: RootState) => state.mesinCuci.mesinCuciCollection)
+  const dispatch = useDispatch<AppDispatch>()
+  const [segmented, setSegmented]  = useState('card')
+
+  const { washerList, loading, status } = useSelector((state: RootState) => state.mesinCuci)
   
   useEffect(() => {
-    dispatch(retriveMesinCuci())
-  }, [dispatch, success])
+    dispatch(getWasher())
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  
+  useEffect(() => {
+    if(status === 'success'){
+      dispatch(getWasher())
+    }
+  }, [dispatch, status])
 
   return (
     <div className='w-full flex flex-col items-center'>
@@ -38,7 +51,7 @@ function MesinCuciLayout() {
         {segmented === 'table' ?
           <DataTable 
             columns={columns}
-            data={data}
+            data={washerList}
             renderAction={(row) => (
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
@@ -49,11 +62,11 @@ function MesinCuciLayout() {
                   <EditModal data={row}/>
                   <DropdownMenu.Separator />
                   {row.is_active === true 
-                    ? <ConfirmChange label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeActive({id: row.id, is_active: false}))} />
-                    : <ConfirmChange label='Set as Active' onConfirm={() => dispatch(changeActive({id: row.id, is_active: true}))}/>
+                    ? <ConfirmChangeDialog label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: false}))} />
+                    : <ConfirmChangeDialog label='Set as Active' onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: true}))}/>
                   }
                   <DropdownMenu.Separator />
-                  <ConfirmDelete onConfirm={() => dispatch(deleteMesinCuci(row.id))}/>
+                  <ConfirmDeleteDialog onConfirm={() => dispatch(deleteWasher(row.id))}/>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             )}
@@ -65,7 +78,7 @@ function MesinCuciLayout() {
             }
           />
          : <DataCard
-            data={data}
+            data={washerList}
             renderCard={(row) => (
               <Box maxWidth="350px">
                 <Card>
@@ -95,11 +108,11 @@ function MesinCuciLayout() {
                         <EditModal data={row}/>
                         <DropdownMenu.Separator />
                         {row.is_active === true 
-                          ? <ConfirmChange label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeActive({id: row.id, is_active: false}))} />
-                          : <ConfirmChange label='Set as Active' onConfirm={() => dispatch(changeActive({id: row.id, is_active: true}))}/>
+                          ? <ConfirmChangeDialog label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: false}))} />
+                          : <ConfirmChangeDialog label='Set as Active' onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: true}))}/>
                         }
                         <DropdownMenu.Separator />
-                        <ConfirmDelete onConfirm={() => dispatch(deleteMesinCuci(row.id))}/>
+                        <ConfirmDeleteDialog onConfirm={() => dispatch(deleteWasher(row.id))}/>
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>
                   </Flex>
