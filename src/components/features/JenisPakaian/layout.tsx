@@ -109,7 +109,7 @@ function JenisPakaianLayout() {
                   <Box className='mt-2'>
                     <Badge className='mr-2'>Harga / (kg): {formatRupiah(Number(row.harga_per_kg)) || '-'}</Badge>
                     <Badge>Harga / (item): {formatRupiah(Number(row.harga_per_item)) || '-'}</Badge>
-                    <Badge color='green'>Estimasi Waktu: {row.estimasi_waktu} Jam</Badge>
+                    <Badge color='green'>Estimasi Waktu: {row.estimasi_waktu} Menit</Badge>
                   </Box>
                 </Card>
               </Box>

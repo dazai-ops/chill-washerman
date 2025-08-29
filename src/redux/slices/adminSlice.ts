@@ -36,11 +36,7 @@ const adminSlice = createSlice({
     },
     resetAdminForm: (state) => {
       state.adminForm = {
-        // nama: "",
-        // username: "",
-        // role: "", 
-        // no_telepon: '',
-        // alamat_rumah: "",
+        ...initialState.adminForm
       }
     },
   },

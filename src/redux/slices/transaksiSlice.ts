@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction } from "@/lib/thunk/transaksi/transaksiThunk";
+import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus } from "@/lib/thunk/transaksi/transaksiThunk";
 import { generateTransaksiCode } from "@/utils/generateCode";
 import { Transaction, CreateTransaction, CreateTransactionDetail, TransactionDetail  } from "@/models/transaksitwo.model";
 interface TransaksiState {
@@ -262,14 +262,41 @@ const transaksiSlice = createSlice({
       .addCase(getSingleTransaction.rejected, (state) => {
         state.loading = false
       })
+
       .addCase(updateTransaction.pending, (state) => {
         state.loading = true
       })
       .addCase(updateTransaction.fulfilled, (state, action) => {
         state.loading = false
-        state.status = action.payload.res
+        state.status = action.payload.status
       })
       .addCase(updateTransaction.rejected, (state) => {
+        state.loading = false
+      })
+
+      //
+      .addCase(updateDetailTransactionStatus.pending, (state) => {
+        state.loading = true
+        state.status = null
+      })
+      .addCase(updateDetailTransactionStatus.fulfilled, (state, action) => {
+        state.loading = false
+        state.status = action.payload.status
+      })
+      .addCase(updateDetailTransactionStatus.rejected, (state) => {
+        state.loading = false
+      })
+
+      //
+      .addCase(updatePaymentStatus.pending, (state) => {
+        state.loading = true
+        state.status = null
+      })
+      .addCase(updatePaymentStatus.fulfilled, (state, action) => {
+        state.loading = false
+        state.status = action.payload.status
+      })
+      .addCase(updatePaymentStatus.rejected, (state) => {
         state.loading = false
       })
   }

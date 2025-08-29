@@ -2,16 +2,18 @@
 import React from 'react'
 import Link from 'next/link'
 import { Dialog, DataList, Badge, DropdownMenu, Table, Box, Flex, Button } from '@radix-ui/themes'
-import { EyeOpenIcon, Pencil1Icon } from '@radix-ui/react-icons'
+import { EyeOpenIcon } from '@radix-ui/react-icons'
 
 //utils
 import { formatDateWIB } from '@/utils/dateFormatter'
 import { formatRupiah } from '@/utils/rupiahFormatter';
 import { formatToTitleCase } from '@/utils/titleFormatter';
-import { Transaction } from '@/models/transaksi.model';
+import { Transaction } from '@/models/transaksitwo.model';
 
 //components
 import ServiceDetailDialog from './LayananDetailDialog';
+import LayananEditProses from '@/components/modal/TransaksiModal/LayananEditProses';
+import SelesaikanTransaksiModal from './SelesaikanTransaksiModal';
 
 function TransaksiDetailDialog({data}: {data: Partial<Transaction>}) {
   return (
@@ -25,15 +27,22 @@ function TransaksiDetailDialog({data}: {data: Partial<Transaction>}) {
       <Dialog.Content maxWidth="700px">
         <Flex justify={'between'} align={'center'}>
           <Dialog.Title>{data.kode_transaksi}</Dialog.Title>
-          <Link 
-            href={`/transaksi/edit/${data.id}`} 
-            target='_blank' 
-            className='mb-3'
-          >
-            <Button color="yellow">
-              <Pencil1Icon fontSize={20}/>
-            </Button>
-          </Link>
+          <Flex gap={"3"}>
+            {data.status_proses !== 'selesai' && (
+              <>
+                <SelesaikanTransaksiModal data={data}/>
+                <Link 
+                  href={`/transaksi/edit/${data.id}`} 
+                  target='_blank' 
+                  className='mb-3'
+                >
+                  <Button color="yellow" variant='soft' size={"2"} >
+                    Edit
+                  </Button>
+                </Link>
+              </>
+            )}
+          </Flex>
         </Flex>
         <DropdownMenu.Separator />
         
@@ -119,14 +128,17 @@ function TransaksiDetailDialog({data}: {data: Partial<Transaction>}) {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                { data. transaksi_detail && data.transaksi_detail.map((detail, index) => (
+                { data.transaksi_detail && data.transaksi_detail.map((detail, index) => (
                   <Table.Row key={index}>
                     <Table.RowHeaderCell align='center'>{detail.jenis_pakaian.jenis_pakaian}</Table.RowHeaderCell>
-                    <Table.Cell align='center'>{formatToTitleCase(detail.status_proses)}</Table.Cell>
+                    <Table.Cell align='center'>{formatToTitleCase(detail.status_proses ? detail.status_proses : '')}</Table.Cell>
                     <Table.Cell align='center'>{detail.layanan_setrika ? 'Ya' : 'Tidak'}</Table.Cell>
                     <Table.Cell align='center' justify={'center'}>
                       <Flex justify={'center'} gap={"2"}>
                         <ServiceDetailDialog data={detail}/>
+                        {data.status_proses !== 'selesai' && (
+                          <LayananEditProses data={detail}/>
+                        )}
                       </Flex>
                     </Table.Cell>
                   </Table.Row>

@@ -17,6 +17,8 @@ import { addTransactionDetailForm, calculateBalance, calculateServicePrice, calc
 import { formatRupiah } from '@/utils/rupiahFormatter';
 import { CreateTransactionDetail, CreateTransaction } from '@/models/transaksitwo.model';
 
+//components
+import InputRupiah from '@/components/ui/InputRupiah/InputRupiah';
 
 function CreateTransaksiForm() {
   const dispatch = useDispatch<AppDispatch>()
@@ -75,7 +77,7 @@ function CreateTransaksiForm() {
     e.preventDefault()
 
     if(transactionOverview.nama_pelanggan === '') {
-      return toast.error('Nama pelanggan is required', {
+      return toast.error('Nama pelanggan harus diisi', {
         position: "top-center"
       })
     }
@@ -83,12 +85,12 @@ function CreateTransaksiForm() {
       const item = transactionDetail[i]
       const serviceNumber = i + 1
       if(item!.jenis_pakaian.id === null) {
-        return toast.error(`Select at least one item for service ${serviceNumber}`, {
+        return toast.error(`Piih jenis pakaian untuk service ${serviceNumber}`, {
           position: "top-center"
         })
       }
       if(item!.total_harga_layanan === 0){
-        return toast.error(`Fill the form with valid data for service ${i+1}`, {
+        return toast.error(`Isi form dengan data valid untuk service ${i+1}`, {
           description: 'Jumlah item/berat, layanan setrika, acuan harga',
           position: "top-center"
         })
@@ -170,7 +172,7 @@ function CreateTransaksiForm() {
                     </Flex>
                     <Flex gap={"2"} className='mb-1'>
                       <Box>
-                        <Text size={"1"} weight={"bold"}>Nama Customer</Text>
+                        <Text size={"1"} weight={"bold"}>Nama Pelanggan</Text>
                         <TextField.Root 
                           type='text'
                           name='nama_pelanggan'
@@ -233,21 +235,17 @@ function CreateTransaksiForm() {
                           />
                         </Box>
                       </Box>
-                      <Box>
-                        <Text size={"1"} weight={"bold"} color='green'>Dibayarkan</Text>
-                        <TextField.Root 
-                          // type='number'
+                      <Box className='w-full'>
+                        <InputRupiah
                           style={{width: "155px"}}
-                          name='dibayarkan'
-                          size={"2"}
-                          value={String(transactionOverview.dibayarkan)}
-                          disabled={transactionOverview.total_harga === 0}
-                          onChange={(event) => updateTransactionOverview('dibayarkan', Number(event.target.value))}
-                        >
-                          <TextField.Slot>
-                            Rp
-                          </TextField.Slot>
-                        </TextField.Root>
+                          label='Harga / (item)'
+                          name='harga_per_item'
+                          size='2'
+                          labelSize='1'
+                          className="mb-1"
+                          labelColor='green'
+                          onChange={(value: string) => updateTransactionOverview('dibayarkan', Number(value))}
+                        />
                       </Box>
                     </Flex>
 
@@ -299,7 +297,7 @@ function CreateTransaksiForm() {
                       </Text>
                       <Box>
                         {transactionDetail.length > 1 && (
-                          <Button color='red' size={"1"} type='button' onClick={() => dispatch(removeTransactionDetailForm({index}))}>
+                          <Button color='red' variant='soft' size={"1"} type='button' onClick={() => dispatch(removeTransactionDetailForm({index}))}>
                             Hapus
                           </Button>
                         )}
@@ -476,13 +474,14 @@ function CreateTransaksiForm() {
                 ) 
               ))}
               <Flex gap="2" className='mb-5 mt-2'>
-                <Button type='submit' color='green'>
-                    Save(simpan)
+                <Button type='submit' color='green' variant='soft'>
+                    Simpan
                 </Button>
                 <Button 
                   type='button'
+                  variant='soft'
                   onClick={() => dispatch(addTransactionDetailForm())}>
-                    New Service
+                    Tambah Layanan
                 </Button>
               </Flex>
             </Box>

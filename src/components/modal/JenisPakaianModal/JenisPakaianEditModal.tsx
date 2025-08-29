@@ -19,6 +19,7 @@ import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
 //components
 import ErrorMessage from '@/components/ui/FieldError/ErrorMessage'
 import ConfirmChange from '@/components/dialog/ConfirmChange/ConfirmChange';
+import InputRupiah from '@/components/ui/InputRupiah/InputRupiah';
 
 const rules: Record<string, FieldRules> = {
   jenis_pakaian: ['required'],
@@ -150,33 +151,29 @@ function JenisPakaianEditModal({data}: {data: Apparel}) {
               </Flex>
               <Flex className='w-full' gap="3">
                 <Box className='w-full'>
-                  <Text size="2" weight="bold">Harga / (kg)</Text>
-                  <TextField.Root 
-                    size="3" 
-                    className={`mb-1 ${getErrorMessage('harga_per_kg') ? 'border border-red-500' : ''}`}
-                    name='harga_per_kg' 
-                    onChange={handleFormChange} 
+                  <InputRupiah
+                    label='Harga / (kg)'
+                    name='harga_per_kg'
+                    size='3'
+                    labelSize='2'
                     value={String(apparelForm.harga_per_kg)}
-                  />
-                  <ErrorMessage 
-                    message={getErrorMessage('harga_per_kg') ?? ''} 
+                    className="mb-1"
+                    onChange={(value) => dispatch(setApparelForm({...apparelForm, harga_per_kg: Number(value)}))}
                   />
                 </Box>
                 <Box className='w-full'>
-                  <Text size="2" weight="bold">Harga / (item)</Text>
-                  <TextField.Root 
-                    size="3" 
-                    className={`mb-1 ${getErrorMessage('harga_per_item') ? 'border border-red-500' : ''}`}
-                    name='harga_per_item' 
-                    onChange={handleFormChange} 
+                  <InputRupiah
+                    label='Harga / (item)'
+                    name='harga_per_item'
+                    size='3'
+                    labelSize='2'
                     value={String(apparelForm.harga_per_item)}
-                  />
-                  <ErrorMessage 
-                    message={getErrorMessage('harga_per_item') ?? ''} 
+                    className="mb-1"
+                    onChange={(value) => dispatch(setApparelForm({...apparelForm, harga_per_item: Number(value)}))}
                   />
                 </Box>
               </Flex>
-              <Text size="2" weight="bold">Estimasi Waktu</Text>
+              <Text size="2" weight="bold">Estimasi Pengerjaan (menit)</Text>
               <TextField.Root 
                 size="3" 
                 type='number'

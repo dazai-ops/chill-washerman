@@ -45,6 +45,8 @@ export interface TransactionDetail extends BaseEntity {
   transaksi_parent?: number | string
   mesin_cuci?: Washer
   jenis_pakaian: Apparel
+  kode_transaksi?: string
+  tanggal_selesai?: string
 }
 
 export interface ApiResponse<T> {

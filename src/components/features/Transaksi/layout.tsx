@@ -21,6 +21,7 @@ import SegmentedControl from '@/components/layout/SegmentedControl/SegementedCon
 //utils
 import { transactionColumns } from '@/features/transaksi/columns';
 import { formatDateWIB } from '@/utils/dateFormatter';
+import { formatToTitleCase } from '@/utils/titleFormatter';
 
 
 function TransaksiLayout() {
@@ -110,7 +111,7 @@ function TransaksiLayout() {
                       </DropdownMenu.Root>
                     </Flex>
                     <Box className='mt-2'>
-                      <Badge className='mr-2'>{row.status_proses === 'antrian' ? 'Antrian' : row.status_proses === 'dicuci' ? 'Dicuci' : row.status_proses === 'selesai' ? 'Selesai' : row.status_proses === 'diambil' ? 'Diambil' : 'Dibatalkan'}</Badge>
+                      <Badge className='mr-2'>{formatToTitleCase(row.status_proses)}</Badge>
                       <Badge color="yellow" variant="soft">Jumlah: {row.transaksi_detail.length} Layanan</Badge>
                       <Box className='mt-2'>
                         <Text as="div" size="1" color="gray">

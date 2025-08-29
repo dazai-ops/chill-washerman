@@ -47,6 +47,7 @@ export const getTransaction = createAsyncThunk<
           status_proses,
           created_at,
           updated_at,
+          tanggal_selesai,
           jenis_pakaian(
             id,
             jenis_pakaian,
@@ -295,7 +296,7 @@ export const getSingleTransaction = createAsyncThunk<
 )
 
 export const updateTransaction = createAsyncThunk<
-  { message: string, res: string}, 
+  { message: string, status: string}, 
   { id: number, overview: Partial<Transaction>, detailTransaction: Partial<TransactionDetail[]>, deletedDetail: number[]},
   { rejectValue: string }
 >(
@@ -369,10 +370,154 @@ export const updateTransaction = createAsyncThunk<
       
       return {
         message: "Transaction updated successfully",
-        res: "ok"
+        status: "success"
       }
     }catch (error) {
       toast.error('Failed to update transaction', {
+        description: (error as Error).message
+      });
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)
+
+export const updateDetailTransactionStatus = createAsyncThunk<
+  { message: string, status: string}, 
+  { id: number, payload: {status_proses: string, updated_by: string, mesin_cuci: string} },
+  { rejectValue: string }
+>(
+  "transaction/updateDetailTransactionStatus",
+  async ({id, payload}, { rejectWithValue }) => {
+    try{
+      const { data, error } = await supabase
+        .from("transaksi_detail")
+        .update({
+          status_proses: payload.status_proses, 
+          updated_by: payload.updated_by, 
+          mesin_cuci: payload.mesin_cuci,
+          updated_at: new Date(),
+          tanggal_selesai: payload.status_proses === 'selesai' ? new Date() : null
+        })
+        .eq("id", id)
+        .select()
+        
+      if (error) {
+        toast.error('Something went wrong',{
+          description: 'Failed to update transaksi',
+        })
+        return rejectWithValue(error.message)
+      }
+
+      const {data: details, error: detailError} = await supabase
+        .from("transaksi_detail")
+        .select("status_proses")
+        .eq("transaksi_parent", data[0].transaksi_parent)
+
+      if(detailError){
+        toast.error('Something went wrong',{
+          description: 'Failed to update transaksi',
+        })
+        return rejectWithValue(detailError.message)
+      }
+
+      const allWaiting = details.every(d => d.status_proses === 'menunggu')
+      const allDone = details.every(d => d.status_proses === 'selesai')
+
+      if(allWaiting){
+        await supabase
+          .from("transaksi")
+          .update({
+            status_proses: 'antrian',
+            updated_by: payload.updated_by,
+            updated_at: new Date()
+          })
+          .eq("id", data[0].transaksi_parent)
+
+        toast.success('Transaction status updated successfully')
+        
+        return {
+          message: "Transaction status updated successfully",
+          status: "success"
+        }
+      }
+
+      if(allDone){
+        await supabase
+          .from("transaksi")
+          .update({
+            status_proses: 'siap_diambil',
+            updated_by: payload.updated_by,
+            updated_at: new Date(),
+            tanggal_selesai: new Date()
+          })
+          .eq("id", data[0].transaksi_parent)
+
+        toast.success('Transaction status updated successfully')
+        
+        return {
+          message: "Transaction status updated successfully",
+          status: "success"
+        }
+      }
+
+      await supabase
+        .from("transaksi")
+        .update({
+          status_proses: 'diproses',
+          updated_by: payload.updated_by,
+          updated_at: new Date()
+        })
+        .eq("id", data[0].transaksi_parent)
+
+      toast.success('Transaction status updated successfully')
+      
+      return {
+        message: "Transaction status updated successfully",
+        status: "success"
+      }
+    }catch (error) {
+      toast.error('Failed to update transaction status', {
+        description: (error as Error).message
+      });
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)
+
+export const updatePaymentStatus = createAsyncThunk<
+  { message: string, status: string}, 
+  { id: number, payload: {status_proses: string, updated_by: number} },
+  { rejectValue: string }
+>(
+  "transaction/updatePaymentStatus",
+  async ({id, payload}, { rejectWithValue }) => {
+    try{
+      const { error } = await supabase
+        .from("transaksi")
+        .update({
+          status_proses: payload.status_proses, 
+          updated_by: payload.updated_by, 
+          updated_at: new Date(),
+          tanggal_keluar: new Date()
+        })
+        .eq("id", id)
+        .select()
+        
+      if (error) {
+        toast.error('Something went wrong',{
+          description: 'Failed to update transaksi',
+        })
+        return rejectWithValue(error.message)
+      }
+
+      toast.success('Payment status updated successfully')
+      
+      return {
+        message: "Payment status updated successfully",
+        status: "success"
+      }
+    }catch (error) {
+      toast.error('Failed to update payment status', {
         description: (error as Error).message
       });
       return rejectWithValue((error as Error).message)

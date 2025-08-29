@@ -5,6 +5,7 @@ import { EyeOpenIcon } from '@radix-ui/react-icons'
 //utils
 import { formatDateWIB } from '@/utils/dateFormatter'
 import { JenisPakaian } from '@/models/jenispakaian.model'
+import { formatRupiah } from '@/utils/rupiahFormatter'
 
 function JenisPakaianDetailDialog({data}: {data: JenisPakaian}) {
   return (
@@ -33,16 +34,16 @@ function JenisPakaianDetailDialog({data}: {data: JenisPakaian}) {
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Harga / (item)</DataList.Label>
-            <DataList.Value>{data.harga_per_item}</DataList.Value>
+            <DataList.Value>{formatRupiah(data.harga_per_item)}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Harga / (kg)</DataList.Label>
-            <DataList.Value>{data.harga_per_kg}</DataList.Value>
+            <DataList.Value>{formatRupiah(data.harga_per_kg)}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Estimasi Pengerjaan</DataList.Label>
             <DataList.Value>
-              {data.estimasi_waktu} Jam
+              {data.estimasi_waktu} Menit
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>

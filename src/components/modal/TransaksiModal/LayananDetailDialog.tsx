@@ -1,19 +1,21 @@
 //lin
 import React from 'react'
-import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
+import { Dialog, DataList, Badge, DropdownMenu, Button } from '@radix-ui/themes'
 import { EyeOpenIcon } from '@radix-ui/react-icons'
 
 //utils
 import { formatDateWIB } from '@/utils/dateFormatter'
 import { formatToTitleCase } from '@/utils/titleFormatter';
-import { TransactionDetail } from '@/models/transaksi.model';
+import { TransactionDetail } from '@/models/transaksitwo.model';
 
-function LayananDetailDialog({data}: {data: TransactionDetail }) {
+function LayananDetailDialog({data}: {data: Partial<TransactionDetail> }) {
   return (
     <Dialog.Root>
       <Dialog.Trigger>
         <DropdownMenu.Item onSelect={(e) => e.preventDefault()}>
-          <EyeOpenIcon />
+          <Button variant="soft" color="blue" size={'1'}>
+            <EyeOpenIcon />
+          </Button>
         </DropdownMenu.Item>
       </Dialog.Trigger>
 
@@ -37,13 +39,13 @@ function LayananDetailDialog({data}: {data: TransactionDetail }) {
                 variant="soft" 
                 radius="full"
               >
-                {formatToTitleCase(data.status_proses)}
+                {formatToTitleCase(data.status_proses ? data.status_proses : '')}
               </Badge>
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Jenis Pakaian</DataList.Label>
-            <DataList.Value>{data.jenis_pakaian.jenis_pakaian}</DataList.Value>
+            <DataList.Value>{data.jenis_pakaian!.jenis_pakaian}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Berat (kg)</DataList.Label>
@@ -72,6 +74,10 @@ function LayananDetailDialog({data}: {data: TransactionDetail }) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Diubah</DataList.Label>
             <DataList.Value>{ data.updated_at && formatDateWIB(data.updated_at) || '-'}</DataList.Value>
+          </DataList.Item>
+          <DataList.Item>
+            <DataList.Label minWidth="88px">Tgl Selesai</DataList.Label>
+            <DataList.Value>{ data.tanggal_selesai && formatDateWIB(data.tanggal_selesai) || '-'}</DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Diubah Oleh</DataList.Label>

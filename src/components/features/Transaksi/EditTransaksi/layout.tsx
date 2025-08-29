@@ -13,6 +13,7 @@ import { Transaction, TransactionDetail, CreateTransaction, CreateTransactionDet
 import { setTransactionOverviewField, calculateBalance, calculateServicePrice, calculateTotalPrice, addTransactionDetailForm, removeTransactionDetailForm, setTransactionDetailField } from '@/redux/slices/transaksiSlice'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import InputRupiah from '@/components/ui/InputRupiah/InputRupiah';
 
 function TransaksiEditLayout({id}: {id:number}) {
 
@@ -113,6 +114,9 @@ function TransaksiEditLayout({id}: {id:number}) {
 
   useEffect(() => {
     if(status === 'success') {
+      toast.success("Transaction updated successfully", {
+        description: 'Please wait 5 seconds to redirect to transaction page'
+      })
       const timer = setTimeout(() => {
         router.push('/transaksi')
       }, 500)
@@ -240,20 +244,18 @@ function TransaksiEditLayout({id}: {id:number}) {
                           readOnly
                         />
                       </Box>
-                      <Box>
-                        <Text size={"1"} weight={"bold"} color='green'>Dibayarkan</Text>
-                        <TextField.Root
+                       <Box className='w-full'>
+                        <InputRupiah
+                          value={transactionOverview?.dibayarkan?.toString()}
                           style={{width: "155px"}}
-                          name='dibayarkan'
-                          size={"2"}
-                          value={transactionOverview?.dibayarkan}
-                          disabled={transactionOverview?.total_harga === 0}
-                          onChange={(e) => overviewService("dibayarkan", e.target.value)}
-                        >
-                          <TextField.Slot>
-                            Rp
-                          </TextField.Slot>
-                        </TextField.Root>
+                          label='Harga / (item)'
+                          name='harga_per_item'
+                          size='2'
+                          labelSize='1'
+                          className="mb-1"
+                          labelColor='green'
+                          onChange={(value: string) => overviewService('dibayarkan', Number(value))}
+                        />
                       </Box>
                     </Flex>
                   </Box>

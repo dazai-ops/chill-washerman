@@ -3,10 +3,10 @@ import { EyeOpenIcon } from '@radix-ui/react-icons'
 import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
 
 //utils
-import { MesinCuci } from '@/models/mesincuci.model'
+import { Washer } from '@/models/mesincuci.model'
 import { formatDateToDDMMYYYY, formatDateWIB } from '@/utils/dateFormatter'
 
-function MesinCuciDetailDialog({data}: {data: MesinCuci}) {
+function MesinCuciDetailDialog({data}: {data: Washer}) {
   return (
     <Dialog.Root>
       <Dialog.Trigger>
@@ -65,13 +65,13 @@ function MesinCuciDetailDialog({data}: {data: MesinCuci}) {
           <DataList.Item>
             <DataList.Label minWidth="88px">Tanggal Dibeli</DataList.Label>
             <DataList.Value>
-              {formatDateToDDMMYYYY(data.tanggal_dibeli)}
+              {formatDateToDDMMYYYY(data.tanggal_dibeli ?? '')}
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tanggal Ditambahkan</DataList.Label>
             <DataList.Value>
-              {formatDateWIB(data.created_at)}
+              {formatDateWIB(data.created_at ?? '')}
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>

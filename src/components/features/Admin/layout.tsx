@@ -4,7 +4,6 @@
 import { useEffect, useState } from 'react'
 import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
-import { Switch } from 'radix-ui';
 
 // redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -69,27 +68,29 @@ function AdminLayout() {
                   <DropdownMenu.Trigger>
                     <DotsVerticalIcon className='mt-0.5'/>
                   </DropdownMenu.Trigger>
-                  <DropdownMenu.Content>
-                    <AdminDetailDialog data={row}/>
-                    {admin?.role === 'superuser' && (
-                    <>
-                      <AdminEditModal data={row}/>
-                      <DropdownMenu.Separator />
-                      {row.role === 'admin' 
-                        ? <ConfirmChangeDialog 
-                            label='Set as Superuser' 
-                            onConfirm={() => row.id && dispatch(updateAdminRole({id: row.id, role: 'superuser'}))}
-                          />
-                        : <ConfirmChangeDialog 
-                            label='Set as Admin' 
-                            onConfirm={() => row.id && dispatch(updateAdminRole({id: row.id, role: 'admin'}))}
-                          />
-                      }
-                      <DropdownMenu.Separator />
-                      <ConfirmDeleteDialog onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
-                    </>
-                    )}
-                  </DropdownMenu.Content>
+                    <DropdownMenu.Content>
+                      <AdminDetailDialog data={row}/>
+                      {admin?.role === 'superuser' && (
+                      <>
+                        <AdminEditModal 
+                          data={row}
+                        />
+                        <DropdownMenu.Separator />
+                          {row.role === 'admin' 
+                            ? <ConfirmChangeDialog 
+                                label='Set as Superuser' 
+                                onConfirm={() => row.id && dispatch(updateAdminRole({id: row.id, role: 'superuser'}))}
+                              />
+                            : <ConfirmChangeDialog 
+                                label='Set as Admin' 
+                                onConfirm={() => row.id && dispatch(updateAdminRole({id: row.id, role: 'admin'}))}
+                              />
+                          }
+                        <DropdownMenu.Separator />
+                        <ConfirmDeleteDialog onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
+                        </>
+                        )}
+                    </DropdownMenu.Content>
                 </DropdownMenu.Root>
               )}
               renderToolbar={
