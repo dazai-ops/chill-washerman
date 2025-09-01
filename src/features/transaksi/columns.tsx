@@ -27,10 +27,10 @@ export const transactionColumns = [
       accessorKey: 'status_proses',
       cell: ({getValue}: {getValue: () => unknown}) => {
         const value = getValue() as string
-        const status = value === 'antrian' ? 'Antrian' : value === 'dikerjakan' ? 'Dikerjakan' : value === 'selesai' ? 'Selesai' : value === 'diambil' ? 'Diambil' : 'Dibatalkan'
+        const status = value === 'antrian' ? 'Antrian' : value === 'diproses' ? 'Diproses' : value === 'siap_diambil' ? 'Siap Diambil' : value === 'selesai' ? 'Selesai' : 'Dibatalkan'
 
         return (
-          <Badge color={status === 'Antrian' ? 'yellow' : status === 'Dikerjakan' ? 'blue' : status === 'Selesai' ? 'green' : status === 'Diambil' ? 'gray' : 'red'}>
+          <Badge color={status === 'Antrian' ? 'yellow' : status === 'Diproses' ? 'blue' : status === 'Siap Diambil' ? 'gray' : status === 'Selesai' ? 'green' : 'red'}>
             {status}
           </Badge>
         )

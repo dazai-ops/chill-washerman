@@ -4,10 +4,10 @@ import { EyeOpenIcon } from '@radix-ui/react-icons'
 
 //utils
 import { formatDateWIB } from '@/utils/dateFormatter'
-import { JenisPakaian } from '@/models/jenispakaian.model'
+import { Apparel } from '@/models/jenispakaian.model'
 import { formatRupiah } from '@/utils/rupiahFormatter'
 
-function JenisPakaianDetailDialog({data}: {data: JenisPakaian}) {
+function JenisPakaianDetailDialog({data}: {data: Apparel}) {
   return (
     <Dialog.Root>
       <Dialog.Trigger>

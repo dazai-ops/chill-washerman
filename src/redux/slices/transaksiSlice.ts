@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus } from "@/lib/thunk/transaksi/transaksiThunk";
+import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus, getTransactionForChart, getTransactionByDate } from "@/lib/thunk/transaksi/transaksiThunk";
 import { generateTransaksiCode } from "@/utils/generateCode";
 import { Transaction, CreateTransaction, CreateTransactionDetail, TransactionDetail  } from "@/models/transaksitwo.model";
 interface TransaksiState {
@@ -8,6 +8,7 @@ interface TransaksiState {
   transactionDetail: Partial<CreateTransactionDetail[]> | Partial<TransactionDetail[]>
   transactionDetailDelete: number[] 
   currentTransaction: Partial<Transaction> | null
+  chartTransaction: null
   loading: boolean,
   error: string | null
   status: string | null
@@ -51,6 +52,7 @@ const initialState: TransaksiState = {
   ],
   transactionDetailDelete: [],
   currentTransaction: null,
+  chartTransaction: null,
   loading: false,
   error: null,
   status: "",
@@ -297,6 +299,17 @@ const transaksiSlice = createSlice({
         state.status = action.payload.status
       })
       .addCase(updatePaymentStatus.rejected, (state) => {
+        state.loading = false
+      })
+
+      .addCase(getTransactionForChart.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(getTransactionForChart.fulfilled, (state, action) => {
+        state.loading = false
+        state.chartTransaction = action.payload.result
+      })
+      .addCase(getTransactionForChart.rejected, (state) => {
         state.loading = false
       })
   }

@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { Washer, WasherListResponse } from '@/models/mesincuci.model';
 
 export const getWasher = createAsyncThunk<
-  WasherListResponse, Partial<{status_mesin: string; is_active: string}> | undefined, 
+  WasherListResponse, 
+  Partial<{status_mesin: string; is_active: string}> | undefined, 
   { rejectValue: string }
 >(
   "mesinCuci/getWasher",

@@ -5,6 +5,7 @@ export interface Apparel {
   harga_per_kg: number
   satuan: string
   estimasi_waktu?: string
+  created_at?: string
 }
 
 export interface ApparelListResponse {

@@ -10,12 +10,14 @@ import { ApiResponse, Transaction, TransactionDetail, CreateTransaction, CreateT
 
 export const getTransaction = createAsyncThunk<
   ApiResponse<Partial<Transaction[]>>, 
-  void, 
+  // void, 
+  Partial<{start_date: Date, end_date: Date}> | undefined,
   { rejectValue: string }
 >(
   "transaction/getTransaction",
-  async (_, { rejectWithValue }) => {
-    const { data, error } = await supabase
+  async (params, { rejectWithValue }) => {
+
+    let query = supabase
       .from("transaksi")
       .select(`
         id,
@@ -65,7 +67,72 @@ export const getTransaction = createAsyncThunk<
           )
         )
       `)
-      .order("created_at", { ascending: false })
+    
+    if(params?.start_date){
+      const start = new Date(params?.start_date.setHours(0,0,0,0)).toISOString()
+      query = query.gte("created_at", start)
+    }
+
+    if(params?.end_date){
+      const end = new Date(params?.end_date.setHours(23,59,59,0)).toISOString()
+      query = query.lte("created_at", end)
+    }
+
+    query = query.order("created_at", { ascending: false })
+
+    const {data, error} = await query
+
+    // const { data, error } = await supabase
+    //   .from("transaksi")
+    //   .select(`
+    //     id,
+    //     kode_transaksi,
+    //     nama_pelanggan,
+    //     telepon_pelanggan,
+    //     tanggal_masuk,
+    //     tanggal_selesai,
+    //     tanggal_keluar,
+    //     total_harga,
+    //     dibayarkan,
+    //     status_pembayaran,
+    //     status_proses,
+    //     catatan,
+    //     created_at,
+    //     updated_at,
+    //     dibuat_oleh(
+    //       id,
+    //       nama
+    //     ),
+    //     transaksi_detail(
+    //       id,
+    //       transaksi_parent,
+    //       berat_kg,
+    //       jumlah_item,
+    //       layanan_setrika,
+    //       catatan_pelanggan,
+    //       catatan_admin,
+    //       status_proses,
+    //       created_at,
+    //       updated_at,
+    //       tanggal_selesai,
+    //       jenis_pakaian(
+    //         id,
+    //         jenis_pakaian,
+    //         satuan
+    //       ),
+    //       mesin_cuci(
+    //         id,
+    //         merk,
+    //         seri
+    //       ),
+    //       updated_by(
+    //         id,
+    //         nama,
+    //         username
+    //       )
+    //     )
+    //   `)
+      // .order("created_at", { ascending: false })
 
     if (error) {
       toast.error('Something went wrong', {
@@ -518,6 +585,69 @@ export const updatePaymentStatus = createAsyncThunk<
       }
     }catch (error) {
       toast.error('Failed to update payment status', {
+        description: (error as Error).message
+      });
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)
+
+export const getTransactionForChart = createAsyncThunk<
+  { result: {date: string, selesai: number, belum_selesai: number}[], message: string, status: string },
+  Partial<{start_date: Date, end_date: Date}> | undefined,
+  { rejectValue: string }
+>(
+  "transaction/getTransactionForChart",
+  async (params, { rejectWithValue} ) => {
+    try {
+      let query = supabase
+        .from("transaksi")
+        .select("created_at, status_proses")
+
+      if(params?.start_date){
+        const start = new Date(params?.start_date.setHours(0,0,0,0)).toISOString()
+        query = query.gte("created_at", start)
+      }
+
+      if(params?.end_date){
+        const end = new Date(params?.end_date.setHours(23,59,59,0)).toISOString()
+        query = query.lte("created_at", end)
+      }
+
+      query = query.gte("created_at", new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString())
+
+      const {data, error} = await query
+
+      if(error){
+        toast.error('Something went wrong',{
+          description: 'Failed to get transaction for chart',
+        })
+        return rejectWithValue(error.message)
+      }
+
+      const grouped = data.reduce((acc: Record<string, {date: string, selesai: number, belum_selesai: number}>, row) => {
+        const date = row.created_at.split("T")[0]
+        if(!acc[date]) acc[date] = { date, selesai: 0, belum_selesai: 0}
+
+        if(row.status_proses === 'selesai') {
+          acc[date].selesai += 1
+        } else {
+          acc[date].belum_selesai += 1
+        }
+
+        return acc
+      },{})
+
+      const result = Object.values(grouped)
+      console.log(result)
+
+      return {
+        result: result,
+        message: "Transaction for chart fetched successfully",
+        status: "success"
+      }
+    } catch (error) {
+      toast.error('Failed to get transaction for chart', {
         description: (error as Error).message
       });
       return rejectWithValue((error as Error).message)
