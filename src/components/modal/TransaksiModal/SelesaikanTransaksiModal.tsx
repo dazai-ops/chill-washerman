@@ -1,31 +1,39 @@
-import React, { use, useEffect, useState } from 'react'
+import {useEffect, useState } from 'react'
 import { Button, Flex, AlertDialog, Link, DataList, Badge, Text, DropdownMenu } from '@radix-ui/themes'
 import { formatRupiah } from '@/utils/rupiahFormatter'
 import { updatePaymentStatus } from '@/lib/thunk/transaksi/transaksiThunk'
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store'
+import { formatToTitleCase } from '@/utils/titleFormatter';
+import { Transaction } from '@/models/transaksitwo.model';
 
-function SelesaikanTransaksiModal({data}) {
+interface Props {
+  data: Transaction
+}
+
+function SelesaikanTransaksiModal({data}: Props) {
   const dispatch = useDispatch<AppDispatch>()
   const admin = useSelector((state: RootState) => state.auth.user)
   const {status} = useSelector((state: RootState) => state.transaksi)
+
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    if(status === 'success') setOpen(false)
-  },[status])
-
-  const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault()
-
     dispatch(updatePaymentStatus({
-      id: data.id,
+      id: data.id!,
       payload: {
         status_proses: 'selesai',
         updated_by: admin!.id
       }
     }))
   }
+  
+  useEffect(() => {
+    if(status === 'success'){
+      setOpen(false) 
+    }
+  },[status])
 
   return (
     <AlertDialog.Root open={open} onOpenChange={setOpen}>
@@ -47,7 +55,7 @@ function SelesaikanTransaksiModal({data}) {
               {data.kode_transaksi}
               <Text>
                 <Badge>
-                  {data.status_pembayaran}
+                  {formatToTitleCase(data.status_pembayaran)}
                 </Badge>
               </Text>
             </Flex>

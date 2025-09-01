@@ -7,11 +7,18 @@ import { AppDispatch, RootState } from '@/redux/store'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Tabnav from '@/components/layout/TabNav/TabNav'
-import { Spinner, Flex, Box, Text, Badge } from '@radix-ui/themes'
+import { Spinner, Flex, Button, Text, Badge } from '@radix-ui/themes'
 import { DataTable } from '../../layout/DataTable/DataTable';
 import { transactionColumns } from '@/features/transaksi/columns'
 import { DatePicker } from '../../ui/DatePicker/DatePicker';
 import { toast } from 'sonner'
+import { CalendarIcon } from '@radix-ui/react-icons';
+import { Transaction } from '@/models/transaksitwo.model'
+
+interface Props {
+  selesai: Array<Transaction>
+  belum_selesai: Array<Transaction>
+}
 
 function HistoryLayout() {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -26,7 +33,7 @@ function HistoryLayout() {
   useEffect(() => {
     dispatch(getTransactionForChart())
     dispatch(getTransaction())
-  },[])
+  },[dispatch])
   
   useEffect(() => {
     if(selectedDate && selectedDateFinal){
@@ -45,12 +52,12 @@ function HistoryLayout() {
     }
   },[selectedDate, selectedDateFinal, dispatch])
 
-  const result = transaction.reduce(
+  const result = transaction.reduce<Props>(
     (acc, curr) => {
-      if(curr?.status_proses === "selesai"){
-        acc?.selesai.push(curr)
+      if(curr!.status_proses === "selesai"){
+        acc.selesai.push(curr!)
       } else {
-        acc?.belum_selesai.push(curr)
+        acc.belum_selesai.push(curr!)
       }
       return acc
     }, {
@@ -58,11 +65,58 @@ function HistoryLayout() {
     }
   )
 
+  const handleFilterDate = (range: string) => {
+    if(range === 'all'){
+      dispatch(getTransaction())
+      dispatch(getTransactionForChart())
+    }
+    if(range === 'today'){
+      const today = new Date()
+      setSelectedDate(today)
+      setSelectedDateFinal(today)
+    }
+    if(range === 'week'){
+      const today = new Date()
+      setSelectedDate(new Date(today.setDate(today.getDate() - 7)))
+      setSelectedDateFinal(new Date())
+    }
+    if(range === 'month'){
+      const today = new Date()
+      setSelectedDate(new Date(today.setDate(1)))
+      setSelectedDateFinal(today)
+    }
+    if(range === 'last_month'){
+      const today = new Date()
+      setSelectedDate(new Date(today.getFullYear(), today.getMonth() - 1, 1))
+      setSelectedDateFinal(new Date(today.getFullYear(), today.getMonth(), 0))
+    }
+  }
+
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
       <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1000px] mt-10">
-        <Flex justify="end" className='mb-2 gap-0.5'>
+        <Flex justify="end" align="center" className='mb-2 gap-2'>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('all')}>
+            <CalendarIcon/>
+            Semua
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('today')}>
+            <CalendarIcon/>
+            Hari ini
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('week')}>
+            <CalendarIcon/>
+            Minggu ini
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('month')}>
+            <CalendarIcon/>
+            Bulan ini
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('last_month')}>
+            <CalendarIcon/>
+            Bulan lalu
+          </Button>
           <DatePicker label='Tanggal mulai' onDateChange={(date) => setSelectedDate(date)}/>
           <DatePicker label='Tanggal akhir' onDateChange={(date) => setSelectedDateFinal(date)}/>
         </Flex>

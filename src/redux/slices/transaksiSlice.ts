@@ -1,14 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus, getTransactionForChart, getTransactionByDate } from "@/lib/thunk/transaksi/transaksiThunk";
+import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus, getTransactionForChart } from "@/lib/thunk/transaksi/transaksiThunk";
 import { generateTransaksiCode } from "@/utils/generateCode";
 import { Transaction, CreateTransaction, CreateTransactionDetail, TransactionDetail  } from "@/models/transaksitwo.model";
+
+interface ChartItem {
+  date: string,
+  selesai: number,
+  belum_selesai: number
+}
 interface TransaksiState {
   transactionList: Partial<Transaction[]>
   transactionOverview: Partial<CreateTransaction> | Partial<Transaction>
   transactionDetail: Partial<CreateTransactionDetail[]> | Partial<TransactionDetail[]>
   transactionDetailDelete: number[] 
   currentTransaction: Partial<Transaction> | null
-  chartTransaction: null
+  chartTransaction: ChartItem[]
   loading: boolean,
   error: string | null
   status: string | null
@@ -52,7 +58,7 @@ const initialState: TransaksiState = {
   ],
   transactionDetailDelete: [],
   currentTransaction: null,
-  chartTransaction: null,
+  chartTransaction: [],
   loading: false,
   error: null,
   status: "",
