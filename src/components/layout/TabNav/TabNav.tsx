@@ -1,14 +1,13 @@
-import React from 'react'
 import { TabNav } from '@radix-ui/themes'
 import { usePathname } from 'next/navigation'
 import Profile from '@/components/layout/AdminProfile/AdminProfile';
 
-function Tabnav() {
+const Tabnav = () => {
 
   const pathName = usePathname()
   
   return (
-    <TabNav.Root size="2" color="gray" highContrast>
+    <TabNav.Root size={{initial: '1', sm: '2'}} color="gray" highContrast>
       <Profile/>
       <TabNav.Link href="/admin" active={pathName === '/admin'} >Admin</TabNav.Link>
       <TabNav.Link href="/transaksi" active={pathName === '/transaksi'}>Transaksi</TabNav.Link>

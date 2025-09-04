@@ -5,12 +5,15 @@ import { AlertDialog, Button, Flex } from '@radix-ui/themes'
 import { Admin } from '@/models/admin.model'
 import { useDispatch } from 'react-redux'
 
-function ConfirmLogout({id} : Admin) {
+const ConfirmLogout = ({id} : Admin) => {
   const dispatch = useDispatch<AppDispatch>()
   
   const handleLogout = () => {
-    dispatch(logoutAdmin({id: id}))
+    dispatch(logoutAdmin({
+      id: id
+    }))
   }
+
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
@@ -22,20 +25,24 @@ function ConfirmLogout({id} : Admin) {
         </Button>        
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="450px">
-        <AlertDialog.Title>Logout</AlertDialog.Title>
+        <AlertDialog.Title>Konfirmasi Logout</AlertDialog.Title>
         <AlertDialog.Description size="2">
-          Clik confirm to Logout
+          Anda harus login kembali, apakah anda yakin?
         </AlertDialog.Description>
 
         <Flex gap="3" mt="4" justify="end">
           <AlertDialog.Cancel>
             <Button variant="soft" color="gray">
-              Cancel
+              Batal
             </Button>
           </AlertDialog.Cancel>
           <AlertDialog.Action>
-            <Button variant="solid" color="red" onClick={handleLogout}>
-              Confirm
+            <Button 
+              variant="soft" 
+              color="red" 
+              onClick={handleLogout}
+            >
+              Logout
             </Button>
           </AlertDialog.Action>
         </Flex>

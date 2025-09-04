@@ -4,9 +4,15 @@ import { AlertDialog, Button, Flex, DropdownMenu } from '@radix-ui/themes'
 type ConfirmDeleteProps = {
   onConfirm: () => void
   label?: string
+  description?: string
 }
 
-function ConfirmDelete({onConfirm, label = 'Delete'}: ConfirmDeleteProps) {
+const ConfirmDelete = ({
+    onConfirm, 
+    label = 'Hapus', 
+    description = 'Data yang dihapus tidak dapat dikembalikan!'
+  }: ConfirmDeleteProps
+) => {
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
@@ -14,24 +20,31 @@ function ConfirmDelete({onConfirm, label = 'Delete'}: ConfirmDeleteProps) {
           color="red" 
           onSelect={(e) => e.preventDefault()}
         >
-          <TrashIcon />Delete
+          <TrashIcon />Hapus
         </DropdownMenu.Item>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="450px">
         <AlertDialog.Title>{label}</AlertDialog.Title>
         <AlertDialog.Description size="2">
-          Are you sure? This action cannot be undone
+          {description}
         </AlertDialog.Description>
 
         <Flex gap="3" mt="4" justify="end">
           <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
-              Cancel
+            <Button 
+              variant="soft" 
+              color="gray"
+            >
+              Batal
             </Button>
           </AlertDialog.Cancel>
           <AlertDialog.Action>
-            <Button variant="solid" color="red" onClick={onConfirm}>
-              Confirm
+            <Button 
+              variant="soft" 
+              color="red" 
+              onClick={onConfirm}
+            >
+              Hapus
             </Button>
           </AlertDialog.Action>
         </Flex>

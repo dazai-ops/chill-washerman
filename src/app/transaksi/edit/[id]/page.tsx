@@ -1,4 +1,4 @@
-import TransaksiEditLayout from '@/components/features/Transaksi/EditTransaksi/layout'
+import TransaksiEditLayout from '@/components/features/Transaction/TransactionEditLayout/layout'
 
 async function TransaksiEditPage({
   params

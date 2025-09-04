@@ -1,6 +1,6 @@
-import { ValidationError } from "./singleFormValidation.model";
+import { ValidationError } from "./validation.model";
 import { validateField } from "./validateField";
-import { FieldRules } from "./singleFormValidation.model";
+import { FieldRules } from "./validation.model";
 
 export const validateForm = (
   formData: Record<string, string | number | boolean | object | null | undefined>,

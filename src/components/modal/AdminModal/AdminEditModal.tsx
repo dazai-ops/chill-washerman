@@ -12,7 +12,7 @@ import { updateAdmin } from '@/lib/thunk/admin/adminThunk'
 //utils
 import { Admin } from '@/models/admin.model'
 import { validateForm } from '@/utils/form-validation/validateForm'
-import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
+import { FieldRules } from '@/utils/form-validation/validation.model'
 import { setErrors, clearErrors } from '@/redux/slices/form-validation/singleForm'
 
 //component
@@ -29,14 +29,14 @@ const rules: Record<string, FieldRules> = {
   role: ['required'],
 }
 
-function AdminEditModal({data}: {data: Admin}) {
+const AdminEditModal = ({data}: {data: Admin}) => {
   const [open, setOpen] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
   const {adminForm, status} = useSelector((state:RootState) => state.admin)
-  const errors = useSelector((state:RootState) => state.singleForm.errors)
+  const errors = useSelector((state:RootState) => state.validateSingleForm.errors)
 
   useEffect(() => {
     if(data) {
@@ -70,8 +70,8 @@ function AdminEditModal({data}: {data: Admin}) {
       setShowConfirm(false)
     } else {
       setShowConfirm(true)
-      toast.success('Data has verified', {
-        description: 'Clik update to save changes',
+      toast.success('Data sudah terverifikasi', {
+        description: 'Klik update untuk melanjutkan',
         position: "top-center"
       })
     }  
@@ -216,12 +216,13 @@ function AdminEditModal({data}: {data: Admin}) {
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <ConfirmChange
-                onConfirm={() => dispatch(updateAdmin({ id: String(data.id), payload: adminForm }))} 
+                onConfirm={() => dispatch(updateAdmin({ id: String(data.id), payload: adminForm }))}
+                label='Update Admin'
                 customButton={
                   showConfirm ? (
                     <Button color='green'>Update</Button>
                   ) : (
-                    <Button disabled={disabled} color='green' onClick={(e) => handleFormVerify(e)}>Verify</Button>
+                    <Button disabled={disabled} color='green' onClick={(e) => handleFormVerify(e)}>Cek Data</Button>
                   )
                 }
               />

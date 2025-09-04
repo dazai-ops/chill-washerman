@@ -1,8 +1,8 @@
-import MesinCuciLayout from '@/components/features/MesinCuci/layout'
+import WasherLayout from '@/components/features/Washer/layout'
 
-function MesinCuciPage() {
+const MesinCuciPage = () => {
   return (
-    <MesinCuciLayout/>
+    <WasherLayout/>
   )
 }
 

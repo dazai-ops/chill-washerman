@@ -1,8 +1,8 @@
-import JenisPakaianLayout from '@/components/features/JenisPakaian/layout'
+import ApparelLayout from '@/components/features/Apparel/layout'
 
-function JenisPakaianPage() {
+const JenisPakaianPage = () => {
   return (
-    <JenisPakaianLayout/>
+    <ApparelLayout/>
   )
 }
 

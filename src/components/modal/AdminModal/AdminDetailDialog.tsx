@@ -4,9 +4,10 @@ import { Dialog, DataList, Badge, DropdownMenu } from '@radix-ui/themes'
 
 //utils
 import { Admin } from '@/models/admin.model';
-import { formatDateWIB } from '@/utils/dateFormatter'
+import { formatDate } from '@/utils/helpers/formatters/date'
+import { formatToTitleCase } from '@/utils/helpers/formatters/titleCase';
 
-function AdminDetailDialog({data}: {data: Admin}) {
+const AdminDetailDialog = ({data}: {data: Admin}) => {
   return (
     <Dialog.Root>
       <Dialog.Trigger>
@@ -27,8 +28,8 @@ function AdminDetailDialog({data}: {data: Admin}) {
           <DataList.Item align="center">
             <DataList.Label minWidth="88px">Role</DataList.Label>
             <DataList.Value>
-              <Badge color={data.role === 'admin' ? 'green' : 'yellow'} variant="soft" radius="full">
-                {data.role}
+              <Badge color={data.role === 'admin' ? 'pink' : 'sky'} variant="soft" radius="full">
+                {formatToTitleCase(data.role)}
               </Badge>
             </DataList.Value>
           </DataList.Item>
@@ -48,7 +49,7 @@ function AdminDetailDialog({data}: {data: Admin}) {
               ) : data.last_login == null ?(
                 <Badge color="red" variant="soft">Belum login / Baru Ditambahkan</Badge>
               ) : (
-                <Badge color="yellow" variant="soft">Last login: {data.last_login && formatDateWIB(data.last_login)}</Badge>
+                <Badge color="yellow" variant="soft">{data.last_login && formatDate(data.last_login, "long")}</Badge>
               )}
             </DataList.Value>
           </DataList.Item>

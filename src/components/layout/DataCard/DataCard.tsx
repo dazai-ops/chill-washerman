@@ -44,9 +44,9 @@ export function DataCard<T>({
 
   return (
     <div className="w-full">
-      <div className="flex gap-2 mb-4">
+      <div className="flex sm:gap-2 gap-1 mb-4">
         <TextField.Root
-          size="3"
+          size={{initial: '2', sm: '3'}}
           placeholder="Search..."
           value={search}
           onChange={(e) => {
@@ -58,7 +58,7 @@ export function DataCard<T>({
         {renderToolbar}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-6">
         {currentData.map((item, index) => (
           <div key={index}>{renderCard(item)}</div>
         ))}

@@ -1,6 +1,6 @@
 import { Badge } from "@radix-ui/themes"
 
-export const adminColumns = [
+export const adminTableColumns = [
     {
       header: 'No',
       cell: ({row}: {row: {index: number}}) => row.index + 1
@@ -22,10 +22,10 @@ export const adminColumns = [
       accessorKey: 'role',
       cell: ({getValue}: {getValue: () => unknown}) => {
         const value = getValue() as string
-        const role = value === 'admin' ? 'admin' : 'superuser'
+        const role = value === 'admin' ? 'Admin' : 'Superuser'
 
         return (
-          <Badge color={role === 'admin' ? 'green' : 'yellow'}>
+          <Badge color={role === 'Admin' ? 'pink' : 'sky'}>
             {role}
           </Badge>
         )

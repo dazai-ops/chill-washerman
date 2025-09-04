@@ -11,27 +11,26 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { getAdmin, updateAdminRole, deleteAdmin } from '@/lib/thunk/admin/adminThunk';
 
 //utils
-import { adminColumns } from '@/features/admin/columns';
-import { formatDateWIB } from '@/utils/dateFormatter';
+import { adminTableColumns } from '@/features/admin/columns';
+import { formatDate } from '@/utils/helpers/formatters/date';
 
 //components
 import { DataTable } from '@/components/layout/DataTable/DataTable';
 import { DataCard } from '@/components/layout/DataCard/DataCard';
 import Tabnav from '@/components/layout/TabNav/TabNav'
+import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
 import AdminDetailDialog from '@/components/modal/AdminModal/AdminDetailDialog';
 import AdminCreateModal from '@/components/modal/AdminModal/AdminCreateModal';
 import AdminEditModal from '@/components/modal/AdminModal/AdminEditModal';
 import ConfirmDeleteDialog from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import ConfirmChangeDialog from '@/components/dialog/ConfirmChange/ConfirmChange';
-import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
 
-function AdminLayout() {
-  const tableColumns = adminColumns
+const AdminLayout = () => {
+  const tableColumns = adminTableColumns
   const dispatch = useDispatch<AppDispatch>()
 
   const admin = useSelector((state: RootState) => state.auth.user)
   const { loading, status, adminList } = useSelector((state: RootState) => state.admin)
-
   const [ segmented, setSegmented ] = useState('card')
  
   useEffect(() => {
@@ -58,7 +57,7 @@ function AdminLayout() {
       {loading ? (
         <Spinner className='mt-8 mb-4'/>  
       ): (
-        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1000px] mt-10">
+        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] px-3 mt-10">
           {segmented === 'table' ?  
             <DataTable 
               columns={tableColumns} 
@@ -103,7 +102,7 @@ function AdminLayout() {
             <DataCard
               data={adminList}
               renderCard={(row) => (
-                <Box maxWidth="350px">
+                <Box maxWidth="350px" className='sm:w-full'>
                   <Card>
                     <Flex gap="3" align="center" justify="between">
                       <Flex gap="3" align="center">
@@ -143,28 +142,37 @@ function AdminLayout() {
                                   />
                               }
                               <DropdownMenu.Separator />
-                              <ConfirmDeleteDialog onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
+                              <ConfirmDeleteDialog 
+                                label="Hapus Admin"
+                                onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}
+                              />
                             </>
                           )}
                         </DropdownMenu.Content>
                       </DropdownMenu.Root>
                     </Flex>
                     <Box className='mt-2'>
-                      <Badge>{row.role}</Badge>
-                      <Box className='mt-2'>
-                        <Text as="div" size="2" weight="bold">
+                      {row.role === 'superuser' ? (
+                        <Badge color="sky" variant="soft">Superuser</Badge>
+                      ): (
+                        <Badge color="pink" variant="soft">Admin</Badge>
+                      )}
+                      <Flex direction={'column'} className='mt-2'>
+                        <Text size="2" weight="bold">
                           {row.is_login ? (
                             <Badge color="jade" variant="soft">Sedang Online</Badge>
                           ) : row.last_login == null ?(
                             <Badge color="red" variant="soft">Belum login / Baru Ditambahkan</Badge>
                           ) : (
-                            <Badge color="yellow" variant="soft">Last login: {row.last_login && formatDateWIB(row.last_login)}</Badge>
+                            <Badge color="yellow" variant="soft">Last login: {row.last_login && formatDate(row.last_login, "long")}</Badge>
                           )}
                         </Text>
-                        <Text as="div" size="1" color="gray">
-                          Telepon: {row.no_telepon}
+                        <Text>
+                          <Badge color='gray'>
+                            Telepon: {row.no_telepon}
+                          </Badge>
                         </Text>
-                      </Box>
+                      </Flex>
                     </Box>
                   </Card>
                 </Box>

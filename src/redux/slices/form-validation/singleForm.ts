@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ValidationError } from "@/utils/form-validation/singleFormValidation.model";
+import { ValidationError } from "@/utils/form-validation/validation.model";
 
 interface FormState {
   data: Record<string, any>

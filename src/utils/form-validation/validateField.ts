@@ -1,5 +1,5 @@
-import { formatFieldName } from '../fieldNameFormatter';
-import { FieldRules, ValidationError } from './singleFormValidation.model';
+import { formatFieldName } from '@/utils/helpers/formatters/fieldName';
+import { FieldRules, ValidationError } from '@/utils/form-validation/validation.model';
 
 export const validateField = (
   fieldName: string,

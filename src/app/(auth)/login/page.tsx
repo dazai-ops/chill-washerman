@@ -1,6 +1,6 @@
 import LoginLayout from '@/components/features/Login/layout'
 
-function LoginPage() {
+const LoginPage = () => {
   return (
     <LoginLayout/>
   )

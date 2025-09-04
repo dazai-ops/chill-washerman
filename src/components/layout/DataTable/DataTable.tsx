@@ -59,9 +59,9 @@ export function DataTable<TData, TValue>({ columns, data, renderAction, renderTo
 
   return (
     <div className='w-full'>
-      <div className='flex gap-2'>
+      <div className='flex sm:gap-2 gap-1'>
         <TextField.Root
-          size="3"
+          size={{ initial: '2', sm: '3' }}
           placeholder="Search..."
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}

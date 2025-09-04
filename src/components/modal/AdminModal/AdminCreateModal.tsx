@@ -11,7 +11,7 @@ import { clearForm, setErrors, clearErrors } from '@/redux/slices/form-validatio
 
 // utils
 import { validateForm } from '@/utils/form-validation/validateForm'
-import { FieldRules } from '@/utils/form-validation/singleFormValidation.model'
+import { FieldRules } from '@/utils/form-validation/validation.model'
 
 // component
 import ErrorMessage from '../../ui/FieldError/ErrorMessage';
@@ -26,13 +26,13 @@ const rules: Record<string, FieldRules> = {
   role: ['required'],
 }
 
-function AdminAddModal() {
+const AdminCreateModal = () => {
   const [open, setOpen] = useState(false)
   const [disabled, setDisabled] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
   const {adminForm} = useSelector((state:RootState) => state.admin)
-  const {errors} = useSelector((state:RootState) => state.singleForm)
+  const {errors} = useSelector((state:RootState) => state.validateSingleForm)
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target
@@ -75,7 +75,7 @@ function AdminAddModal() {
     <AlertDialog.Root open={open}>
       <AlertDialog.Trigger>
         <Button 
-          size="3" 
+          size={{initial: '2', sm: '3'}} 
           color='gray' 
           onClick={() => setOpen(true)} 
           highContrast
@@ -189,7 +189,7 @@ function AdminAddModal() {
             </Grid>
           </Flex>
           <Flex gap="3" mt="4" justify="between">
-            <Button type='reset' color='yellow'>
+            <Button type='reset' color='yellow' variant='soft'>
               Reset
             </Button>
             <Flex gap={"2"}>
@@ -207,7 +207,7 @@ function AdminAddModal() {
                   color='green'
                   disabled={disabled}
                 >
-                  Submit
+                  Tambah
                 </Button>
               </AlertDialog.Action>
             </Flex>
@@ -219,4 +219,4 @@ function AdminAddModal() {
   )
 }
 
-export default AdminAddModal
+export default AdminCreateModal

@@ -9,12 +9,12 @@ interface SegmentedControlProps {
 
 function SegementedControl({segmented, setSegmented}: SegmentedControlProps) {
   return (
-    <SegmentedControl.Root defaultValue="ink" size="3" onValueChange={setSegmented} value={segmented}>
+    <SegmentedControl.Root defaultValue="ink" size={{initial: '2', sm: '3'}} onValueChange={setSegmented} value={segmented}>
       <SegmentedControl.Item value="table">
-        <TableIcon width="20" height="20"/>
+        <TableIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6"/>
       </SegmentedControl.Item>
       <SegmentedControl.Item value="card">
-        <ListBulletIcon width="20" height="20"/>
+        <ListBulletIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6"/>
       </SegmentedControl.Item>
     </SegmentedControl.Root>
   )

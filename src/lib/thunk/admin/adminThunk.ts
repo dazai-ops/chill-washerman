@@ -1,6 +1,6 @@
+import bcrypt from "bcryptjs";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
-import bcrypt from "bcryptjs";
 import { toast } from "sonner";
 import { Admin, AdminListResponse, CreateAdminForm, UpdateAdminForm } from "@/models/admin.model";
 
@@ -20,20 +20,20 @@ export const getAdmin = createAsyncThunk<
       .order("role", { ascending: false })
 
       if (error) {
-        toast.error('Something went wrong', {
-          description: 'Failed to retrive admin',
+        toast.error('Terjadi kesalahan', {
+          description: 'Gagal mengambil data admin',
         });
         return rejectWithValue(error.message)
       }
 
       return {
         result: data as Admin[],
-        message: "Admin retrieved successfully",
+        message: "Data admin berhasil diambil",
         status: "success",
         error: null
       }
     } catch(error) {
-      toast.error('Failed to retrive admin', {
+      toast.error('Status: Failed', {
         description: 'Call the IT department',
       });
       return rejectWithValue((error as Error).message)
@@ -63,21 +63,21 @@ export const addAdmin = createAsyncThunk<
         .select("nama, username, role")
 
       if(error) {
-        toast.error('Something went wrong',{
-          description: 'Failed to add admin',
+        toast.error('Terjadi kesalahan',{
+          description: 'Admin gagal ditambahkan',
         })
         return rejectWithValue(error.message)
       }
 
-      toast.success('Admin added successfully')
+      toast.success('Admin baru ditambahkan')
       return {
         result: data[0] as CreateAdminForm,
-        message: "Admin added successfully",
+        message: "Admin baru ditambahkan",
         status: "success",
         error: null
       }
     } catch (error) {
-      toast.error('Failed to add admin', {
+      toast.error('Status: Failed', {
         description: 'Call the IT department',
       });
       return rejectWithValue((error as Error).message)
@@ -100,22 +100,22 @@ export const deleteAdmin = createAsyncThunk<
         .select("id, nama, username, role")
 
       if (error) {
-        toast.error('Something went wrong',{
-          description: 'Failed to delete admin',
+        toast.error('Terjadi kesalahan',{
+          description: 'Admin gagal dihapus',
         })
         return rejectWithValue(error.message)
       }
 
-      toast.success('Admin deleted successfully')
+      toast.success('Admin berhasil dihapus')
 
       return {
         result: data[0],
-        message: "Admin deleted successfully",
+        message: "Admin berhasil dihapus",
         status: "success",
         error: null
       }
     }catch (error) {
-      toast.error('Failed to delete admin', {
+      toast.error('Status: Failed', {
         description: 'Call the IT department',
       });
       return rejectWithValue((error as Error).message)
@@ -138,22 +138,22 @@ export const updateAdmin = createAsyncThunk<
         .select("nama, username, role")
         
       if (error) {
-        toast.error('Something went wrong',{
-          description: 'Failed to update admin',
+        toast.error('Terjadi kesalahan',{
+          description: 'Data admin gagal diubah',
         })
         return rejectWithValue(error.message)
       }
 
-      toast.success('Admin updated successfully')
+      toast.success('Data admin berhasil diubah')
       
       return {
         result: data[0] as Admin,
-        message: "Admin updated successfully",
+        message: "Data admin berhasil diubah",
         status: "success",
         error: null
       }
     }catch (error) {
-      toast.error('Failed to update admin', {
+      toast.error('Status: Failed', {
         description: 'Call the IT department',
       });
       return rejectWithValue((error as Error).message)
@@ -176,22 +176,22 @@ export const updateAdminRole = createAsyncThunk<
         .select("nama, username, role")
 
       if (error) {
-        toast.error('Something went wrong',{
-          description: 'Failed to change admin role',
+        toast.error('Terjadi kesalahan',{
+          description: 'Gagal mengubah role admin',
         })
         return rejectWithValue(error.message as string)
       }
 
-      toast.success('Role changed successfully');
+      toast.success('Role admin berhasil diubah');
 
       return {
         result: data[0] as Admin,
-        message: "Admin role changed successfully",
+        message: "Role admin berhasil diubah",
         status: "success",
         error: null
       }
     }catch (error) {
-      toast.error('Failed to change admin role', {
+      toast.error('Status: Failed', {
         description: 'Call the IT department',
       });
       return rejectWithValue((error as Error).message)

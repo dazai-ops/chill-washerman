@@ -1,9 +1,8 @@
-import HistoryLayout from '@/components/features/History/layout'
-import React from 'react'
+import SummaryLayoyt from '@/components/features/Summary/layout'
 
-function HistoryPage() {
+const HistoryPage = () => {
   return (
-    <HistoryLayout/>
+    <SummaryLayoyt/>
   )
 }
 

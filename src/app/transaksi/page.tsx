@@ -1,8 +1,8 @@
-import TransaksiLayout from '@/components/features/Transaksi/layout'
+import TransactionLayout from '@/components/features/Transaction/layout'
 
 function TransaksiPage() {
   return (
-    <TransaksiLayout/>
+    <TransactionLayout/>
   )
 }
 

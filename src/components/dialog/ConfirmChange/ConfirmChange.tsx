@@ -7,16 +7,26 @@ type ConfirmChangeProps = {
   customIcon?: React.ReactNode
   customButton?: React.ReactNode
   disabled?: boolean
+  description?: string
 }
 
-function ConfirmChange({onConfirm, label = 'Update', customButton, customIcon}: ConfirmChangeProps) {
+const ConfirmChange = ({
+    onConfirm,
+    label = 'Update', 
+    customButton, 
+    customIcon, 
+    description = 'Klik update untuk simpan perubahan'
+  }: ConfirmChangeProps
+) => {
+
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
         {customButton 
           ? customButton 
           : <DropdownMenu.Item 
-              color="blue" onSelect={(e) => e.preventDefault()}
+              color="blue" 
+              onSelect={(e) => e.preventDefault()}
             >
               {customIcon ? customIcon : <PersonIcon />}{label}
             </DropdownMenu.Item>
@@ -25,17 +35,24 @@ function ConfirmChange({onConfirm, label = 'Update', customButton, customIcon}: 
       <AlertDialog.Content maxWidth="450px">
         <AlertDialog.Title>{label}</AlertDialog.Title>
         <AlertDialog.Description size="2">
-          Are you sure? Click update to confirm
+          {description}
         </AlertDialog.Description>
 
         <Flex gap="3" mt="4" justify="end">
           <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
+            <Button 
+              variant="soft" 
+              color="gray"
+            >
               Cancel
             </Button>
           </AlertDialog.Cancel>
           <AlertDialog.Action>
-            <Button variant="solid" color="red" onClick={onConfirm}>
+            <Button 
+              variant="soft" 
+              color="green" 
+              onClick={onConfirm}
+            >
               Update
             </Button>
           </AlertDialog.Action>

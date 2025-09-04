@@ -5,7 +5,7 @@ interface ErrorMessageProps {
   className?: string
 }
 
-function ErrorMessage({message, className}: ErrorMessageProps) {
+const ErrorMessage = ({message, className}: ErrorMessageProps) => {
   return (
     <p className={`text-red-500 text-sm ${className}`}>
       {message}

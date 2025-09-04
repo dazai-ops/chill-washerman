@@ -1,6 +1,6 @@
 import AdminLayout from '@/components/features/Admin/layout'
 
-function AdminPage() {
+const AdminPage = () => {
   return (
     <AdminLayout/>
   )
