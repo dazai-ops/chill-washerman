@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus, getTransactionForChart } from "@/lib/thunk/transaction/transactionThunk";
+import { deleteTransaction, getTransaction, addTransaction, getSingleTransaction, updateTransaction, updateDetailTransactionStatus, updatePaymentStatus, getTransactionForChart, archiveTransaction } from "@/lib/thunk/transaction/transactionThunk";
 import { generateTransaksiCode } from "@/features/transaction/generateCode";
 import { Transaction, CreateTransaction, CreateTransactionDetail, TransactionDetail  } from "@/models/transaction.model";
 
@@ -319,6 +319,18 @@ const transactionSlice = createSlice({
         state.chartTransaction = action.payload.result
       })
       .addCase(getTransactionForChart.rejected, (state) => {
+        state.loading = false
+      })
+
+      .addCase(archiveTransaction.pending, (state) => {
+        state.loading = true
+        state.status = null
+      })
+      .addCase(archiveTransaction.fulfilled, (state, action) => {
+        state.loading = false
+        state.status = action.payload.status
+      })
+      .addCase(archiveTransaction.rejected, (state) => {
         state.loading = false
       })
   }

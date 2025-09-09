@@ -32,7 +32,7 @@ const TransactionDetailDialog = ({data}: TransactionDetailDialogProps) => {
         <Flex justify={'between'} align={'center'}>
           <Dialog.Title>{data.kode_transaksi}</Dialog.Title>
           <Flex gap={"3"}>
-            {data.status_proses !== 'selesai' && (
+            {data.status_proses !== 'selesai' && data.is_archive === false && (
               <>
                 <CompleteTransactionModal data={data}/>
                 <Link 
@@ -58,8 +58,10 @@ const TransactionDetailDialog = ({data}: TransactionDetailDialogProps) => {
           <DataList.Item>
             <DataList.Label minWidth="100px">Proses</DataList.Label>
             <DataList.Value>
-              {data.status_proses === 'selesai' ? (
-                <Badge color="green" variant="soft">Selesai</Badge>
+              {data.is_archive === true ? (
+                <Badge color="red" variant="soft">Dibatalkan</Badge>
+                ) : data.status_proses === 'selesai' ? (
+                  <Badge color="green" variant="soft">Selesai</Badge>
                 ) : data.status_proses === 'diproses' ? (
                   <Badge color="iris" variant="soft">Diproses</Badge>
                 ) : data.status_proses === 'siap_diambil' ? (
@@ -149,7 +151,7 @@ const TransactionDetailDialog = ({data}: TransactionDetailDialogProps) => {
                     <Table.Cell align='center' justify={'center'}>
                       <Flex justify={'center'} gap={"2"}>
                         <ServiceDetailDialog data={detail}/>
-                        {data.status_proses !== 'selesai' && (
+                        {data.status_proses !== 'selesai' && data.is_archive !== true && (
                           <ServiceProcessEditModal data={detail}/>
                         )}
                       </Flex>

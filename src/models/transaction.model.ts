@@ -31,6 +31,7 @@ export interface Transaction extends BaseEntity{
 
   sisa_bayar?: number
   kembalian?: number
+  is_archive?: boolean
 }
 
 export interface TransactionDetail extends BaseEntity {

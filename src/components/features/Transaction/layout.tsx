@@ -8,7 +8,7 @@ import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge, Button, Li
 
 //redux
 import { AppDispatch, RootState } from '@/redux/store';
-import { getTransaction , deleteTransaction} from '@/lib/thunk/transaction/transactionThunk';
+import { getTransaction , deleteTransaction, archiveTransaction} from '@/lib/thunk/transaction/transactionThunk';
 
 //components
 import { DataTable } from '@/components/layout/DataTable/DataTable';
@@ -17,16 +17,18 @@ import Tabnav from '@/components/layout/TabNav/TabNav'
 import TransactionDetailDialog from '@/components/modal/TransactionModal/TransactionDetailDialog';
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
+import FilterStatusTransaction from '@/components/layout/FilterStatusTransaction/FilterStatustransaction';
 
 //utils
 import { transactionTableColumns } from '@/features/transaction/columns';
 import { formatDate } from '@/utils/helpers/formatters/date';
+import ConfirmArchiveTransaction from '../../dialog/ConfirmArchiveTransaction/ConfirmArchiveTransaction';
 
 
 function TransaksiLayout() {
   const dispatch = useDispatch<AppDispatch>()
   const { loading, status, transactionList } = useSelector((state: RootState) => state.transaksi)
-
+  const { user } = useSelector((state: RootState) => state.auth)
   const [ segmented, setSegmented ] = useState('card')
   const columns = transactionTableColumns
 
@@ -58,10 +60,14 @@ function TransaksiLayout() {
                   <DropdownMenu.Content>
                     <TransactionDetailDialog data={row}/>
                     <DropdownMenu.Separator />
+
                     <ConfirmDelete 
                       label='Hapus Transaksi' 
                       onConfirm={() => row.id && dispatch(deleteTransaction({id: row.id}))}
                     />
+                    {/* <ConfirmarchiveTransaction
+                      onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id}}))}
+                    /> */}
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
               )
@@ -69,9 +75,10 @@ function TransaksiLayout() {
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
+                <FilterStatusTransaction/>
                 <Button asChild size="3" color="gray" highContrast>
                   <Link href="/transaksi/create" target="_blank" underline='none'>
-                    Add new...
+                    Tambah Transaksi...
                   </Link>
                 </Button>
               </>
@@ -108,6 +115,21 @@ function TransaksiLayout() {
                         <DropdownMenu.Content>
                           <TransactionDetailDialog data={row}/>
                           <DropdownMenu.Separator />
+                          
+                          {row.is_archive === false ? (
+                            <ConfirmArchiveTransaction
+                              label='Batalkan Transaksi'
+                              buttonLabel='Batalkan'
+                              onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id, act: 'archive'}}))}
+                            />
+                          ) : (
+                          <ConfirmArchiveTransaction
+                            label='Kembalikan Transaksi'
+                            description='Apakah anda yakin ingin mengembalikan transaksi ini?'
+                            buttonLabel='Kembalikan'
+                            onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id, act: 'unarchive'}}))}
+                          />
+                          )}
                           <ConfirmDelete 
                             label='Hapus Transaksi'
                             onConfirm={() => row.id && dispatch(deleteTransaction({id: row.id}))}
@@ -116,8 +138,10 @@ function TransaksiLayout() {
                       </DropdownMenu.Root>
                     </Flex>
                     <Box className='mt-2'>
-                      {row.status_proses === 'selesai' ? (
-                        <Badge color="green" variant="soft">Selesai</Badge>
+                      {row.is_archive === true ? (
+                        <Badge color="red" variant="soft">Dibatalkan</Badge>
+                        ) : row.status_proses === 'selesai' ? (
+                          <Badge color="green" variant="soft">Selesai</Badge>
                         ) : row.status_proses === 'diproses' ? (
                           <Badge color="iris" variant="soft">Diproses</Badge>
                         ) : row.status_proses === 'siap_diambil' ? (
@@ -154,9 +178,10 @@ function TransaksiLayout() {
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
+                <FilterStatusTransaction/>
                 <Button asChild size="3" color="gray" highContrast>
                   <Link href="/transaksi/create" target="_blank" underline='none'>
-                    Add new...
+                    Tambah Transaksi...
                   </Link>
                 </Button>
               </>

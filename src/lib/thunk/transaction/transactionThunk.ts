@@ -10,7 +10,7 @@ import { ApiResponse, Transaction, TransactionDetail, CreateTransaction, CreateT
 
 export const getTransaction = createAsyncThunk<
   ApiResponse<Partial<Transaction[]>>, 
-  Partial<{start_date: Date, end_date: Date}> | undefined,
+  Partial<{start_date: Date, end_date: Date, status_proses: string, is_archive: boolean}> | undefined,
   { rejectValue: string }
 >(
   "transaction/getTransaction",
@@ -34,6 +34,7 @@ export const getTransaction = createAsyncThunk<
           catatan,
           created_at,
           updated_at,
+          is_archive,
           dibuat_oleh(
             id,
             nama
@@ -81,6 +82,14 @@ export const getTransaction = createAsyncThunk<
       if(params?.end_date){
         const end = new Date(params?.end_date.setHours(23,59,59,0)).toISOString()
         query = query.lte("created_at", end)
+      }
+
+      if(params?.status_proses){
+        query = query.eq("status_proses", params.status_proses).eq("is_archive", false)
+      }
+
+      if(params?.is_archive){
+        query = query.eq("is_archive", params.is_archive)
       }
 
       query = query.order("created_at", { ascending: false })
@@ -655,6 +664,46 @@ export const getTransactionForChart = createAsyncThunk<
         status: "success"
       }
     } catch (error) {
+      toast.error('Status: Failed', {
+        description: 'Call the IT department',
+      });
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)
+
+export const archiveTransaction = createAsyncThunk<
+  { message: string, status: string}, 
+  { id: number, payload: {updated_by: number, act: string} },
+  { rejectValue: string }
+>(
+  "transaction/archiveTransaction",
+  async ({id, payload}, { rejectWithValue }) => {
+    try{
+      const { error } = await supabase
+        .from("transaksi")
+        .update({
+          is_archive: payload.act === 'archive' ? true : false,
+          updated_by: payload.updated_by,
+          updated_at: new Date()
+        })
+        .eq("id", id)
+        .select()
+        
+      if (error) {
+        toast.error('Terjadi kesalahan',{
+          description: 'Gagal mengubah transaksi',
+        })
+        return rejectWithValue(error.message)
+      }
+
+      toast.success(`Transaksi berhasil ${payload.act === 'archive' ? 'dibatalkan' : 'kembalikan'}`)
+      
+      return {
+        message: `Transaksi berhasil ${payload.act === 'archive' ? 'dibatalkan' : 'kembalikan'}`,
+        status: "success"
+      }
+    }catch (error) {
       toast.error('Status: Failed', {
         description: 'Call the IT department',
       });
