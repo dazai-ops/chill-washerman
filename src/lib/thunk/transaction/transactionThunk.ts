@@ -38,6 +38,11 @@ export const getTransaction = createAsyncThunk<
             id,
             nama
           ),
+          updated_by(
+            id,
+            nama,
+            username
+          ),
           transaksi_detail(
             id,
             transaksi_parent,
@@ -413,6 +418,9 @@ export const updateTransaction = createAsyncThunk<
       if(detailData && detailData.length > 0 && detailData.every(d => d.status_proses === "selesai")){
         newStatusProses = "siap_diambil"
         newTanggalSelesai = new Date()
+      } else if(detailData && detailData.length > 0 && detailData.every(d => d.status_proses === "menunggu")){
+        newStatusProses = "menunggu"
+        newTanggalSelesai = null
       }
 
       const {error: statusError} = await supabase

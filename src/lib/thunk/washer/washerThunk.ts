@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from '@/lib/supabase'
 import { toast } from "sonner";
 import { Washer, WasherListResponse } from '@/models/washer.model';
+import { TransactionDetail } from "@/models/transaction.model";
 
 export const getWasher = createAsyncThunk<
   WasherListResponse, 
@@ -12,6 +13,27 @@ export const getWasher = createAsyncThunk<
   async (params, { rejectWithValue }) => {
 
     try{
+
+      if(!params){
+        const { data, error } = await supabase
+          .from("v_mesin_cuci_tracking")
+          .select("*")
+
+        if (error) {
+          toast.error('Terjadi kesalahan', {
+            description: 'Gagal mengambil data mesin cuci',
+          });
+          return rejectWithValue(error.message)
+        }
+
+        return {
+          result: data as Washer[],
+          message: "Mesin cucis retrived successfully",
+          status: "success",
+          error: null
+        }
+      }
+
       let query = supabase
         .from("mesin_cuci")
         .select("*")
@@ -184,14 +206,14 @@ export const updateWasher = createAsyncThunk<
 
 export const changeWasherStatus = createAsyncThunk<
   { result: Washer; message: string, status: string, error: string | null }, 
-  {id: number, is_active: boolean}, 
+  { id: number, is_active: boolean}, 
   { rejectValue: string }
 >(
   "admin/changeWasherStatus",
   async ({id, is_active}, { rejectWithValue }) => {
     try{
       const { data: currentData, error: fetchError } = await supabase
-        .from("mesin_cuci")
+        .from("v_mesin_cuci_tracking")
         .select("status_mesin")
         .eq("id", id)
         .single()
@@ -233,6 +255,53 @@ export const changeWasherStatus = createAsyncThunk<
       }
     }catch (error) {
       toast.error('Gagal mengubah status mesin cuci');
+      return rejectWithValue((error as Error).message)
+    }
+  }
+)
+
+export const getTrackingService = createAsyncThunk<
+  { result: Partial<TransactionDetail[]>; message: string, status: string, error: string | null }, 
+  number,
+  { rejectValue: string }
+>(
+  "admin/getTrackingService",
+  async (id, { rejectWithValue }) => {
+    try{
+      const { data, error } = await supabase
+        .from("transaksi_detail")
+        .select(`
+          berat_kg,
+          jumlah_item,
+          status_proses,
+          jenis_pakaian(
+            jenis_pakaian
+          ),
+          transaksi_parent(
+            kode_transaksi
+          )
+        `)
+        .eq("mesin_cuci", id)
+        .neq("status_proses", 'selesai')
+        .order("status_proses", { ascending: false })
+
+      if (error) {
+        toast.error('Terjadi kesalahan',{
+          description: 'Gagal mengambil data tracking service',
+        })
+        return rejectWithValue(error.message)
+      }
+
+      return {
+        result: data,
+        message: "Berhasil mengambil data mesin cuci",
+        status: "success",
+        error: null
+      }
+    }catch (error) {
+      toast.error('Status: Invalid', {
+        description: 'Call the IT department',
+      });
       return rejectWithValue((error as Error).message)
     }
   }

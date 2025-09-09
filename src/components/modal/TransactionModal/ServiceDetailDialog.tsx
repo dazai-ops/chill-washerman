@@ -76,7 +76,9 @@ const ServiceDetailDialog = ({data}: ServiceDetailDialogProps) => {
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Diubah</DataList.Label>
-            <DataList.Value>{ data.updated_at && formatDate(data.updated_at, "long") || '-'}</DataList.Value>
+            <DataList.Value>
+              { data.updated_at && formatDate(data.updated_at, "long") || '-'} {data.updated_by && `(${data.updated_by?.nama})` || ''}
+            </DataList.Value>
           </DataList.Item>
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Selesai</DataList.Label>

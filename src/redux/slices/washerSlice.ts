@@ -1,11 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { addWasher, changeWasherStatus, deleteWasher, getWasher, updateWasher } from '@/lib/thunk/washer/washerThunk';
+import { addWasher, changeWasherStatus, deleteWasher, getTrackingService, getWasher, updateWasher } from '@/lib/thunk/washer/washerThunk';
 import { Washer } from "@/models/washer.model";
+import { TransactionDetail } from "@/models/transaction.model";
 
 interface MesinCuciState {
   washerList: Washer[]
   washerForm: Partial<Washer>
+  serviceTrackingList: Partial<TransactionDetail[]>
   loading: boolean,
+  loadingTracking: boolean
   error: string | null
   status: string | null
 }
@@ -20,7 +23,9 @@ const initialState: MesinCuciState = {
     tahun_pembuatan: "",
     tanggal_dibeli: "",
   },
+  serviceTrackingList: [],
   loading: false, 
+  loadingTracking: false,
   error: null,
   status: null
 }
@@ -118,6 +123,19 @@ const washerSlice = createSlice({
         state.loading = false
         state.error = action.payload as string
         state.status = null
+      })
+
+      .addCase(getTrackingService.pending, (state) => {
+        state.loadingTracking = true
+        state.error = null
+      })
+      .addCase(getTrackingService.fulfilled, (state, action) => {
+        state.serviceTrackingList = action.payload.result
+        state.loadingTracking = false
+      })
+      .addCase(getTrackingService.rejected, (state, action) => {
+        state.loadingTracking = false
+        state.error = action.payload as string
       })
   }
 })

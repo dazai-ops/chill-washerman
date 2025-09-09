@@ -46,7 +46,8 @@ const LoginLayout = () => {
   }
 
   useEffect(() => {
-    if(error) setUserForm({...userForm, password: ''})
+    if(error !== null) setUserForm({...userForm, password: ''})
+    dispatch(clearError())
   }, [error, userForm])
   
   useEffect(() => {

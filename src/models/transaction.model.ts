@@ -42,7 +42,10 @@ export interface TransactionDetail extends BaseEntity {
   status_proses?: string
   acuan_harga?: string
   total_harga_layanan: number
-  transaksi_parent?: number | string
+  transaksi_parent?: {
+    id: number
+    kode_transaksi: string
+  }
   mesin_cuci?: Washer
   jenis_pakaian: Apparel
   kode_transaksi?: string

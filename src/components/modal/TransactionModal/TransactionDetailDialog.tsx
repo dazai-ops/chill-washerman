@@ -88,7 +88,7 @@ const TransactionDetailDialog = ({data}: TransactionDetailDialogProps) => {
           <DataList.Item>
             <DataList.Label minWidth="88px">Tgl Masuk</DataList.Label>
             <DataList.Value>
-              {data.tanggal_masuk &&formatDate(data.tanggal_masuk, "long") || '-' }
+              {data.tanggal_masuk &&formatDate(data.tanggal_masuk, "long") || '-' } {data.dibuat_oleh && `(${data.dibuat_oleh.nama})` || '' }
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>
@@ -101,6 +101,12 @@ const TransactionDetailDialog = ({data}: TransactionDetailDialogProps) => {
             <DataList.Label minWidth="88px">Tgl Keluar</DataList.Label>
             <DataList.Value>
               {data.tanggal_keluar && formatDate(data.tanggal_keluar, "long") || '-' }
+            </DataList.Value>
+          </DataList.Item>
+          <DataList.Item>
+            <DataList.Label minWidth="88px">Tgl Diubah</DataList.Label>
+            <DataList.Value>
+              {data.updated_at && formatDate(data.updated_at, "long") || '-' } {data.updated_by && `(${data.updated_by.nama})` || '' }
             </DataList.Value>
           </DataList.Item>
           <DataList.Item>

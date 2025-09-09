@@ -11,6 +11,9 @@ export interface Washer {
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
+
+  total_digunakan?: number
+  layanan_aktif?: number
 }
 
 export interface WasherListResponse {

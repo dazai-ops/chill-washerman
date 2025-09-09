@@ -24,6 +24,7 @@ import WasherCreateModal from '@/components/modal/WasherModal/WasherCreateModal'
 //utils
 import { washerTableColumns } from '@/features/washer/columns';
 import { formatDate } from '@/utils/helpers/formatters/date';
+import WasherTrackingServiceDialog from '../../modal/WasherModal/WasherTrackingServiceDialog';
 
 const WasherLayout = () => {
   const columns = washerTableColumns
@@ -65,6 +66,7 @@ const WasherLayout = () => {
                     ? <ConfirmChangeDialog label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: false}))} />
                     : <ConfirmChangeDialog label='Set as Active' onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: true}))}/>
                   }
+                  {/* <WasherTrackingServiceDialog data={row}/> */}
                   <DropdownMenu.Separator />
                   <ConfirmDeleteDialog onConfirm={() => dispatch(deleteWasher(row.id))}/>
                 </DropdownMenu.Content>
@@ -111,6 +113,7 @@ const WasherLayout = () => {
                           ? <ConfirmChangeDialog label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: false}))} />
                           : <ConfirmChangeDialog label='Set as Active' onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: true}))}/>
                         }
+                        <WasherTrackingServiceDialog id={row.id} nama={row.nama}/>
                         <DropdownMenu.Separator />
                         <ConfirmDeleteDialog onConfirm={() => dispatch(deleteWasher(row.id))}/>
                       </DropdownMenu.Content>
@@ -124,19 +127,14 @@ const WasherLayout = () => {
                     <Box className='mt-2'>
                       
                       <Text as="div" size="1" color="gray">
-                        {row.status_mesin === 'digunakan' ? (
-                          <Badge color='red'>
-                            -
-                          </Badge>
-                        ) : row.terakhir_digunakan === null ? (
-                          <Badge color='yellow'>
-                            Belum Pernah Digunakan
-                          </Badge>
-                        ) : (
-                          <Badge color='green'>
-                            Terakhir Digunakan: {formatDate(row.terakhir_digunakan, "long")}
-                          </Badge>
-                        )}
+                        <Badge>
+                          Total digunakan: {row.total_digunakan}
+                        </Badge>
+                      </Text>
+                      <Text>
+                        <Badge>
+                          Layanan aktif: {row.layanan_aktif}
+                        </Badge>
                       </Text>
                     </Box>
                   </Box>
