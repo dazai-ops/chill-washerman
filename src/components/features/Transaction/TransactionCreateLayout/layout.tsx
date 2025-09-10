@@ -140,7 +140,7 @@ function CreateTransaksiForm() {
             <InfoCircledIcon />
           </Callout.Icon>
           <Callout.Text>
-            Your changes will be saved untill you click the <b>save button.</b>
+            Data akan tersimpan hingga anda mekana button <b>Simpan</b>!
           </Callout.Text>
         </Callout.Root>
         {admin?.nama ? (

@@ -140,7 +140,7 @@ function TransaksiEditLayout({id}: {id:number}) {
             <InfoCircledIcon />
           </Callout.Icon>
           <Callout.Text>
-            Your changes will be saved untill you click the <b>save button.</b>
+            Perubahan akan tersimpan hingga anda menekan button<b> Simpan</b>!
           </Callout.Text>
         </Callout.Root>
         <form onSubmit={(e) => formSubmit(e)}>
@@ -317,7 +317,7 @@ function TransaksiEditLayout({id}: {id:number}) {
                           </Text>
                           <Box>
                             {transactionDetail.length > 1 && (
-                              <Button color='red' size={"1"} type='button' onClick={() => deleteDetailJenisPakaian(index, Number(detail.id))}>
+                              <Button color='red' variant='soft' size={"1"} type='button' onClick={() => deleteDetailJenisPakaian(index, Number(detail.id))}>
                                 Hapus
                               </Button>
                             )}

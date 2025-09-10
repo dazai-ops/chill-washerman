@@ -18,6 +18,7 @@ import TransactionDetailDialog from '@/components/modal/TransactionModal/Transac
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
 import FilterStatusTransaction from '@/components/layout/FilterStatusTransaction/FilterStatustransaction';
+import ExportCSVButton from '@/components/ui/CSV/CsvButton';
 
 //utils
 import { transactionTableColumns } from '@/features/transaction/columns';
@@ -115,20 +116,23 @@ function TransaksiLayout() {
                         <DropdownMenu.Content>
                           <TransactionDetailDialog data={row}/>
                           <DropdownMenu.Separator />
-                          
-                          {row.is_archive === false ? (
-                            <ConfirmArchiveTransaction
-                              label='Batalkan Transaksi'
-                              buttonLabel='Batalkan'
-                              onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id, act: 'archive'}}))}
-                            />
-                          ) : (
-                          <ConfirmArchiveTransaction
-                            label='Kembalikan Transaksi'
-                            description='Apakah anda yakin ingin mengembalikan transaksi ini?'
-                            buttonLabel='Kembalikan'
-                            onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id, act: 'unarchive'}}))}
-                          />
+                          {row.status_proses !== 'selesai' && (
+                            <>
+                              {row.is_archive === false ? (
+                                <ConfirmArchiveTransaction
+                                  label='Batalkan Transaksi'
+                                  buttonLabel='Batalkan'
+                                  onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id, act: 'archive'}}))}
+                                />
+                              ) : (
+                                <ConfirmArchiveTransaction
+                                  label='Kembalikan Transaksi'
+                                  description='Apakah anda yakin ingin mengembalikan transaksi ini?'
+                                  buttonLabel='Kembalikan'
+                                  onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id, act: 'unarchive'}}))}
+                                />
+                              )}
+                            </>
                           )}
                           <ConfirmDelete 
                             label='Hapus Transaksi'

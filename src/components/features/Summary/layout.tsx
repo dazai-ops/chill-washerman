@@ -21,6 +21,7 @@ import { getTransaction, getTransactionForChart } from '@/lib/thunk/transaction/
 //utils
 import { transactionTableColumns } from '@/features/transaction/columns'
 import { Transaction } from '@/models/transaction.model'
+import ExportCSVButton from '../../ui/CSV/CsvButton';
 
 interface SummaryDataProps {
   completed: Array<Transaction>
@@ -103,31 +104,40 @@ function HistoryLayout() {
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
-      <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] mt-10">
-        <Flex justify="end" align="center" className='mb-2 gap-2'>
-          <Button color='gray' size="2" onClick={() => handleFilterDate('all')}>
-            <CalendarIcon/>
-            Semua
-          </Button>
-          <Button color='gray' size="2" onClick={() => handleFilterDate('today')}>
-            <CalendarIcon/>
-            Hari ini
-          </Button>
-          <Button color='gray' size="2" onClick={() => handleFilterDate('week')}>
-            <CalendarIcon/>
-            Minggu ini
-          </Button>
-          <Button color='gray' size="2" onClick={() => handleFilterDate('month')}>
-            <CalendarIcon/>
-            Bulan ini
-          </Button>
-          <Button color='gray' size="2" onClick={() => handleFilterDate('last_month')}>
-            <CalendarIcon/>
-            Bulan lalu
-          </Button>
-          <DatePicker label='Tanggal mulai' onDateChange={(date) => setStartDate(date)}/>
-          <DatePicker label='Tanggal akhir' onDateChange={(date) => setEndDate(date)}/>
-        </Flex>
+      <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] mt-10 flex justify-between">
+        {loading ? (
+          <Spinner/>
+        ) : (
+          <>
+            <Flex justify="start" align="center" className='mb-2'>
+              <ExportCSVButton data={transactionTableData}/>
+            </Flex>
+            <Flex justify="end" align="center" className='mb-2 gap-2'>
+              <Button color='gray' size="2" onClick={() => handleFilterDate('all')}>
+                <CalendarIcon/>
+                Semua
+              </Button>
+              <Button color='gray' size="2" onClick={() => handleFilterDate('today')}>
+                <CalendarIcon/>
+                Hari ini
+              </Button>
+              <Button color='gray' size="2" onClick={() => handleFilterDate('week')}>
+                <CalendarIcon/>
+                Minggu ini
+              </Button>
+              <Button color='gray' size="2" onClick={() => handleFilterDate('month')}>
+                <CalendarIcon/>
+                Bulan ini
+              </Button>
+              <Button color='gray' size="2" onClick={() => handleFilterDate('last_month')}>
+                <CalendarIcon/>
+                Bulan lalu
+              </Button>
+              <DatePicker label='Tanggal mulai' onDateChange={(date) => setStartDate(date)}/>
+              <DatePicker label='Tanggal akhir' onDateChange={(date) => setEndDate(date)}/>
+            </Flex>
+          </>
+        )}
       </div>
       {loading ? (
         <Spinner className='mt-8 mb-4'/>  
