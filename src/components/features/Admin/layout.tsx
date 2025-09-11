@@ -2,7 +2,7 @@
 
 // lib
 import { useEffect, useState } from 'react'
-import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
+import { DropdownMenu, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 
 // redux
@@ -24,6 +24,7 @@ import AdminCreateModal from '@/components/modal/AdminModal/AdminCreateModal';
 import AdminEditModal from '@/components/modal/AdminModal/AdminEditModal';
 import ConfirmDeleteDialog from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import ConfirmChangeDialog from '@/components/dialog/ConfirmChange/ConfirmChange';
+import LoadingBars from '@/components/layout/LoadingBars/LoadingBars';
 
 const AdminLayout = () => {
   const tableColumns = adminTableColumns
@@ -54,9 +55,7 @@ const AdminLayout = () => {
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
-      {loading ? (
-        <Spinner className='mt-8 mb-4'/>  
-      ): (
+      {loading ? <LoadingBars/> : null}
         <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] px-3 mt-10">
           {segmented === 'table' ?  
             <DataTable 
@@ -186,7 +185,6 @@ const AdminLayout = () => {
             />
           }
         </div>
-      )}
     </div>
   )
 }

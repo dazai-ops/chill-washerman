@@ -23,6 +23,7 @@ import SegmentedControl from '@/components/layout/SegmentedControl/SegementedCon
 
 //utils
 import { formatRupiah } from '@/utils/helpers/formatters/rupiah';
+import LoadingBars from '@/components/layout/LoadingBars/LoadingBars';
 
 const ApparelLayout = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -47,7 +48,7 @@ const ApparelLayout = () => {
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
-      {loading ? <Spinner className='mt-8 mb-4'/> : null}
+      {loading ? <LoadingBars/> : null}
       <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] mt-10">
         {segmented === 'table' ? (
           <DataTable 

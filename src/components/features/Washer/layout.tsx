@@ -23,8 +23,8 @@ import WasherCreateModal from '@/components/modal/WasherModal/WasherCreateModal'
 
 //utils
 import { washerTableColumns } from '@/features/washer/columns';
-import { formatDate } from '@/utils/helpers/formatters/date';
 import WasherTrackingServiceDialog from '../../modal/WasherModal/WasherTrackingServiceDialog';
+import LoadingBars from '@/components/layout/LoadingBars/LoadingBars';
 
 const WasherLayout = () => {
   const columns = washerTableColumns
@@ -47,7 +47,7 @@ const WasherLayout = () => {
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
-      {loading ? <Spinner className='mt-8'/> : null}
+      {loading ? <LoadingBars/> : null}
       <div className='w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] mt-10'>
         {segmented === 'table' ?
           <DataTable 

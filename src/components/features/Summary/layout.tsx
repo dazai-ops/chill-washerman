@@ -4,9 +4,9 @@
 import { useState } from 'react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { CalendarIcon } from '@radix-ui/react-icons';
+import { CalendarIcon, DownloadIcon } from '@radix-ui/react-icons';
 import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
-import { Spinner, Flex, Button, Text, Badge } from '@radix-ui/themes'
+import { Spinner, Flex, Button, Text, Badge, DropdownMenu, Skeleton } from '@radix-ui/themes'
 
 //components
 import { ChartBarInteractive } from '@/components/layout/BarChart/BarChart'
@@ -21,7 +21,8 @@ import { getTransaction, getTransactionForChart } from '@/lib/thunk/transaction/
 //utils
 import { transactionTableColumns } from '@/features/transaction/columns'
 import { Transaction } from '@/models/transaction.model'
-import ExportCSVButton from '../../ui/CSV/CsvButton';
+import ExportHistory from '@/components/layout/ExportToDoc/ExportButton';
+import LoadingBars from '@/components/layout/LoadingBars/LoadingBars';
 
 interface SummaryDataProps {
   completed: Array<Transaction>
@@ -104,64 +105,71 @@ function HistoryLayout() {
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
+      {loading ? <LoadingBars/> : null}
       <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] mt-10 flex justify-between">
-        {loading ? (
-          <Spinner/>
-        ) : (
-          <>
-            <Flex justify="start" align="center" className='mb-2'>
-              <ExportCSVButton data={transactionTableData}/>
-            </Flex>
-            <Flex justify="end" align="center" className='mb-2 gap-2'>
-              <Button color='gray' size="2" onClick={() => handleFilterDate('all')}>
-                <CalendarIcon/>
-                Semua
+        <Flex justify="start" align="center" className='mb-2'>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Button variant="solid">
+                <DownloadIcon /> Export
+                <DropdownMenu.TriggerIcon />
               </Button>
-              <Button color='gray' size="2" onClick={() => handleFilterDate('today')}>
-                <CalendarIcon/>
-                Hari ini
-              </Button>
-              <Button color='gray' size="2" onClick={() => handleFilterDate('week')}>
-                <CalendarIcon/>
-                Minggu ini
-              </Button>
-              <Button color='gray' size="2" onClick={() => handleFilterDate('month')}>
-                <CalendarIcon/>
-                Bulan ini
-              </Button>
-              <Button color='gray' size="2" onClick={() => handleFilterDate('last_month')}>
-                <CalendarIcon/>
-                Bulan lalu
-              </Button>
-              <DatePicker label='Tanggal mulai' onDateChange={(date) => setStartDate(date)}/>
-              <DatePicker label='Tanggal akhir' onDateChange={(date) => setEndDate(date)}/>
-            </Flex>
-          </>
-        )}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item color='gray' className='mb-1'>
+                <ExportHistory data={transactionTableData} docType='xlsx'/>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item color='gray'> 
+                <ExportHistory data={transactionTableData} docType='csv'/>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+
+        </Flex>
+        <Flex justify="end" align="center" className='mb-2 gap-2'>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('all')}>
+            <CalendarIcon/>
+            Semua
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('today')}>
+            <CalendarIcon/>
+            Hari ini
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('week')}>
+            <CalendarIcon/>
+            Minggu ini
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('month')}>
+            <CalendarIcon/>
+            Bulan ini
+          </Button>
+          <Button color='gray' size="2" onClick={() => handleFilterDate('last_month')}>
+            <CalendarIcon/>
+            Bulan lalu
+          </Button>
+          <DatePicker label='Tanggal mulai' onDateChange={(date) => setStartDate(date)}/>
+          <DatePicker label='Tanggal akhir' onDateChange={(date) => setEndDate(date)}/>
+        </Flex>
       </div>
-      {loading ? (
-        <Spinner className='mt-8 mb-4'/>  
-      ): (  
-        <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px]">
-          <ChartBarInteractive data={transactionChartData ?? []}/>
-          <Flex gap="2" className='mt-3' justify="between" align="start">
-            <Flex justify="center" align="center" direction="column" gap="1" className='w-1/2'>
-              <Text className='font-bold text-end mb-1'>
-                <Badge size="2" color='green'>Selesai</Badge>
-              </Text>
-              <DataTable columns={columns} data={result.completed ?? []}/>
-            </Flex>
-            <Flex justify="center" align="center" direction="column" gap="1" className='w-1/2'>
-              <Text className='font-bold text-end'>
-                <Badge size="2" color='yellow'>
-                  Belum Selesai
-                </Badge>
-              </Text>
-              <DataTable columns={columns} data={result.incomplete ?? []}/>
-            </Flex>
+      <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px]">
+        <ChartBarInteractive data={transactionChartData ?? []}/>
+        <Flex gap="2" className='mt-3' justify="between" align="start">
+          <Flex justify="center" align="center" direction="column" gap="1" className='w-1/2'>
+            <Text className='font-bold text-end mb-1'>
+              <Badge size="2" color='green'>Selesai</Badge>
+            </Text>
+            <DataTable columns={columns} data={result.completed ?? []}/>
           </Flex>
-        </div>
-      )}
+          <Flex justify="center" align="center" direction="column" gap="1" className='w-1/2'>
+            <Text className='font-bold text-end'>
+              <Badge size="2" color='yellow'>
+                Belum Selesai
+              </Badge>
+            </Text>
+            <DataTable columns={columns} data={result.incomplete ?? []}/>
+          </Flex>
+        </Flex>
+      </div>
     </div>
   )
 }

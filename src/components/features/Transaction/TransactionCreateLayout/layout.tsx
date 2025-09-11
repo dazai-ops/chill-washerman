@@ -19,13 +19,14 @@ import { CreateTransactionDetail, CreateTransaction } from '@/models/transaction
 
 //components
 import InputRupiah from '@/components/ui/InputRupiah/InputRupiah';
+import { Spinner as ShadcnSpinner } from '@/components/ui/shadcn-io/spinner';
 
 function CreateTransaksiForm() {
   const dispatch = useDispatch<AppDispatch>()
 
   const admin = useSelector((state: RootState) => state.auth.user)
   const {apparelList} = useSelector((state: RootState) => state.apparel)
-  const {transactionOverview, transactionDetail, status} = useSelector((state: RootState) => state.transaksi)
+  const {transactionOverview, transactionDetail, status, loading} = useSelector((state: RootState) => state.transaksi)
 
   const totalWeight = transactionDetail.reduce((sum, detail) => sum + detail!.berat_kg, 0);
   const totalItems = transactionDetail.reduce((sum, detail) => sum + detail!.jumlah_item, 0);
@@ -133,370 +134,379 @@ function CreateTransaksiForm() {
   // },[transactionOverview, transactionDetail])
 
   return (
-    <div className='w-full flex flex-col items-center'>
-      <div className='w-full sm:w-[600px] md:w-[900px] lg:w-[1200px] mt-10'>
-        <Callout.Root className='mb-2'>
-          <Callout.Icon>
-            <InfoCircledIcon />
-          </Callout.Icon>
-          <Callout.Text>
-            Data akan tersimpan hingga anda mekana button <b>Simpan</b>!
-          </Callout.Text>
-        </Callout.Root>
-        {admin?.nama ? (
-          <form onSubmit={handleSubmit}>
-            <Box>
-              <Card size="2" className='mb-3'>
-                <Flex gap="2">
-                  <Flex direction={"column"}>
-                    <Flex gap={"2"} className='mb-1'>
-                      <Box>
-                        <Text size={"1"} weight={"bold"}>Nama Admin</Text>
-                        <TextField.Root 
-                          type='text'
-                          name='dibuat_oleh'
-                          size={"2"} 
-                          value={transactionOverview.dibuat_oleh?.nama}
-                          readOnly 
-                        />
-                      </Box>
-                      <Box>
-                        <Text size={"1"} weight={"bold"}>Kode Transaksi</Text>
-                        <TextField.Root 
-                          type='text'
-                          name='kode_transaksi'
-                          size={"2"} 
-                          value={transactionOverview.kode_transaksi}
-                          onChange={(event) => updateTransactionOverview('kode_transaksi', event.target.value)}
-                          readOnly 
-                        />
-                      </Box>
+    <>
+    {loading ? (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-500 opacity-50">
+        <ShadcnSpinner variant="bars" className="text-black" />
+      </div>
+    ) : (
+      <div className='w-full flex flex-col items-center'>
+        <div className='w-full sm:w-[600px] md:w-[900px] lg:w-[1200px] mt-10'>
+          <Callout.Root className='mb-2'>
+            <Callout.Icon>
+              <InfoCircledIcon />
+            </Callout.Icon>
+            <Callout.Text>
+              Data akan tersimpan hingga anda mekana button <b>Simpan</b>!
+            </Callout.Text>
+          </Callout.Root>
+          {admin?.nama ? (
+            <form onSubmit={handleSubmit}>
+              <Box>
+                <Card size="2" className='mb-3'>
+                  <Flex gap="2">
+                    <Flex direction={"column"}>
+                      <Flex gap={"2"} className='mb-1'>
+                        <Box>
+                          <Text size={"1"} weight={"bold"}>Nama Admin</Text>
+                          <TextField.Root 
+                            type='text'
+                            name='dibuat_oleh'
+                            size={"2"} 
+                            value={transactionOverview.dibuat_oleh?.nama}
+                            readOnly 
+                          />
+                        </Box>
+                        <Box>
+                          <Text size={"1"} weight={"bold"}>Kode Transaksi</Text>
+                          <TextField.Root 
+                            type='text'
+                            name='kode_transaksi'
+                            size={"2"} 
+                            value={transactionOverview.kode_transaksi}
+                            onChange={(event) => updateTransactionOverview('kode_transaksi', event.target.value)}
+                            readOnly 
+                          />
+                        </Box>
+                      </Flex>
+                      <Flex gap={"2"} className='mb-1'>
+                        <Box>
+                          <Text size={"1"} weight={"bold"}>Nama Pelanggan</Text>
+                          <TextField.Root 
+                            type='text'
+                            name='nama_pelanggan'
+                            size={"2"}
+                            className='mb-1'
+                            value={transactionOverview.nama_pelanggan}
+                            onChange={(event) => updateTransactionOverview('nama_pelanggan', event.target.value)}
+                          />
+                        </Box>
+                        <Box>
+                          <Text size={"1"} weight={"bold"}>Telepon Customer</Text>
+                          <TextField.Root 
+                            type='number'
+                            name='telepon_pelanggan'
+                            size={"2"}
+                            value={transactionOverview?.telepon_pelanggan || ""}
+                            onChange={(event) => updateTransactionOverview('telepon_pelanggan', event.target.value)}
+                          />
+                        </Box>
+                      </Flex>
+                      <Flex>
+                        <Box width="100%">
+                          <Text size={"1"} weight="bold">Catatan</Text>
+                          <TextArea
+                            value={transactionOverview.catatan}
+                            onChange={(event) => updateTransactionOverview('catatan', event.target.value)}
+                            name='catatan' 
+                          />
+                        </Box>
+                      </Flex>
                     </Flex>
-                    <Flex gap={"2"} className='mb-1'>
-                      <Box>
-                        <Text size={"1"} weight={"bold"}>Nama Pelanggan</Text>
-                        <TextField.Root 
-                          type='text'
-                          name='nama_pelanggan'
-                          size={"2"}
-                          className='mb-1'
-                          value={transactionOverview.nama_pelanggan}
-                          onChange={(event) => updateTransactionOverview('nama_pelanggan', event.target.value)}
-                        />
-                      </Box>
-                      <Box>
-                        <Text size={"1"} weight={"bold"}>Telepon Customer</Text>
-                        <TextField.Root 
-                          type='number'
-                          name='telepon_pelanggan'
-                          size={"2"}
-                          value={transactionOverview?.telepon_pelanggan || ""}
-                          onChange={(event) => updateTransactionOverview('telepon_pelanggan', event.target.value)}
-                        />
-                      </Box>
-                    </Flex>
-                    <Flex>
-                      <Box width="100%">
-                        <Text size={"1"} weight="bold">Catatan</Text>
-                        <TextArea
-                          value={transactionOverview.catatan}
-                          onChange={(event) => updateTransactionOverview('catatan', event.target.value)}
-                          name='catatan' 
-                        />
-                      </Box>
-                    </Flex>
-                  </Flex>
-                  <Flex direction={"column"}>
-                    <Flex gap={"2"}>
-                      <Box>
-                        <Text size={"1"} weight={"bold"}>Sisa Bayar</Text>
-                        <TextField.Root 
-                          size={"2"} 
-                          value={ transactionOverview.sisa_bayar !== undefined ? formatRupiah(transactionOverview.sisa_bayar) : formatRupiah(0)}
-                          readOnly
-                        />
-                      </Box>
-                      <Box>
-                        <Text size={"1"} weight={"bold"}>Kembalian</Text>
-                        <TextField.Root 
-                          size={"2"} 
-                          value={ transactionOverview.kembalian !== undefined ? formatRupiah(transactionOverview.kembalian) : formatRupiah(0)}
-                          readOnly
-                        />
-                      </Box>
-                    </Flex>
-                    <Flex gap={"2"}>
-                      <Box>
-                        <Text size={"1"} weight={"bold"} color='yellow'>Total Harga</Text>
-                        <TextField.Root 
-                          name='total_harga'
-                          size={"2"}
-                          value={transactionOverview.total_harga !== undefined ? formatRupiah(transactionOverview.total_harga) : formatRupiah(0)}
-                          readOnly
-                        />
-                      </Box>
-                      <Box>
-                        <InputRupiah
-                          // style={{width: "155px"}}
-                          label='Dibayarkan'
-                          name='harga_per_item'
-                          size='2'
-                          labelSize='1'
-                          className="mb-1"
-                          labelColor='green'
-                          onChange={(value: string) => updateTransactionOverview('dibayarkan', Number(value))}
-                        />
-                      </Box>
-                    </Flex>
+                    <Flex direction={"column"}>
+                      <Flex gap={"2"}>
+                        <Box>
+                          <Text size={"1"} weight={"bold"}>Sisa Bayar</Text>
+                          <TextField.Root 
+                            size={"2"} 
+                            value={ transactionOverview.sisa_bayar !== undefined ? formatRupiah(transactionOverview.sisa_bayar) : formatRupiah(0)}
+                            readOnly
+                          />
+                        </Box>
+                        <Box>
+                          <Text size={"1"} weight={"bold"}>Kembalian</Text>
+                          <TextField.Root 
+                            size={"2"} 
+                            value={ transactionOverview.kembalian !== undefined ? formatRupiah(transactionOverview.kembalian) : formatRupiah(0)}
+                            readOnly
+                          />
+                        </Box>
+                      </Flex>
+                      <Flex gap={"2"}>
+                        <Box>
+                          <Text size={"1"} weight={"bold"} color='yellow'>Total Harga</Text>
+                          <TextField.Root 
+                            name='total_harga'
+                            size={"2"}
+                            value={transactionOverview.total_harga !== undefined ? formatRupiah(transactionOverview.total_harga) : formatRupiah(0)}
+                            readOnly
+                          />
+                        </Box>
+                        <Box>
+                          <InputRupiah
+                            // style={{width: "155px"}}
+                            label='Dibayarkan'
+                            name='harga_per_item'
+                            size='2'
+                            labelSize='1'
+                            className="mb-1"
+                            labelColor='green'
+                            onChange={(value: string) => updateTransactionOverview('dibayarkan', Number(value))}
+                          />
+                        </Box>
+                      </Flex>
 
-                  </Flex>
-                  <Box width={"40%"}>
-                    <Table.Root size="1" variant='surface'>
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.ColumnHeaderCell align='center'>No</Table.ColumnHeaderCell>
-                          <Table.ColumnHeaderCell align='center'>Jenis Pakaian</Table.ColumnHeaderCell>
-                          <Table.ColumnHeaderCell align='center'>Berat (kg)</Table.ColumnHeaderCell>
-                          <Table.ColumnHeaderCell align='center'>Jumlah</Table.ColumnHeaderCell>
-                          <Table.ColumnHeaderCell align='center'>Biaya</Table.ColumnHeaderCell>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {transactionDetail[0]?.jenis_pakaian.id && transactionDetail.map((detail, index) => (
-                          detail && (
-                            <Table.Row key={index}>
-                              <Table.RowHeaderCell align='center'>{index + 1}</Table.RowHeaderCell>
-                              <Table.RowHeaderCell align='center'>{detail.jenis_pakaian.jenis_pakaian}</Table.RowHeaderCell>
-                              <Table.Cell align='center'>{detail.berat_kg}</Table.Cell>
-                              <Table.Cell align='center'>{detail.jumlah_item}</Table.Cell>
-                              <Table.Cell align='center'>{formatRupiah(detail.total_harga_layanan)}</Table.Cell>
-                            </Table.Row>
-                          )
-                        ))}
+                    </Flex>
+                    <Box width={"40%"}>
+                      <Table.Root size="1" variant='surface'>
+                        <Table.Header>
                           <Table.Row>
-                            <Table.Cell colSpan={2} align='center' className='font-bold'>Total</Table.Cell>
-                            <Table.Cell align='center' className='font-bold'>{totalWeight}</Table.Cell>
-                            <Table.Cell align='center' className='font-bold'>{totalItems}</Table.Cell>
-                            <Table.Cell align='center' className='font-bold'>{formatRupiah(totalPrice)}</Table.Cell>
+                            <Table.ColumnHeaderCell align='center'>No</Table.ColumnHeaderCell>
+                            <Table.ColumnHeaderCell align='center'>Jenis Pakaian</Table.ColumnHeaderCell>
+                            <Table.ColumnHeaderCell align='center'>Berat (kg)</Table.ColumnHeaderCell>
+                            <Table.ColumnHeaderCell align='center'>Jumlah</Table.ColumnHeaderCell>
+                            <Table.ColumnHeaderCell align='center'>Biaya</Table.ColumnHeaderCell>
                           </Table.Row>
-                      </Table.Body>
-                    </Table.Root>
-                  </Box>
+                        </Table.Header>
+                        <Table.Body>
+                          {transactionDetail[0]?.jenis_pakaian.id && transactionDetail.map((detail, index) => (
+                            detail && (
+                              <Table.Row key={index}>
+                                <Table.RowHeaderCell align='center'>{index + 1}</Table.RowHeaderCell>
+                                <Table.RowHeaderCell align='center'>{detail.jenis_pakaian.jenis_pakaian}</Table.RowHeaderCell>
+                                <Table.Cell align='center'>{detail.berat_kg}</Table.Cell>
+                                <Table.Cell align='center'>{detail.jumlah_item}</Table.Cell>
+                                <Table.Cell align='center'>{formatRupiah(detail.total_harga_layanan)}</Table.Cell>
+                              </Table.Row>
+                            )
+                          ))}
+                            <Table.Row>
+                              <Table.Cell colSpan={2} align='center' className='font-bold'>Total</Table.Cell>
+                              <Table.Cell align='center' className='font-bold'>{totalWeight}</Table.Cell>
+                              <Table.Cell align='center' className='font-bold'>{totalItems}</Table.Cell>
+                              <Table.Cell align='center' className='font-bold'>{formatRupiah(totalPrice)}</Table.Cell>
+                            </Table.Row>
+                        </Table.Body>
+                      </Table.Root>
+                    </Box>
+                  </Flex>
+                </Card>
+              </Box>
+
+              <Box>
+                {transactionDetail.map((detail, index) => (
+                  detail && (
+                    <Card size="2" key={index} className='mb-1'>
+                      <Flex justify={"between"}>
+                        <Text size="4" weight={"bold"}>
+                          Service 
+                          <Text color='red'> #{index + 1}</Text>
+                        </Text>
+                        <Box>
+                          {transactionDetail.length > 1 && (
+                            <Button color='red' variant='soft' size={"1"} type='button' onClick={() => dispatch(removeTransactionDetailForm({index}))}>
+                              Hapus
+                            </Button>
+                          )}
+                        </Box>
+                      </Flex>
+                      
+                      <Flex gap="4" className='mb-1'>
+                        <Box width="200px">
+                          <Box>
+                            <Text size="1" weight="bold">Jenis Pakaian</Text>
+                          </Box>
+                          <Select.Root 
+                            value={String(detail.jenis_pakaian?.id)} 
+                            size={"2"}
+                            name='jenis_pakaian'
+                            onValueChange={(value) => updateClothingType(value, 'jenis_pakaian', index)}
+                          >
+                            <Select.Trigger placeholder='Pilih Jenis Pakaian' style={{ width: "100%" }} />
+                            <Select.Content>
+                              <Select.Group>
+                                <Select.Label>Jenis Pakaian</Select.Label>
+                                {apparelList.map(( jenis_pakaian, index ) => (
+                                  <Select.Item key={index} value={String(jenis_pakaian.id)}>
+                                    {jenis_pakaian.jenis_pakaian}
+                                  </Select.Item>
+                                ))}
+                              </Select.Group>
+                            </Select.Content>
+                          </Select.Root>
+                        </Box>
+                        
+                        
+                        {detail.jenis_pakaian?.jenis_pakaian && (
+                          <>
+                            <Flex direction={"column"}>
+                              <Flex gap={"2"} className='mb-1 w-full' justify={"between"}>
+                                <Flex gap={"2"} width={"350px"}>
+                                  <Box width="50%">
+                                    <Text size="1" weight="bold">Satuan Pakaian</Text>
+                                    <TextField.Root 
+                                      type='text'
+                                      className="w-full" 
+                                      size={"2"}
+                                      value={detail.jenis_pakaian?.satuan || "-"}
+                                      readOnly
+                                    />
+                                  </Box>
+                                  <Box width="50%">
+                                    <Text size="1" weight="bold">Harga / Kg</Text>
+                                    <TextField.Root 
+                                      // type='number'
+                                      className="w-full" 
+                                      size={"2"} 
+                                      value={ detail.jenis_pakaian?.harga_per_kg && formatRupiah(detail.jenis_pakaian?.harga_per_kg) || "-"}
+                                      readOnly
+                                    />
+                                  </Box>
+                                </Flex>
+                                <Flex gap={"2"} width={"350px"}>
+                                  <Box width="50%">
+                                    <Text size="1" weight="bold">Harga / Item</Text>
+                                    <TextField.Root 
+                                      className="w-full" 
+                                      size={"2"} 
+                                      value={ detail.jenis_pakaian?.harga_per_item && formatRupiah(detail.jenis_pakaian?.harga_per_item) || "-"}
+                                      readOnly
+                                    />
+                                  </Box>
+                                  <Box width="50%">
+                                    <Text size={"1"} weight={"bold"} color='yellow'>Total Harga</Text>
+                                    <TextField.Root 
+                                      name='total_harga'
+                                      size={"2"}
+                                      value={ detail.total_harga_layanan && formatRupiah(detail.total_harga_layanan) || "Rp 0"}
+                                      readOnly
+                                    />
+                                  </Box>
+                                </Flex>
+                              </Flex>
+                              <Flex gap={"2"}>
+                                <Flex gap={"2"} width={"350px"}>
+                                  <Box width="50%">
+                                    <Text size="1" weight="bold">Berat (kg)</Text>
+                                    <TextField.Root
+                                      type='number'
+                                      className="w-full"
+                                      name='berat_kg'
+                                      size={"2"}
+                                      value={String(detail.berat_kg)}
+                                      onChange={(event) => updateTransactionDetail(index, 'berat_kg', Number(event.target.value))}
+                                    />
+                                  </Box>
+                                  <Box width="50%">
+                                    <Text size="1" weight="bold">Jumlah Item</Text>
+                                    <TextField.Root 
+                                      type='number'
+                                      className="w-full" 
+                                      name='jumlah_item' 
+                                      size={"2"}
+                                      value={String(detail.jumlah_item)}
+                                      onChange={(event) => updateTransactionDetail(index, 'jumlah_item', Number(event.target.value))}
+                                    />
+                                  </Box>
+                                </Flex>
+                                <Flex gap={"2"} width={"350px"}>
+                                  <Box width="50%">
+                                    <Text size="1" weight="bold">Layanan Setrika</Text>
+                                    <RadioCards.Root
+                                      name="layanan_setrika"
+                                      columns={{ initial: "1", sm: "1" }} 
+                                      size={"1"}
+                                      value={String(detail.layanan_setrika)}
+                                      onValueChange={(value) => updateTransactionDetail(index, 'layanan_setrika', value === "true" ? true : false)}
+                                    >
+                                      <Flex gap={"2"}>
+                                        <RadioCards.Item value="true" style={{ width: "50%", height: "33px" }}>
+                                          <Flex direction="column" width="100%">
+                                            <Text className='text-center'>Iya</Text>
+                                          </Flex>
+                                        </RadioCards.Item>
+                                        <RadioCards.Item value="false" style={{ width: "50%", height: "33px" }}>
+                                          <Flex direction="column" width="100%">
+                                            <Text className='text-center'>Tidak</Text>
+                                          </Flex>
+                                        </RadioCards.Item>
+                                      </Flex>
+                                    </RadioCards.Root>
+                                  </Box>
+                                  <Box width="50%">
+                                    <Box>
+                                      <Text size="1" weight="bold">Acuan Harga</Text>
+                                    </Box>
+                                    <Select.Root 
+                                      size={"2"}
+                                      name='mesin_cuci'
+                                      value={String(detail.acuan_harga)}
+                                      onValueChange={(value) => updateTransactionDetail(index, 'acuan_harga', value)}
+                                    >
+                                      <Select.Trigger style={{ width: "100%" }} />
+                                      <Select.Content>
+                                        <Select.Group>
+                                          <Select.Label>Acuan harga</Select.Label>
+                                          <Select.Item value="berat">Berat</Select.Item>
+                                          <Select.Item value="item">Item</Select.Item>
+                                        </Select.Group>
+                                      </Select.Content>
+                                    </Select.Root>
+                                  </Box>
+                                </Flex>
+                              </Flex>
+                              <Flex gap={"2"}>
+                                <Box width="50%">
+                                  <Text size={"1"} weight="bold">Catatan Admin</Text>
+                                  <TextArea 
+                                    name='catatan_admin'
+                                    value={String(detail.catatan_admin)}
+                                    onChange={(event) => updateTransactionDetail(index, 'catatan_admin', event.target.value)}
+                                  />
+                                </Box>
+                                <Box width="50%">
+                                  <Text size={"1"} weight="bold">Catatan Pelanggan</Text>
+                                  <TextArea 
+                                    name='catatan_pelanggan' 
+                                    value={String(detail.catatan_pelanggan)}
+                                    onChange={(event) => updateTransactionDetail(index, 'catatan_pelanggan', event.target.value)}
+                                  />
+                                </Box>
+                              </Flex>
+                            </Flex>
+                          </>       
+                        )}
+                      </Flex>
+                    </Card>
+                  ) 
+                ))}
+                <Flex gap="2" className='mb-5 mt-2'>
+                  <Button type='submit' color='green' variant='soft'>
+                      Simpan
+                  </Button>
+                  <Button 
+                    type='button'
+                    variant='soft'
+                    onClick={() => dispatch(addTransactionDetailForm())}>
+                      Tambah Layanan
+                  </Button>
+                </Flex>
+              </Box>
+            </form>
+          ) : (
+            <Box width={"100%"} className='mb-3'>
+              <Card size="2">
+                <Flex direction="column" gap="2">
+                  <Text size={"1"} weight={"bold"}>Preparing esentials...</Text>
                 </Flex>
               </Card>
             </Box>
-
-            <Box>
-              {transactionDetail.map((detail, index) => (
-                detail && (
-                  <Card size="2" key={index} className='mb-1'>
-                    <Flex justify={"between"}>
-                      <Text size="4" weight={"bold"}>
-                        Service 
-                        <Text color='red'> #{index + 1}</Text>
-                      </Text>
-                      <Box>
-                        {transactionDetail.length > 1 && (
-                          <Button color='red' variant='soft' size={"1"} type='button' onClick={() => dispatch(removeTransactionDetailForm({index}))}>
-                            Hapus
-                          </Button>
-                        )}
-                      </Box>
-                    </Flex>
-                    
-                    <Flex gap="4" className='mb-1'>
-                      <Box width="200px">
-                        <Box>
-                          <Text size="1" weight="bold">Jenis Pakaian</Text>
-                        </Box>
-                        <Select.Root 
-                          value={String(detail.jenis_pakaian?.id)} 
-                          size={"2"}
-                          name='jenis_pakaian'
-                          onValueChange={(value) => updateClothingType(value, 'jenis_pakaian', index)}
-                        >
-                          <Select.Trigger placeholder='Pilih Jenis Pakaian' style={{ width: "100%" }} />
-                          <Select.Content>
-                            <Select.Group>
-                              <Select.Label>Jenis Pakaian</Select.Label>
-                              {apparelList.map(( jenis_pakaian, index ) => (
-                                <Select.Item key={index} value={String(jenis_pakaian.id)}>
-                                  {jenis_pakaian.jenis_pakaian}
-                                </Select.Item>
-                              ))}
-                            </Select.Group>
-                          </Select.Content>
-                        </Select.Root>
-                      </Box>
-                      
-                      
-                      {detail.jenis_pakaian?.jenis_pakaian && (
-                        <>
-                          <Flex direction={"column"}>
-                            <Flex gap={"2"} className='mb-1 w-full' justify={"between"}>
-                              <Flex gap={"2"} width={"350px"}>
-                                <Box width="50%">
-                                  <Text size="1" weight="bold">Satuan Pakaian</Text>
-                                  <TextField.Root 
-                                    type='text'
-                                    className="w-full" 
-                                    size={"2"}
-                                    value={detail.jenis_pakaian?.satuan || "-"}
-                                    readOnly
-                                  />
-                                </Box>
-                                <Box width="50%">
-                                  <Text size="1" weight="bold">Harga / Kg</Text>
-                                  <TextField.Root 
-                                    // type='number'
-                                    className="w-full" 
-                                    size={"2"} 
-                                    value={ detail.jenis_pakaian?.harga_per_kg && formatRupiah(detail.jenis_pakaian?.harga_per_kg) || "-"}
-                                    readOnly
-                                  />
-                                </Box>
-                              </Flex>
-                              <Flex gap={"2"} width={"350px"}>
-                                <Box width="50%">
-                                  <Text size="1" weight="bold">Harga / Item</Text>
-                                  <TextField.Root 
-                                    className="w-full" 
-                                    size={"2"} 
-                                    value={ detail.jenis_pakaian?.harga_per_item && formatRupiah(detail.jenis_pakaian?.harga_per_item) || "-"}
-                                    readOnly
-                                  />
-                                </Box>
-                                <Box width="50%">
-                                  <Text size={"1"} weight={"bold"} color='yellow'>Total Harga</Text>
-                                  <TextField.Root 
-                                    name='total_harga'
-                                    size={"2"}
-                                    value={ detail.total_harga_layanan && formatRupiah(detail.total_harga_layanan) || "Rp 0"}
-                                    readOnly
-                                  />
-                                </Box>
-                              </Flex>
-                            </Flex>
-                            <Flex gap={"2"}>
-                              <Flex gap={"2"} width={"350px"}>
-                                <Box width="50%">
-                                  <Text size="1" weight="bold">Berat (kg)</Text>
-                                  <TextField.Root
-                                    type='number'
-                                    className="w-full"
-                                    name='berat_kg'
-                                    size={"2"}
-                                    value={String(detail.berat_kg)}
-                                    onChange={(event) => updateTransactionDetail(index, 'berat_kg', Number(event.target.value))}
-                                  />
-                                </Box>
-                                <Box width="50%">
-                                  <Text size="1" weight="bold">Jumlah Item</Text>
-                                  <TextField.Root 
-                                    type='number'
-                                    className="w-full" 
-                                    name='jumlah_item' 
-                                    size={"2"}
-                                    value={String(detail.jumlah_item)}
-                                    onChange={(event) => updateTransactionDetail(index, 'jumlah_item', Number(event.target.value))}
-                                  />
-                                </Box>
-                              </Flex>
-                              <Flex gap={"2"} width={"350px"}>
-                                <Box width="50%">
-                                  <Text size="1" weight="bold">Layanan Setrika</Text>
-                                  <RadioCards.Root
-                                    name="layanan_setrika"
-                                    columns={{ initial: "1", sm: "1" }} 
-                                    size={"1"}
-                                    value={String(detail.layanan_setrika)}
-                                    onValueChange={(value) => updateTransactionDetail(index, 'layanan_setrika', value === "true" ? true : false)}
-                                  >
-                                    <Flex gap={"2"}>
-                                      <RadioCards.Item value="true" style={{ width: "50%", height: "33px" }}>
-                                        <Flex direction="column" width="100%">
-                                          <Text className='text-center'>Iya</Text>
-                                        </Flex>
-                                      </RadioCards.Item>
-                                      <RadioCards.Item value="false" style={{ width: "50%", height: "33px" }}>
-                                        <Flex direction="column" width="100%">
-                                          <Text className='text-center'>Tidak</Text>
-                                        </Flex>
-                                      </RadioCards.Item>
-                                    </Flex>
-                                  </RadioCards.Root>
-                                </Box>
-                                <Box width="50%">
-                                  <Box>
-                                    <Text size="1" weight="bold">Acuan Harga</Text>
-                                  </Box>
-                                  <Select.Root 
-                                    size={"2"}
-                                    name='mesin_cuci'
-                                    value={String(detail.acuan_harga)}
-                                    onValueChange={(value) => updateTransactionDetail(index, 'acuan_harga', value)}
-                                  >
-                                    <Select.Trigger style={{ width: "100%" }} />
-                                    <Select.Content>
-                                      <Select.Group>
-                                        <Select.Label>Acuan harga</Select.Label>
-                                        <Select.Item value="berat">Berat</Select.Item>
-                                        <Select.Item value="item">Item</Select.Item>
-                                      </Select.Group>
-                                    </Select.Content>
-                                  </Select.Root>
-                                </Box>
-                              </Flex>
-                            </Flex>
-                            <Flex gap={"2"}>
-                              <Box width="50%">
-                                <Text size={"1"} weight="bold">Catatan Admin</Text>
-                                <TextArea 
-                                  name='catatan_admin'
-                                  value={String(detail.catatan_admin)}
-                                  onChange={(event) => updateTransactionDetail(index, 'catatan_admin', event.target.value)}
-                                />
-                              </Box>
-                              <Box width="50%">
-                                <Text size={"1"} weight="bold">Catatan Pelanggan</Text>
-                                <TextArea 
-                                  name='catatan_pelanggan' 
-                                  value={String(detail.catatan_pelanggan)}
-                                  onChange={(event) => updateTransactionDetail(index, 'catatan_pelanggan', event.target.value)}
-                                />
-                              </Box>
-                            </Flex>
-                          </Flex>
-                        </>       
-                      )}
-                    </Flex>
-                  </Card>
-                ) 
-              ))}
-              <Flex gap="2" className='mb-5 mt-2'>
-                <Button type='submit' color='green' variant='soft'>
-                    Simpan
-                </Button>
-                <Button 
-                  type='button'
-                  variant='soft'
-                  onClick={() => dispatch(addTransactionDetailForm())}>
-                    Tambah Layanan
-                </Button>
-              </Flex>
-            </Box>
-          </form>
-        ) : (
-          <Box width={"100%"} className='mb-3'>
-            <Card size="2">
-              <Flex direction="column" gap="2">
-                <Text size={"1"} weight={"bold"}>Preparing esentials...</Text>
-              </Flex>
-            </Card>
-          </Box>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    )}
+    </>
+
   )
 }
 

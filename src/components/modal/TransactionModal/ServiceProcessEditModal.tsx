@@ -36,7 +36,7 @@ const ServiceProcessEditModal = ({data}: ServiceProcessEditModalProps) => {
     updated_by: ""
   })
   useEffect(() => {
-    dispatch(getWasher({is_active: 'trues'}))
+    dispatch(getWasher({is_active: 'true'}))
   },[data])
 
   useEffect(() => {

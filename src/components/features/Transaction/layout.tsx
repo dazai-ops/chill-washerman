@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge, Button, Link } from '@radix-ui/themes';
+import { DropdownMenu, Box, Flex, Card, Avatar, Text, Badge, Button, Link } from '@radix-ui/themes';
 
 //redux
 import { AppDispatch, RootState } from '@/redux/store';
@@ -18,12 +18,12 @@ import TransactionDetailDialog from '@/components/modal/TransactionModal/Transac
 import ConfirmDelete from '@/components/dialog/ConfirmDelete/ConfirmDelete';
 import SegmentedControl from '@/components/layout/SegmentedControl/SegementedControl';
 import FilterStatusTransaction from '@/components/layout/FilterStatusTransaction/FilterStatustransaction';
-import ExportCSVButton from '@/components/ui/CSV/CsvButton';
 
 //utils
 import { transactionTableColumns } from '@/features/transaction/columns';
 import { formatDate } from '@/utils/helpers/formatters/date';
 import ConfirmArchiveTransaction from '../../dialog/ConfirmArchiveTransaction/ConfirmArchiveTransaction';
+import LoadingBars from '@/components/layout/LoadingBars/LoadingBars';
 
 
 function TransaksiLayout() {
@@ -46,7 +46,7 @@ function TransaksiLayout() {
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
-      {loading ? <Spinner className='mt-8 mb-4'/> : null}
+      {loading ? <LoadingBars/> : null}
       <div className="w-full sm:w-[600px] md:w-[700px] lg:w-[1300px] mt-10">
         {segmented === 'table' ?
           <DataTable 
@@ -66,9 +66,6 @@ function TransaksiLayout() {
                       label='Hapus Transaksi' 
                       onConfirm={() => row.id && dispatch(deleteTransaction({id: row.id}))}
                     />
-                    {/* <ConfirmarchiveTransaction
-                      onConfirm={() => row.id && dispatch(archiveTransaction({id: row.id, payload: {updated_by: user!.id}}))}
-                    /> */}
                   </DropdownMenu.Content>
                 </DropdownMenu.Root>
               )
