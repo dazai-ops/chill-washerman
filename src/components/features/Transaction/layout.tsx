@@ -52,24 +52,6 @@ function TransaksiLayout() {
           <DataTable 
             columns={columns} 
             data={transactionList}
-            renderAction={(row) => (
-              row && (
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger>
-                    <DotsVerticalIcon className='mt-0.5'/>
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Content>
-                    <TransactionDetailDialog data={row}/>
-                    <DropdownMenu.Separator />
-
-                    <ConfirmDelete 
-                      label='Hapus Transaksi' 
-                      onConfirm={() => row.id && dispatch(deleteTransaction({id: row.id}))}
-                    />
-                  </DropdownMenu.Content>
-                </DropdownMenu.Root>
-              )
-            )}
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>

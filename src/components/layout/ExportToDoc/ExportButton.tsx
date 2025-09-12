@@ -2,7 +2,6 @@
 
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { DownloadIcon } from "@radix-ui/react-icons";
 import { Button } from "@radix-ui/themes";
 import { formatToTitleCase } from "@/utils/helpers/formatters/titleCase";
 import { formatDate } from "@/utils/helpers/formatters/date";
@@ -127,8 +126,9 @@ export default function ExportHistory({ data, docType }: { data: Transaction[], 
       color="gray"
       highContrast={docType === 'xlsx' ? false : true}
       onClick={handleExport}
+      style={{width: '50px'}}
     >
-      <DownloadIcon/>{docType === 'xlsx' ? 'XLSX' : 'CSV'}
+      {docType === 'xlsx' ? '.xlsx' : '.csv'}
     </Button>
   );
 }

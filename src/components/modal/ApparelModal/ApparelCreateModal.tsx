@@ -86,7 +86,7 @@ const ApparelCreateModal = () => {
           onClick={() => setOpen(true)} 
           color='gray' 
           highContrast
-        >Add new...
+        >Tambah...
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { DotsVerticalIcon } from '@radix-ui/react-icons';
 import { apparelTableColumns } from '@/features/apparel/columns';
 import { useDispatch, useSelector } from 'react-redux';
-import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
+import { DropdownMenu, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 
 //redux
 import { AppDispatch, RootState } from '@/redux/store';
@@ -54,19 +54,6 @@ const ApparelLayout = () => {
           <DataTable 
             columns={columns} 
             data={apparelList}
-            renderAction={(row) => (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <DotsVerticalIcon className='mt-0.5'/>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <ApparelDetailDialog data={row}/>
-                  <ApparelEditModal data={row}/>
-                  <DropdownMenu.Separator />
-                  <ConfirmDelete onConfirm={() => row.id && dispatch(deleteApparel(String(row.id)))}/>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            )}
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>

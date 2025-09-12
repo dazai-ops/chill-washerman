@@ -80,7 +80,7 @@ const AdminCreateModal = () => {
           onClick={() => setOpen(true)} 
           highContrast
         >
-          <PersonIcon/>Add new...
+          <PersonIcon/>Tambah...
         </Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="600px">

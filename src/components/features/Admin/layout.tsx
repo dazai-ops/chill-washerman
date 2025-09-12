@@ -52,6 +52,7 @@ const AdminLayout = () => {
   //   }
   // }, [adminList])
   // DEBUG -----------------------
+  
   return (
     <div className='w-full flex flex-col items-center'>
       <Tabnav />
@@ -61,39 +62,12 @@ const AdminLayout = () => {
             <DataTable 
               columns={tableColumns} 
               data={adminList}
-              renderAction={(row) => (
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger>
-                    <DotsVerticalIcon className='mt-0.5'/>
-                  </DropdownMenu.Trigger>
-                    <DropdownMenu.Content>
-                      <AdminDetailDialog data={row}/>
-                      {admin?.role === 'superuser' && (
-                      <>
-                        <AdminEditModal 
-                          data={row}
-                        />
-                        <DropdownMenu.Separator />
-                          {row.role === 'admin' 
-                            ? <ConfirmChangeDialog 
-                                label='Set as Superuser' 
-                                onConfirm={() => row.id && dispatch(updateAdminRole({id: row.id, role: 'superuser'}))}
-                              />
-                            : <ConfirmChangeDialog 
-                                label='Set as Admin' 
-                                onConfirm={() => row.id && dispatch(updateAdminRole({id: row.id, role: 'admin'}))}
-                              />
-                          }
-                        <DropdownMenu.Separator />
-                        <ConfirmDeleteDialog onConfirm={() => row.id && dispatch(deleteAdmin(row.id))}/>
-                        </>
-                        )}
-                    </DropdownMenu.Content>
-                </DropdownMenu.Root>
-              )}
               renderToolbar={
                 <>
-                  <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
+                  <SegmentedControl 
+                    segmented={segmented} 
+                    setSegmented = {setSegmented}
+                  />
                   <AdminCreateModal/>
                 </>
               }
@@ -178,7 +152,10 @@ const AdminLayout = () => {
               )}
               renderToolbar={
                 <>
-                  <SegmentedControl segmented={segmented} setSegmented = {setSegmented}/>
+                  <SegmentedControl 
+                    segmented={segmented} 
+                    setSegmented = {setSegmented}
+                  />
                   <AdminCreateModal/>
                 </>
               }

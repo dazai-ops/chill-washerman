@@ -427,9 +427,6 @@ export const updateTransaction = createAsyncThunk<
       if(detailData && detailData.length > 0 && detailData.every(d => d.status_proses === "selesai")){
         newStatusProses = "siap_diambil"
         newTanggalSelesai = new Date()
-      } else if(detailData && detailData.length > 0 && detailData.every(d => d.status_proses === "menunggu")){
-        newStatusProses = "menunggu"
-        newTanggalSelesai = null
       }
 
       const {error: statusError} = await supabase
@@ -504,6 +501,7 @@ export const updateDetailTransactionStatus = createAsyncThunk<
 
       const allWaiting = details.every(d => d.status_proses === 'menunggu')
       const allDone = details.every(d => d.status_proses === 'selesai')
+      const allProcess = details.every(d => d.status_proses === 'dicuci' || d.status_proses === 'dikeringkan' || d.status_proses === 'disetrika')
 
       if(allWaiting){
         await supabase
@@ -511,7 +509,8 @@ export const updateDetailTransactionStatus = createAsyncThunk<
           .update({
             status_proses: 'antrian',
             updated_by: payload.updated_by,
-            updated_at: new Date()
+            updated_at: new Date(),
+            tanggal_selesai: null
           })
           .eq("id", data[0].transaksi_parent)
 
@@ -531,6 +530,25 @@ export const updateDetailTransactionStatus = createAsyncThunk<
             updated_by: payload.updated_by,
             updated_at: new Date(),
             tanggal_selesai: new Date()
+          })
+          .eq("id", data[0].transaksi_parent)
+
+        toast.success('Status layanan berhasil diubah')
+        
+        return {
+          message: "Status layanan berhasil diubah",
+          status: "success"
+        }
+      }
+
+      if(allProcess){
+        await supabase
+          .from("transaksi")
+          .update({
+            status_proses: 'diproses',
+            updated_by: payload.updated_by,
+            updated_at: new Date(),
+            tanggal_selesai: null
           })
           .eq("id", data[0].transaksi_parent)
 

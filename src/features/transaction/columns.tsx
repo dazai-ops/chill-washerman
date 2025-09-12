@@ -25,15 +25,25 @@ export const transactionTableColumns = [
     {
       header: 'Status',
       accessorKey: 'status_proses',
-      cell: ({getValue}: {getValue: () => unknown}) => {
+      cell: ({getValue, row}) => {
         const value = getValue() as string
-        const status = value === 'antrian' ? 'Antrian' : value === 'diproses' ? 'Diproses' : value === 'siap_diambil' ? 'Siap Diambil' : value === 'selesai' ? 'Selesai' : 'Dibatalkan'
+        const data = row.original as {is_archive?: boolean}
 
-        return (
-          <Badge color={status === 'Antrian' ? 'orange' : status === 'Diproses' ? 'iris' : status === 'Siap Diambil' ? 'brown' : status === 'Selesai' ? 'green' : 'red'}>
-            {status}
-          </Badge>
-        )
+        if(data.is_archive){
+          return <Badge color="red">Dibatalkan</Badge>
+        }
+
+        const map: Record<string, { label: string; color: 'orange' | 'iris' | 'brown' | 'green' | 'red' }> = {
+          antrian: { label: 'Antrian', color: 'orange' },
+          diproses: { label: 'Diproses', color: 'iris' },
+          siap_diambil: { label: 'Siap Diambil', color: 'brown' },
+          selesai: { label: 'Selesai', color: 'green' },
+          pending: { label: 'Pending', color: 'red' },
+        }
+
+        const status = map[value] ?? {label: "Unknown", color: "gray"}
+
+        return <Badge color={status.color}>{status.label}</Badge>
       }
     },
     {

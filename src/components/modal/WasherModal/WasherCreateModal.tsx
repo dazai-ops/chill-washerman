@@ -72,7 +72,7 @@ function WasherCreateModal() {
   return (
     <AlertDialog.Root open={open}>
       <AlertDialog.Trigger>
-        <Button size="3" color='gray' onClick={() => setOpen(true)} highContrast>Add new...</Button>
+        <Button size="3" color='gray' onClick={() => setOpen(true)} highContrast>Tambah...</Button>
       </AlertDialog.Trigger>
       <AlertDialog.Content maxWidth="500px">
         <AlertDialog.Title>Tambah Mesin Cuci</AlertDialog.Title>

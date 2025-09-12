@@ -76,8 +76,8 @@ const WasherEditModal = ({data}: {data: Washer}) => {
       setShowConfirm(false)
     } else {
       setShowConfirm(true)
-      toast.success('Data has verified', {
-        description: 'Clik update to save changes',
+      toast.success('Data terverifikasi', {
+        description: 'Klik update untuk melanjutkan',
         position: "top-center"
       })
     }  

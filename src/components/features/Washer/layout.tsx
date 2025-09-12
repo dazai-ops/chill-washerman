@@ -3,7 +3,7 @@
 //lib
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { DropdownMenu, Spinner, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
+import { DropdownMenu, Box, Flex, Card, Avatar, Text, Badge } from '@radix-ui/themes';
 import { ArchiveIcon, DotsVerticalIcon } from '@radix-ui/react-icons';
 
 //redux
@@ -53,25 +53,6 @@ const WasherLayout = () => {
           <DataTable 
             columns={columns}
             data={washerList}
-            renderAction={(row) => (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <DotsVerticalIcon className='mt-0.5'/>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <WasherDetailDialog data={row}/>
-                  <WasherEditModal data={row}/>
-                  <DropdownMenu.Separator />
-                  {row.is_active === true 
-                    ? <ConfirmChangeDialog label='Set as Inactive' customIcon={<ArchiveIcon />} onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: false}))} />
-                    : <ConfirmChangeDialog label='Set as Active' onConfirm={() => dispatch(changeWasherStatus({id: row.id, is_active: true}))}/>
-                  }
-                  {/* <WasherTrackingServiceDialog data={row}/> */}
-                  <DropdownMenu.Separator />
-                  <ConfirmDeleteDialog onConfirm={() => dispatch(deleteWasher(row.id))}/>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            )}
             renderToolbar={
               <>
                 <SegmentedControl segmented={segmented} setSegmented={setSegmented}/>
